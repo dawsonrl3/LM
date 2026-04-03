@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Jigsaw Listening — Why Gen Z Loves Japan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0a1a0f;
+    --surface: #102018;
+    --surface2:#162a1e;
+    --border:  #1e3d2a;
+    --accent:  #00e676;
+    --gold:    #ffca28;
+    --white:   #FFFFFF;
+    --light:   #c8e6c9;
+    --muted:   #6a9e78;
+    --success: #4CAF7D;
+    --error:   #E05C5C;
+    --A:       #00e676;
+    --B:       #40c4ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; padding-bottom: 60px; }
+
+  .header { background: linear-gradient(135deg, #0a1a0f 0%, #102818 100%); border-bottom: 1px solid var(--border); padding: 24px 20px 18px; text-align: center; }
+  .header-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+  .header h1 { font-family: 'Lora', serif; font-size: 1.25rem; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+  .header .sub { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+  .steps { display: flex; justify-content: center; align-items: center; padding: 12px 8px 0; gap: 0; overflow-x: auto; }
+  .step { display: flex; align-items: center; gap: 3px; font-size: 0.5rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); transition: color 0.3s; white-space: nowrap; }
+  .step.active { color: var(--accent); }
+  .step.done   { color: var(--success); }
+  .step-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: 700; background: var(--surface); transition: all 0.3s; }
+  .step.active .step-dot { border-color: var(--accent); color: var(--accent); }
+  .step.done   .step-dot { border-color: var(--success); background: var(--success); color: #fff; }
+  .step-line { width: 8px; height: 2px; background: var(--border); margin: 0 2px; flex-shrink: 0; }
+
+  .screen { display: none; padding: 18px; max-width: 520px; margin: 0 auto; }
+  .screen.active { display: block; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .sec-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 9px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .card-tag { display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 9px; border-radius: 4px; margin-bottom: 9px; }
+  .tag-p1 { background: rgba(0,230,118,0.12); color: var(--accent); }
+  .tag-p2 { background: rgba(64,196,255,0.12); color: var(--B); }
+  .tag-p3 { background: rgba(255,202,40,0.12); color: var(--gold); }
+  .tag-p4 { background: rgba(76,175,125,0.12); color: var(--success); }
+  .card p { font-family: 'Lora', serif; font-size: 0.88rem; line-height: 1.85; color: var(--light); }
+  .card p strong { color: var(--white); font-weight: 600; }
+
+  .instr { background: rgba(0,230,118,0.06); border: 1px solid rgba(0,230,118,0.18); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 0.78rem; color: #a5d6a7; line-height: 1.6; }
+  .instr strong { color: var(--accent); }
+
+  .partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .partner-btn { background: var(--surface2); border: 2px solid var(--border); border-radius: 14px; padding: 16px 10px; text-align: center; cursor: pointer; transition: all 0.2s; color: var(--white); }
+  .partner-btn.sel-A { border-color: var(--A); background: rgba(0,230,118,0.07); }
+  .partner-btn.sel-B { border-color: var(--B); background: rgba(64,196,255,0.07); }
+  .partner-letter { font-size: 1.9rem; font-family: 'Lora', serif; font-weight: 600; margin-bottom: 4px; }
+  .pa { color: var(--A); } .pb { color: var(--B); }
+  .partner-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.45; }
+
+  .field { margin-bottom: 11px; }
+  .field label { display: block; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .field input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Sora', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .field input:focus { border-color: var(--accent); }
+
+  .para-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; font-family: 'Lora', serif; font-size: 0.9rem; line-height: 2.3; color: var(--light); }
+  .para-card strong { color: var(--white); font-weight: 600; }
+  .blank-wrap { display: inline-block; vertical-align: middle; margin: 0 1px; }
+  select.blank { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 7px; color: var(--accent); font-family: 'Sora', sans-serif; font-size: 0.74rem; font-weight: 600; padding: 3px 22px 3px 7px; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2300e676'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; }
+  select.blank.correct { border-color: var(--success); color: var(--success); background-color: rgba(76,175,125,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234CAF7D'/%3E%3C/svg%3E"); }
+  select.blank.wrong   { border-color: var(--error); color: var(--error); background-color: rgba(224,92,92,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23E05C5C'/%3E%3C/svg%3E"); }
+  select.blank option { background: #162a1e; color: var(--white); }
+
+  .fulltext { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; max-height: 260px; overflow-y: auto; }
+  .fulltext p { font-family: 'Lora', serif; font-size: 0.86rem; line-height: 1.85; color: var(--light); margin-bottom: 12px; }
+  .fulltext p:last-child { margin-bottom: 0; }
+  .fulltext p strong { color: var(--white); font-weight: 600; }
+
+  .kw-row { display: grid; grid-template-columns: auto auto 1fr; gap: 6px 10px; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .kw-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .kw-term { font-family: 'Sora', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .kw-jp   { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  .kw-def  { font-size: 0.78rem; color: var(--light); line-height: 1.45; }
+
+  .q-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 11px; }
+  .q-type { font-size: 0.57rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .q-text { font-family: 'Lora', serif; font-size: 0.88rem; color: var(--white); line-height: 1.5; margin-bottom: 10px; font-weight: 600; }
+  .q-option { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 9px; border: 1.5px solid var(--border); margin-bottom: 7px; cursor: pointer; transition: all 0.2s; background: var(--surface2); }
+  .q-option:last-child { margin-bottom: 0; }
+  .q-option:hover { border-color: var(--accent); }
+  .q-option.selected     { border-color: var(--accent);  background: rgba(0,230,118,0.08); }
+  .q-option.correct      { border-color: var(--success); background: rgba(76,175,125,0.1); }
+  .q-option.wrong        { border-color: var(--error);   background: rgba(224,92,92,0.08); }
+  .q-option.show-correct { border-color: var(--success); background: rgba(76,175,125,0.06); }
+  .opt-letter { min-width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
+  .q-option.selected .opt-letter     { background: var(--accent);  color: var(--bg); }
+  .q-option.correct  .opt-letter     { background: var(--success); color: #fff; }
+  .q-option.wrong    .opt-letter     { background: var(--error);   color: #fff; }
+  .q-option.show-correct .opt-letter { background: var(--success); color: #fff; }
+  .opt-text { font-size: 0.82rem; color: var(--light); line-height: 1.45; padding-top: 2px; }
+
+  .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); margin-top: 9px; }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--white); }
+
+  .score-wrap { display: flex; flex-direction: column; align-items: center; padding: 20px 0 12px; }
+  .score-ring { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .score-ring.high { border-color: var(--success); box-shadow: 0 0 22px rgba(76,175,125,0.25); }
+  .score-ring.mid  { border-color: var(--gold);    box-shadow: 0 0 20px rgba(255,202,40,0.2); }
+  .score-ring.low  { border-color: var(--error);   box-shadow: 0 0 20px rgba(224,92,92,0.2); }
+  .score-num   { font-family: 'Lora', serif; font-size: 2rem; font-weight: 600; line-height: 1; }
+  .score-small { font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+  .score-title { font-family: 'Lora', serif; font-size: 1rem; text-align: center; }
+  .score-sub   { font-size: 0.72rem; color: var(--muted); text-align: center; margin-top: 3px; }
+
+  .review-row { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .review-row:last-child { border-bottom: none; }
+  .review-num { min-width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+  .rn-ok  { background: rgba(76,175,125,0.18); color: var(--success); }
+  .rn-bad { background: rgba(224,92,92,0.18);  color: var(--error); }
+  .review-body { flex: 1; }
+  .review-label  { font-size: 0.62rem; color: var(--muted); margin-bottom: 2px; }
+  .review-answer { font-weight: 600; font-size: 0.82rem; }
+  .rev-ok  { color: var(--success); }
+  .rev-bad { color: var(--error); }
+  .review-correct { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .review-correct span { color: var(--success); font-weight: 600; }
+
+  .total-box { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 14px; }
+  .total-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .total-num   { font-family: 'Lora', serif; font-size: 2.6rem; font-weight: 600; line-height: 1; }
+  .total-denom { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .split-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .split-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+  .split-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .split-num   { font-family: 'Lora', serif; font-size: 1.6rem; font-weight: 600; }
+  .split-denom { font-size: 0.63rem; color: var(--muted); }
+
+  #sheetStatus { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Jigsaw Listening + Reading Quiz</div>
+  <h1>Why Gen Z Loves Japan</h1>
+  <p class="sub">Complete the activity with your partner</p>
+</div>
+
+<div class="steps" id="stepBar">
+  <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-dot">2</div><span>P1</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s3"><div class="step-dot">3</div><span>P2</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s4"><div class="step-dot">4</div><span>P3</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s5"><div class="step-dot">5</div><span>P4</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s6"><div class="step-dot">6</div><span>Score</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s7"><div class="step-dot">7</div><span>Quiz</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s8"><div class="step-dot">8</div><span>Final</span></div>
+</div>
+
+<!-- ── Screen 1: Setup ── -->
+<div class="screen active" id="screen1">
+  <div class="sec-label">Your details</div>
+  <div class="field"><label>Student Number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+  <div class="field"><label>Name (Romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+  <div class="sec-label">Your partner role</div>
+  <div class="partner-grid">
+    <div class="partner-btn" id="btnA" onclick="selectPartner('A')">
+      <div class="partner-letter pa">A</div>
+      <div class="partner-desc">Read <strong>P1 &amp; P3</strong> aloud.<br>Fill in blanks for <strong>P2 &amp; P4</strong>.</div>
+    </div>
+    <div class="partner-btn" id="btnB" onclick="selectPartner('B')">
+      <div class="partner-letter pb">B</div>
+      <div class="partner-desc">Read <strong>P2 &amp; P4</strong> aloud.<br>Fill in blanks for <strong>P1 &amp; P3</strong>.</div>
+    </div>
+  </div>
+  <br>
+  <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled>Next →</button>
+</div>
+
+<!-- ── Screen 2: P1 ── -->
+<div class="screen" id="screen2">
+  <div class="instr" id="s2instr"></div>
+  <div id="s2content"></div>
+  <button class="btn btn-primary" onclick="finishScreen(2)">Finished →</button>
+  <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+</div>
+
+<!-- ── Screen 3: P2 ── -->
+<div class="screen" id="screen3">
+  <div class="instr" id="s3instr"></div>
+  <div id="s3content"></div>
+  <button class="btn btn-primary" onclick="finishScreen(3)">Finished →</button>
+  <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+</div>
+
+<!-- ── Screen 4: P3 ── -->
+<div class="screen" id="screen4">
+  <div class="instr" id="s4instr"></div>
+  <div id="s4content"></div>
+  <button class="btn btn-primary" onclick="finishScreen(4)">Finished →</button>
+  <button class="btn btn-ghost" onclick="goTo(3)">← Back</button>
+</div>
+
+<!-- ── Screen 5: P4 ── -->
+<div class="screen" id="screen5">
+  <div class="instr" id="s5instr"></div>
+  <div id="s5content"></div>
+  <button class="btn btn-primary" onclick="finishScreen(5)">Finished →</button>
+  <button class="btn btn-ghost" onclick="goTo(4)">← Back</button>
+</div>
+
+<!-- ── Screen 6: Jigsaw Score ── -->
+<div class="screen" id="screen6">
+  <div class="score-wrap">
+    <div class="score-ring" id="jigsawRing">
+      <div class="score-num" id="jigsawNum">—</div>
+      <div class="score-small">out of 4</div>
+    </div>
+    <div class="score-title" id="jigsawTitle"></div>
+    <div class="score-sub"   id="jigsawSub"></div>
+  </div>
+  <div class="sec-label">Answer review</div>
+  <div class="card" id="jigsawReview"></div>
+  <br>
+  <button class="btn btn-primary" onclick="goTo(7)">Continue to Reading Quiz →</button>
+</div>
+
+<!-- ── Screen 7: Full text + Quiz ── -->
+<div class="screen" id="screen7">
+  <div class="instr">📄 Read the full article, then answer all 10 questions below.</div>
+  <div class="sec-label">Full Article</div>
+  <div class="fulltext">
+    <p><strong>Paragraph 1</strong><br>Many young Americans, called Gen Z, now love Japan more than any other country. In the past, young people loved to visit France or India, but now Japan is the most popular place to go. Today, traveling to Japan is a big dream for many young people who want to see a different world. They see Japan as a special mix of beautiful old culture and very new technology.</p>
+    <p><strong>Paragraph 2</strong><br>Japan's pop culture and food are very famous and <strong>attractive</strong> to young travelers. Many people grew up watching anime like "Naruto" or "Pokémon" and playing video games. Netflix reported that the number of people watching anime grew three times larger over five years. Food is also a very big reason for travel. For example, the famous chef Anthony Bourdain once said he would choose to eat only in Tokyo for the rest of his life. Because of this interest, travel <strong>bookings</strong> for young people have increased by 1,300% since 2019.</p>
+    <p><strong>Paragraph 3</strong><br>Young travelers also visit Japan because it feels very safe and <strong>orderly</strong>. Japan is <strong>ranked</strong> as the number one safest country for crime and for using public transport. For instance, the streets are very clean even though there are almost no trash cans in public. People carry their trash home because they feel it is their own <strong>responsibility</strong> to keep the city clean. Many young Americans like this <strong>civility</strong> because it feels polite and calm compared to their homes. They think Japan feels like a "future" city with fast trains and kind people.</p>
+    <p><strong>Paragraph 4</strong><br>In conclusion, Japan is now a "cultural <strong>superpower</strong>" that <strong>influences</strong> many people around the world. It is not just about toys like Tamagotchi; it is about a way of life that young people <strong>admire</strong>. Japan has replaced France as the country that <strong>defines</strong> high class and good taste for the new generation. For many Gen Z travelers, Japan is the perfect place to find peace and order in a busy world.</p>
+  </div>
+
+  <div class="sec-label">Key Words</div>
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:grid; gap:9px;">
+      <div class="kw-row"><span class="kw-term">Civility</span><span class="kw-jp">礼儀正しさ</span><span class="kw-def">Being polite and kind to other people.</span></div>
+      <div class="kw-row"><span class="kw-term">Obsession</span><span class="kw-jp">執着 Shūchaku</span><span class="kw-def">Thinking about something all the time because you like it so much.</span></div>
+      <div class="kw-row"><span class="kw-term">Destination</span><span class="kw-jp">目的地 Mokutekichi</span><span class="kw-def">The place where someone is going or traveling to.</span></div>
+      <div class="kw-row"><span class="kw-term">Superpower</span><span class="kw-jp">超大国 Chōtaikoku</span><span class="kw-def">A country that is very strong or has a lot of influence.</span></div>
+      <div class="kw-row"><span class="kw-term">Viewership</span><span class="kw-jp">視聴者数</span><span class="kw-def">The total number of people who watch a specific show or movie.</span></div>
+      <div class="kw-row"><span class="kw-term">Bookings</span><span class="kw-jp">予約 Yoyaku</span><span class="kw-def">Arrangements you make to stay in a hotel or travel on a plane.</span></div>
+      <div class="kw-row"><span class="kw-term">Soft power</span><span class="kw-jp">ソフト・パワー</span><span class="kw-def">The power to make people like a country using culture and ideas.</span></div>
+      <div class="kw-row"><span class="kw-term">Attractive</span><span class="kw-jp">魅力的な Miryokuteki na</span><span class="kw-def">Something that makes you want it or want to go there.</span></div>
+      <div class="kw-row"><span class="kw-term">Responsibility</span><span class="kw-jp">責任 Sekinin</span><span class="kw-def">A duty to do something or take care of something.</span></div>
+      <div class="kw-row"><span class="kw-term">Influence</span><span class="kw-jp">影響する Eikyō suru</span><span class="kw-def">To change the way someone thinks or acts.</span></div>
+      <div class="kw-row"><span class="kw-term">Admire</span><span class="kw-jp">尊敬する Sonkei suru</span><span class="kw-def">To think something or someone is very good or impressive.</span></div>
+      <div class="kw-row"><span class="kw-term">Orderly</span><span class="kw-jp">秩序ある Chitsujo aru</span><span class="kw-def">Calm, organized, and following rules.</span></div>
+      <div class="kw-row"><span class="kw-term">Defines</span><span class="kw-jp">定義する Teigi suru</span><span class="kw-def">To show what something means or what it is like.</span></div>
+      <div class="kw-row"><span class="kw-term">Ranked</span><span class="kw-jp">ランク付けされた</span><span class="kw-def">Given a position on a list from best to worst or first to last.</span></div>
+    </div>
+  </div>
+
+  <div class="sec-label">Comprehension Quiz</div>
+  <div id="quizContainer"></div>
+  <button class="btn btn-primary" onclick="submitQuiz()">Submit Quiz →</button>
+</div>
+
+<!-- ── Screen 8: Final Score ── -->
+<div class="screen" id="screen8">
+  <div class="total-box">
+    <div class="total-label">Total Score</div>
+    <div class="total-num" id="totalNum">—</div>
+    <div class="total-denom">out of 14</div>
+  </div>
+  <div class="split-scores">
+    <div class="split-card">
+      <div class="split-label">Jigsaw</div>
+      <div class="split-num" id="finalJigsaw">—</div>
+      <div class="split-denom">out of 4</div>
+    </div>
+    <div class="split-card">
+      <div class="split-label">Quiz</div>
+      <div class="split-num" id="finalQuiz">—</div>
+      <div class="split-denom">out of 10</div>
+    </div>
+  </div>
+  <div class="sec-label">Quiz Review</div>
+  <div class="card" id="quizReview"></div>
+  <div id="sheetStatus"></div>
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzFFKHJgXG6kjkNivzx9eu5ShuzLCtEarJ83rXXQjm3z0OMMTnhVrDLTPn86D5OHnq_uA/exec";
+
+// ── Full paragraph texts ──────────────────────────────────────
+const PARA = {
+  P1: `Many young Americans, called <strong>Gen Z</strong>, now love Japan more than any other country. In the past, young people loved to visit <strong>France or India</strong>, but now Japan is the most popular place to go. Today, traveling to Japan is a big dream for many young people who want to see a different world. They see Japan as a special mix of beautiful old culture and very new technology.`,
+  P2: `Japan's pop culture and food are very famous and <strong>attractive</strong> to young travelers. Many people grew up watching anime like "Naruto" or "Pokémon" and playing video games. Netflix reported that the number of people watching anime grew three times larger over five years. Food is also a very big reason for travel. For example, the famous chef <strong>Anthony Bourdain</strong> once said he would choose to eat only in Tokyo for the rest of his life. Because of this interest, travel <strong>bookings</strong> for young people have increased by <strong>1,300%</strong> since 2019.`,
+  P3: `Young travelers also visit Japan because it feels very safe and <strong>orderly</strong>. Japan is <strong>ranked</strong> as the <strong>number one</strong> safest country for crime and for using public transport. For instance, the streets are very clean even though there are almost no <strong>trash cans</strong> in public. People carry their trash home because they feel it is their own <strong>responsibility</strong> to keep the city clean. Many young Americans like this <strong>civility</strong> because it feels polite and calm compared to their homes. They think Japan feels like a "future" city with fast trains and kind people.`,
+  P4: `In conclusion, Japan is now a "<strong>cultural superpower</strong>" that influences many people around the world. It is not just about toys like <strong>Tamagotchi</strong>; it is about a way of life that young people admire. Japan has replaced France as the country that defines high class and good taste for the new generation. For many Gen Z travelers, Japan is the perfect place to find peace and order in a busy world.`
+};
+
+// ── Jigsaw blanks ─────────────────────────────────────────────
+const BLANKS = {
+  P1: {
+    tagClass: "tag-p1", tagLabel: "Paragraph 1",
+    filledBy: "B",
+    blanks: [
+      { correct: "Gen Z",           options: ["Gen Z","Gen X","Gen Y","Gen A"] },
+      { correct: "France or India", options: ["France or India","France or Italy","Spain or India","France or China"] },
+    ],
+    segments: [
+      `Many young Americans, called `,
+      `, now love Japan more than any other country. In the past, young people loved to visit `,
+      `, but now Japan is the most popular place to go. Today, traveling to Japan is a big dream for many young people who want to see a different world. They see Japan as a special mix of beautiful old culture and very new technology.`,
+    ]
+  },
+  P2: {
+    tagClass: "tag-p2", tagLabel: "Paragraph 2",
+    filledBy: "A",
+    blanks: [
+      { correct: "Anthony Bourdain", options: ["Anthony Bourdain","Gordon Ramsay","Jamie Oliver","David Chang"] },
+      { correct: "1,300%",           options: ["1,300%","1,030%","3,100%","130%"] },
+    ],
+    segments: [
+      `Japan's pop culture and food are very famous and <strong>attractive</strong> to young travelers. Many people grew up watching anime like "Naruto" or "Pokémon" and playing video games. Netflix reported that the number of people watching anime grew three times larger over five years. Food is also a very big reason for travel. For example, the famous chef `,
+      ` once said he would choose to eat only in Tokyo for the rest of his life. Because of this interest, travel <strong>bookings</strong> for young people have increased by `,
+      ` since 2019.`,
+    ]
+  },
+  P3: {
+    tagClass: "tag-p3", tagLabel: "Paragraph 3",
+    filledBy: "B",
+    blanks: [
+      { correct: "number one", options: ["number one","number two","number three","top five"] },
+      { correct: "trash cans", options: ["trash cans","trash bags","trash bins","trash trucks"] },
+    ],
+    segments: [
+      `Young travelers also visit Japan because it feels very safe and <strong>orderly</strong>. Japan is <strong>ranked</strong> as the `,
+      ` safest country for crime and for using public transport. For instance, the streets are very clean even though there are almost no `,
+      ` in public. People carry their trash home because they feel it is their own <strong>responsibility</strong> to keep the city clean. Many young Americans like this <strong>civility</strong> because it feels polite and calm compared to their homes. They think Japan feels like a "future" city with fast trains and kind people.`,
+    ]
+  },
+  P4: {
+    tagClass: "tag-p4", tagLabel: "Paragraph 4",
+    filledBy: "A",
+    blanks: [
+      { correct: "cultural superpower", options: ["cultural superpower","cultural soft power","cultural superstar","cultural superfood"] },
+      { correct: "Tamagotchi",          options: ["Tamagotchi","Nintendo","Pokémon","Hello Kitty"] },
+    ],
+    segments: [
+      `In conclusion, Japan is now a "`,
+      `" that influences many people around the world. It is not just about toys like `,
+      `; it is about a way of life that young people admire. Japan has replaced France as the country that defines high class and good taste for the new generation. For many Gen Z travelers, Japan is the perfect place to find peace and order in a busy world.`,
+    ]
+  }
+};
+
+// ── Quiz data ─────────────────────────────────────────────────
+const quizData = [
+  { type:"Purpose",   q:"Why did the author write this article?",
+    opts:["To explain why Japan is popular with young Americans.","To teach people how to cook Japanese food.","To complain about the trash in the United States."], correct:0 },
+  { type:"Main Idea", q:"What is the main idea of Paragraph 2?",
+    opts:["Netflix is the most popular app in Japan.","Anime and food make young people want to visit Japan.","Anthony Bourdain lived in Tokyo for many years."], correct:1 },
+  { type:"Detail",    q:"By how much did travel bookings to Japan increase since 2019?",
+    opts:["3%","100%","1,300%"], correct:2 },
+  { type:"Vocabulary",q:"In Paragraph 3, what does \"civility\" mean?",
+    opts:["Being very fast and strong.","Being polite and respectful to others.","Buying expensive clothes and toys."], correct:1 },
+  { type:"Inference", q:"Why are the streets in Japan clean if there are no trash cans?",
+    opts:["Because the government pays people to clean every hour.","Because travelers are not allowed to eat outside.","Because people feel it is their job to take their trash home."], correct:2 },
+  { type:"Detail",    q:"Which country was the most popular for \"high class\" style before Japan?",
+    opts:["India","France","Italy"], correct:1 },
+  { type:"Main Idea", q:"What is the \"cultural superpower\" mentioned in the text?",
+    opts:["A country that uses movies and art to influence the world.","A country that has the strongest army in the world.","A country that has the most high-speed trains."], correct:0 },
+  { type:"Vocabulary",q:"What is a \"destination\"?",
+    opts:["A type of Japanese food.","The place where a person is going.","A famous person who travels a lot."], correct:1 },
+  { type:"Inference", q:"How does Gen Z feel about the United States compared to Japan?",
+    opts:["They think the U.S. is more peaceful than Japan.","They think the U.S. is cleaner than Japan.","They think the U.S. can be loud or rude compared to Japan."], correct:2 },
+  { type:"Detail",    q:"Which city is famous for having the most Michelin-starred restaurants?",
+    opts:["Paris","Tokyo","New York"], correct:1 },
+];
+
+// ── State ─────────────────────────────────────────────────────
+let partner       = null;
+let jigsawScore   = 0;
+let jigsawResults = [];
+let quizSelected  = {};
+let quizLocked    = false;
+
+const SCREEN_PARA   = { 2:'P1', 3:'P2', 4:'P3', 5:'P4' };
+const SCREEN_READER = {
+  2: { A:'reader', B:'filler' },
+  3: { A:'filler', B:'reader' },
+  4: { A:'reader', B:'filler' },
+  5: { A:'filler', B:'reader' },
+};
+const PARA_LABEL = { P1:'Paragraph 1', P2:'Paragraph 2', P3:'Paragraph 3', P4:'Paragraph 4' };
+
+// ── Navigation ────────────────────────────────────────────────
+function updateSteps(n) {
+  [1,2,3,4,5,6,7,8].forEach(i => {
+    const el = document.getElementById('s'+i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '✓' : i;
+  });
+}
+
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen'+n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0,0);
+  if (n>=2 && n<=5) buildJigsawScreen(n);
+  if (n===7) buildQuiz();
+}
+
+// ── Setup ─────────────────────────────────────────────────────
+function selectPartner(p) {
+  partner = p;
+  document.getElementById('btnA').className = 'partner-btn' + (p==='A' ? ' sel-A' : '');
+  document.getElementById('btnB').className = 'partner-btn' + (p==='B' ? ' sel-B' : '');
+  checkReady();
+}
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    partner &&
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', checkReady);
+document.getElementById('studentNumber').addEventListener('input', checkReady);
+
+// ── Build jigsaw screens ──────────────────────────────────────
+function buildJigsawScreen(screenNum) {
+  const para      = SCREEN_PARA[screenNum];
+  const role      = SCREEN_READER[screenNum][partner];
+  const instrEl   = document.getElementById(`s${screenNum}instr`);
+  const contentEl = document.getElementById(`s${screenNum}content`);
+  const d         = BLANKS[para];
+
+  if (role === 'reader') {
+    instrEl.innerHTML   = `📖 <strong>Read ${PARA_LABEL[para]} aloud</strong> to your partner. Read slowly and clearly.`;
+    contentEl.innerHTML = `<div class="card"><div class="card-tag ${d.tagClass}">${PARA_LABEL[para]} — Read Aloud</div><p>${PARA[para]}</p></div>`;
+  } else {
+    instrEl.innerHTML   = `👂 <strong>Listen</strong> to your partner read ${PARA_LABEL[para]}. Choose the missing words.`;
+    contentEl.innerHTML = buildBlankPara(para, `s${screenNum}`);
+  }
+}
+
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+function buildBlankPara(para, prefix) {
+  const d = BLANKS[para];
+  let html = `<div class="para-card"><div class="card-tag ${d.tagClass}">${d.tagLabel} — Fill in the blanks</div>`;
+  d.segments.forEach((seg, i) => {
+    html += seg;
+    if (i < d.blanks.length) {
+      const b    = d.blanks[i];
+      const opts = shuffle(b.options);
+      const w    = Math.max(110, Math.max(...opts.map(o => o.length)) * 8) + 'px';
+      html += `<span class="blank-wrap"><select class="blank" id="${prefix}_b${i}" style="width:${w}"><option value="">—</option>`;
+      opts.forEach(o => { html += `<option value="${o}">${o}</option>`; });
+      html += `</select></span>`;
+    }
+  });
+  return html + '</div>';
+}
+
+// ── Finish screen ─────────────────────────────────────────────
+function finishScreen(screenNum) {
+  const para = SCREEN_PARA[screenNum];
+  const role = SCREEN_READER[screenNum][partner];
+  if (role === 'filler') {
+    const d = BLANKS[para];
+    const unanswered = d.blanks.some((_,i) => !document.getElementById(`s${screenNum}_b${i}`)?.value);
+    if (unanswered) { alert('Please choose an answer for every blank.'); return; }
+  }
+  if (screenNum < 5) { goTo(screenNum + 1); }
+  else { scoreJigsaw(); goTo(6); }
+}
+
+// ── Score jigsaw ──────────────────────────────────────────────
+function scoreJigsaw() {
+  jigsawScore   = 0;
+  jigsawResults = [];
+
+  const myScreens = partner === 'A'
+    ? [ {screen:3, para:'P2'}, {screen:5, para:'P4'} ]
+    : [ {screen:2, para:'P1'}, {screen:4, para:'P3'} ];
+
+  myScreens.forEach(({screen, para}) => {
+    BLANKS[para].blanks.forEach((b, i) => {
+      const sel    = document.getElementById(`s${screen}_b${i}`);
+      const chosen = sel ? sel.value : '—';
+      const ok     = chosen === b.correct;
+      if (ok) jigsawScore++;
+      if (sel) sel.className = 'blank ' + (ok ? 'correct' : 'wrong');
+      jigsawResults.push({ num: jigsawResults.length + 1, para, chosen, correct: ok, answer: b.correct });
+    });
+  });
+
+  const pct  = jigsawScore / 4 * 100;
+  const ring = document.getElementById('jigsawRing');
+  ring.className = 'score-ring ' + (pct>=75?'high':pct>=50?'mid':'low');
+  document.getElementById('jigsawNum').textContent = jigsawScore + '/4';
+  const [t,s] = pct===100 ? ['Perfect listening!','Every word correct.']
+    : pct>=75 ? ['Great listening!','You caught almost everything.']
+    : pct>=50 ? ['Good effort!','Check what you missed below.']
+    : ['Keep practising!','Listen carefully next time.'];
+  document.getElementById('jigsawTitle').textContent = t;
+  document.getElementById('jigsawSub').textContent   = s;
+  document.getElementById('jigsawReview').innerHTML  = jigsawResults.map(r => `
+    <div class="review-row">
+      <div class="review-num ${r.correct?'rn-ok':'rn-bad'}">${r.num}</div>
+      <div class="review-body">
+        <div class="review-label">${r.para}</div>
+        <div class="review-answer ${r.correct?'rev-ok':'rev-bad'}">${r.chosen}</div>
+        ${!r.correct?`<div class="review-correct">Correct: <span>${r.answer}</span></div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// ── Build quiz ────────────────────────────────────────────────
+function buildQuiz() {
+  if (document.getElementById('quizContainer').innerHTML) return;
+  const L = ['A','B','C'];
+  document.getElementById('quizContainer').innerHTML = quizData.map((q,qi) => `
+    <div class="q-block">
+      <div class="q-type">${q.type}</div>
+      <div class="q-text">${qi+1}. ${q.q}</div>
+      ${q.opts.map((opt,oi) => `
+        <div class="q-option" id="qo${qi}_${oi}" onclick="selectOpt(${qi},${oi})">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${opt}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function selectOpt(qi, oi) {
+  if (quizLocked) return;
+  quizData[qi].opts.forEach((_,o) => {
+    document.getElementById(`qo${qi}_${o}`).className = 'q-option';
+  });
+  quizSelected[qi] = oi;
+  document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+}
+
+// ── Submit quiz ───────────────────────────────────────────────
+function submitQuiz() {
+  if (Object.keys(quizSelected).length < quizData.length) {
+    alert('Please answer all 10 questions before submitting.'); return;
+  }
+  quizLocked = true;
+
+  let quizScore = 0;
+  const L = ['A','B','C'];
+  const quizResults = quizData.map((q,qi) => {
+    const chosen = quizSelected[qi];
+    const ok     = chosen === q.correct;
+    if (ok) quizScore++;
+    q.opts.forEach((_,oi) => {
+      const el = document.getElementById(`qo${qi}_${oi}`);
+      if (oi === chosen && ok)       el.className = 'q-option correct';
+      else if (oi === chosen && !ok) el.className = 'q-option wrong';
+      else if (oi === q.correct)     el.className = 'q-option show-correct';
+      else                           el.className = 'q-option';
+    });
+    return { num:qi+1, type:q.type, chosen:L[chosen], ok, correctLetter:L[q.correct] };
+  });
+
+  const total = jigsawScore + quizScore;
+  document.getElementById('totalNum').textContent    = total + '/14';
+  document.getElementById('finalJigsaw').textContent = jigsawScore;
+  document.getElementById('finalQuiz').textContent   = quizScore;
+  document.getElementById('quizReview').innerHTML    = quizResults.map(r => `
+    <div class="review-row">
+      <div class="review-num ${r.ok?'rn-ok':'rn-bad'}">${r.num}</div>
+      <div class="review-body">
+        <div class="review-label">${r.type}</div>
+        <div class="review-answer ${r.ok?'rev-ok':'rev-bad'}">${r.chosen}</div>
+        ${!r.ok?`<div class="review-correct">Correct: <span>${r.correctLetter}</span></div>`:''}
+      </div>
+    </div>`).join('');
+
+  goTo(8);
+  logToSheets(quizScore, total);
+}
+
+// ── Google Sheets ─────────────────────────────────────────────
+function logToSheets(quizScore, total) {
+  if (!SHEET_URL || SHEET_URL === 'PASTE_URL_HERE') {
+    document.getElementById('sheetStatus').textContent = '⚠️ No gradebook URL set.';
+    return;
+  }
+  document.getElementById('sheetStatus').textContent = '⏳ Saving to gradebook…';
+  const name  = document.getElementById('studentName').value.trim();
+  const num   = document.getElementById('studentNumber').value.trim();
+  const jDet  = jigsawResults.map(r=>`${r.num}:${r.chosen}(${r.correct?'✓':'✗'})`).join(' | ');
+  const qDet  = quizData.map((_,qi)=>`Q${qi+1}:${['A','B','C'][quizSelected[qi]]}(${quizSelected[qi]===quizData[qi].correct?'✓':'✗'})`).join(' | ');
+
+  const payload = JSON.stringify({
+    studentNumber: num,
+    studentName:   name,
+    partner,
+    score:         total + '/14',
+    percent:       Math.round(total/14*100),
+    jigsawScore:   jigsawScore + '/4',
+    quizScore:     quizScore + '/10',
+    response:      `${jDet} || ${qDet}`
+  });
+
+  const form   = document.createElement('form');
+  form.method  = 'POST';
+  form.action  = SHEET_URL;
+  form.target  = 'hidden_iframe';
+  form.style.display = 'none';
+  const input  = document.createElement('input');
+  input.type   = 'hidden';
+  input.name   = 'data';
+  input.value  = payload;
+  form.appendChild(input);
+
+  const iframe = document.createElement('iframe');
+  iframe.name  = 'hidden_iframe';
+  iframe.style.display = 'none';
+  iframe.onload = () => {
+    document.getElementById('sheetStatus').textContent = '✅ Saved to gradebook.';
+  };
+
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(() => {
+    const status = document.getElementById('sheetStatus');
+    if (status.textContent.includes('⏳')) status.textContent = '✅ Saved to gradebook.';
+  }, 3000);
+}
+</script>
+</body>
+</html>
