@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Jigsaw Listening — Gen-Z Dating Trends</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #1a0a2e;
+    --surface: #241340;
+    --surface2:#2e1a50;
+    --border:  #3d2660;
+    --accent:  #e040fb;
+    --gold:    #ff9800;
+    --white:   #FFFFFF;
+    --light:   #ddc8f5;
+    --muted:   #9b7fc0;
+    --success: #4CAF7D;
+    --error:   #E05C5C;
+    --A:       #e040fb;
+    --B:       #40c4ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; padding-bottom: 60px; }
+
+  .header { background: linear-gradient(135deg, #1a0a2e 0%, #2a1040 100%); border-bottom: 1px solid var(--border); padding: 24px 20px 18px; text-align: center; }
+  .header-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+  .header h1 { font-family: 'Lora', serif; font-size: 1.25rem; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+  .header .sub { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+  .steps { display: flex; justify-content: center; align-items: center; padding: 12px 8px 0; gap: 0; overflow-x: auto; }
+  .step { display: flex; align-items: center; gap: 3px; font-size: 0.5rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); transition: color 0.3s; white-space: nowrap; }
+  .step.active { color: var(--accent); }
+  .step.done   { color: var(--success); }
+  .step-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: 700; background: var(--surface); transition: all 0.3s; }
+  .step.active .step-dot { border-color: var(--accent); color: var(--accent); }
+  .step.done   .step-dot { border-color: var(--success); background: var(--success); color: #fff; }
+  .step-line { width: 8px; height: 2px; background: var(--border); margin: 0 2px; flex-shrink: 0; }
+
+  .screen { display: none; padding: 18px; max-width: 520px; margin: 0 auto; }
+  .screen.active { display: block; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .sec-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 9px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .card-tag { display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 9px; border-radius: 4px; margin-bottom: 9px; }
+  .tag-p1 { background: rgba(224,64,251,0.12); color: var(--accent); }
+  .tag-p2 { background: rgba(64,196,255,0.12); color: var(--B); }
+  .tag-p3 { background: rgba(255,152,0,0.12); color: var(--gold); }
+  .tag-p4 { background: rgba(76,175,125,0.12); color: var(--success); }
+  .card p { font-family: 'Lora', serif; font-size: 0.88rem; line-height: 1.85; color: var(--light); }
+  .card p strong { color: var(--white); font-weight: 600; }
+
+  .instr { background: rgba(224,64,251,0.06); border: 1px solid rgba(224,64,251,0.18); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 0.78rem; color: #d4a8f0; line-height: 1.6; }
+  .instr strong { color: var(--accent); }
+
+  .partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .partner-btn { background: var(--surface2); border: 2px solid var(--border); border-radius: 14px; padding: 16px 10px; text-align: center; cursor: pointer; transition: all 0.2s; color: var(--white); }
+  .partner-btn.sel-A { border-color: var(--A); background: rgba(224,64,251,0.07); }
+  .partner-btn.sel-B { border-color: var(--B); background: rgba(64,196,255,0.07); }
+  .partner-letter { font-size: 1.9rem; font-family: 'Lora', serif; font-weight: 600; margin-bottom: 4px; }
+  .pa { color: var(--A); } .pb { color: var(--B); }
+  .partner-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.45; }
+
+  .field { margin-bottom: 11px; }
+  .field label { display: block; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .field input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Sora', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .field input:focus { border-color: var(--accent); }
+
+  .para-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; font-family: 'Lora', serif; font-size: 0.9rem; line-height: 2.3; color: var(--light); }
+  .para-card strong { color: var(--white); font-weight: 600; }
+  .blank-wrap { display: inline-block; vertical-align: middle; margin: 0 1px; }
+  select.blank { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 7px; color: var(--accent); font-family: 'Sora', sans-serif; font-size: 0.74rem; font-weight: 600; padding: 3px 22px 3px 7px; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23e040fb'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; }
+  select.blank.correct { border-color: var(--success); color: var(--success); background-color: rgba(76,175,125,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234CAF7D'/%3E%3C/svg%3E"); }
+  select.blank.wrong   { border-color: var(--error); color: var(--error); background-color: rgba(224,92,92,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23E05C5C'/%3E%3C/svg%3E"); }
+  select.blank option { background: #2e1a50; color: var(--white); }
+
+  .fulltext { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; max-height: 260px; overflow-y: auto; }
+  .fulltext p { font-family: 'Lora', serif; font-size: 0.86rem; line-height: 1.85; color: var(--light); margin-bottom: 12px; }
+  .fulltext p:last-child { margin-bottom: 0; }
+  .fulltext p strong { color: var(--white); font-weight: 600; }
+
+  .kw-row { display: grid; grid-template-columns: auto auto 1fr; gap: 6px 10px; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .kw-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .kw-term { font-family: 'Sora', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .kw-jp   { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  .kw-def  { font-size: 0.78rem; color: var(--light); line-height: 1.45; }
+
+  .q-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 11px; }
+  .q-type { font-size: 0.57rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .q-text { font-family: 'Lora', serif; font-size: 0.88rem; color: var(--white); line-height: 1.5; margin-bottom: 10px; font-weight: 600; }
+  .q-option { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 9px; border: 1.5px solid var(--border); margin-bottom: 7px; cursor: pointer; transition: all 0.2s; background: var(--surface2); }
+  .q-option:last-child { margin-bottom: 0; }
+  .q-option:hover { border-color: var(--accent); }
+  .q-option.selected     { border-color: var(--accent);  background: rgba(224,64,251,0.08); }
+  .q-option.correct      { border-color: var(--success); background: rgba(76,175,125,0.1); }
+  .q-option.wrong        { border-color: var(--error);   background: rgba(224,92,92,0.08); }
+  .q-option.show-correct { border-color: var(--success); background: rgba(76,175,125,0.06); }
+  .opt-letter { min-width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
+  .q-option.selected .opt-letter     { background: var(--accent);  color: var(--bg); }
+  .q-option.correct  .opt-letter     { background: var(--success); color: #fff; }
+  .q-option.wrong    .opt-letter     { background: var(--error);   color: #fff; }
+  .q-option.show-correct .opt-letter { background: var(--success); color: #fff; }
+  .opt-text { font-size: 0.82rem; color: var(--light); line-height: 1.45; padding-top: 2px; }
+
+  .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); margin-top: 9px; }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--white); }
+
+  .score-wrap { display: flex; flex-direction: column; align-items: center; padding: 20px 0 12px; }
+  .score-ring { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .score-ring.high { border-color: var(--success); box-shadow: 0 0 22px rgba(76,175,125,0.25); }
+  .score-ring.mid  { border-color: var(--gold);    box-shadow: 0 0 20px rgba(255,152,0,0.2); }
+  .score-ring.low  { border-color: var(--error);   box-shadow: 0 0 20px rgba(224,92,92,0.2); }
+  .score-num   { font-family: 'Lora', serif; font-size: 2rem; font-weight: 600; line-height: 1; }
+  .score-small { font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+  .score-title { font-family: 'Lora', serif; font-size: 1rem; text-align: center; }
+  .score-sub   { font-size: 0.72rem; color: var(--muted); text-align: center; margin-top: 3px; }
+
+  .review-row { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .review-row:last-child { border-bottom: none; }
+  .review-num { min-width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+  .rn-ok  { background: rgba(76,175,125,0.18); color: var(--success); }
+  .rn-bad { background: rgba(224,92,92,0.18);  color: var(--error); }
+  .review-body { flex: 1; }
+  .review-label  { font-size: 0.62rem; color: var(--muted); margin-bottom: 2px; }
+  .review-answer { font-weight: 600; font-size: 0.82rem; }
+  .rev-ok  { color: var(--success); }
+  .rev-bad { color: var(--error); }
+  .review-correct { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .review-correct span { color: var(--success); font-weight: 600; }
+
+  .total-box { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 14px; }
+  .total-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .total-num   { font-family: 'Lora', serif; font-size: 2.6rem; font-weight: 600; line-height: 1; }
+  .total-denom { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .split-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .split-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+  .split-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .split-num   { font-family: 'Lora', serif; font-size: 1.6rem; font-weight: 600; }
+  .split-denom { font-size: 0.63rem; color: var(--muted); }
+
+  #sheetStatus { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Jigsaw Listening + Reading Quiz</div>
+  <h1>Gen-Z Dating Trends</h1>
+  <p class="sub">Complete the activity with your partner</p>
+</div>
+
+<div class="steps" id="stepBar">
+  <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-dot">2</div><span>P1</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s3"><div class="step-dot">3</div><span>P2</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s4"><div class="step-dot">4</div><span>P3</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s5"><div class="step-dot">5</div><span>P4</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s6"><div class="step-dot">6</div><span>Score</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s7"><div class="step-dot">7</div><span>Quiz</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s8"><div class="step-dot">8</div><span>Final</span></div>
+</div>
+
+<!-- ── Screen 1: Setup ── -->
+<div class="screen active" id="screen1">
+  <div class="sec-label">Your details</div>
+  <div class="field"><label>Student Number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+  <div class="field"><label>Name (Romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+  <div class="sec-label">Your partner role</div>
+  <div class="partner-grid">
+    <div class="partner-btn" id="btnA" onclick="selectPartner('A')">
+      <div class="partner-letter pa">A</div>
+      <div class="partner-desc">Read P1 &amp; P3 aloud.<br>Fill in blanks for <strong>P2 &amp; P4</strong>.</div>
+    </div>
+    <div class="partner-btn" id="btnB" onclick="selectPartner('B')">
+      <div class="partner-letter pb">B</div>
+      <div class="partner-desc">Read P2 &amp; P4 aloud.<br>Fill in blanks for <strong>P1 &amp; P3</strong>.</div>
+    </div>
+  </div>
+  <br>
+  <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled>Next →</button>
+</div>
+
+<!-- ── Screen 2: P1 ── -->
+<div class="screen" id="screen2">
+  <div class="instr" id="s2instr"></div>
+  <div id="s2content"></div>
+  <button class="btn btn-primary" onclick="finishScreen(2)">Finished →</button>
+  <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+</div>
+
+<!-- ── Screen 3: P2 ── -->
+<div class="screen" id="screen3">
+  <div class="instr" id="s3instr"></div>
+  <div id="s3content"></div>
+  <button class="btn btn-primary" onclick="finishScreen(3)">Finished →</button>
+  <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+</div>
+
+<!-- ── Screen 4: P3 ── -->
+<div class="screen" id="screen4">
+  <div class="instr" id="s4instr"></div>
+  <div id="s4content"></div>
+  <button class="btn btn-primary" onclick="finishScreen(4)">Finished →</button>
+  <button class="btn btn-ghost" onclick="goTo(3)">← Back</button>
+</div>
+
+<!-- ── Screen 5: P4 ── -->
+<div class="screen" id="screen5">
+  <div class="instr" id="s5instr"></div>
+  <div id="s5content"></div>
+  <button class="btn btn-primary" onclick="finishScreen(5)">Finished →</button>
+  <button class="btn btn-ghost" onclick="goTo(4)">← Back</button>
+</div>
+
+<!-- ── Screen 6: Jigsaw Score ── -->
+<div class="screen" id="screen6">
+  <div class="score-wrap">
+    <div class="score-ring" id="jigsawRing">
+      <div class="score-num" id="jigsawNum">—</div>
+      <div class="score-small">out of 6</div>
+    </div>
+    <div class="score-title" id="jigsawTitle"></div>
+    <div class="score-sub"   id="jigsawSub"></div>
+  </div>
+  <div class="sec-label">Answer review</div>
+  <div class="card" id="jigsawReview"></div>
+  <br>
+  <button class="btn btn-primary" onclick="goTo(7)">Continue to Reading Quiz →</button>
+</div>
+
+<!-- ── Screen 7: Full text + Quiz ── -->
+<div class="screen" id="screen7">
+  <div class="instr">📄 Read the full article, then answer all 10 questions below.</div>
+  <div class="sec-label">Full Article</div>
+  <div class="fulltext">
+    <p><strong>Paragraph 1</strong><br>Gen-Z is changing dating rules around the world. They want deep connections but also want to protect their <strong>mental health</strong>. Many young people now use "6-7 dating," where they only talk or text for one hour a day. This helps them stay balanced with work and school. Experts say this style of dating is "manageable, low-pressure, and realistic" for busy young people. They also use "ick lists" to track things they do not like in a partner, such as being rude or having no hobbies.</p>
+    <p><strong>Paragraph 2</strong><br>In Japan, dating is becoming more relaxed. Many young Japanese people have an "if it happens, it happens" <strong>attitude</strong>. Instead of dating, some prefer "<strong>oshikatsu</strong>," which is spending time and money to support famous idols or actors. Professor Masahiro Yamada says some students even break up with partners to focus more on their hobbies. Because of this, Gen-Z in Japan is less desperate to find a partner than their parents were.</p>
+    <p><strong>Paragraph 3</strong><br>Dating apps are now a normal way to meet in Japan. About 25% of young married couples in Japan met through an app. Japanese apps focus on hobbies and "<strong>honne</strong>," which means honest feelings. For example, the app Pairs has "My Tags" for very specific interests like certain games or even "the smell of osmanthus trees". This helps people with <strong>niche</strong> hobbies find a good match more easily.</p>
+    <p><strong>Paragraph 4</strong><br>However, many Gen-Z daters feel nervous about starting deep conversations. Around 84% of daters want deeper <strong>connections</strong>, but they often wait for the other person to speak first. They prefer "<strong>micro-commitments</strong>," like adding someone to a "Close Friends" list on social media, before making big promises. Even with these challenges, 80% of Gen-Z still believe they will find true love in the future.</p>
+  </div>
+
+  <div class="sec-label">Key Words</div>
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:grid; gap:9px;">
+      <div class="kw-row"><span class="kw-term">Mental health</span><span class="kw-jp">メンタルヘルス</span><span class="kw-def">Feeling good and healthy in your mind.</span></div>
+      <div class="kw-row"><span class="kw-term">Boundary</span><span class="kw-jp">境界線 / ルール</span><span class="kw-def">A rule about what you will or will not do.</span></div>
+      <div class="kw-row"><span class="kw-term">Intentional</span><span class="kw-jp">意図的な</span><span class="kw-def">Doing something for a specific reason.</span></div>
+      <div class="kw-row"><span class="kw-term">Niche</span><span class="kw-jp">ニッチな</span><span class="kw-def">Something very specific that only a few people like.</span></div>
+      <div class="kw-row"><span class="kw-term">Commitment</span><span class="kw-jp">約束 / 献身</span><span class="kw-def">A promise to stay with someone or do something.</span></div>
+      <div class="kw-row"><span class="kw-term">Honne</span><span class="kw-jp">本音</span><span class="kw-def">Your true, honest feelings that you might not show everyone.</span></div>
+      <div class="kw-row"><span class="kw-term">6-7 dating</span><span class="kw-jp">6-7 デーティング</span><span class="kw-def">Connecting with a partner for only one hour a day.</span></div>
+      <div class="kw-row"><span class="kw-term">Ick list</span><span class="kw-jp">イック・リスト</span><span class="kw-def">A list of small things that make you lose romantic interest in someone.</span></div>
+      <div class="kw-row"><span class="kw-term">Oshikatsu</span><span class="kw-jp">推し活</span><span class="kw-def">Supporting and spending time/money on a favorite celebrity or character.</span></div>
+      <div class="kw-row"><span class="kw-term">Micro-commitments</span><span class="kw-jp">マイクロ・コミットメント</span><span class="kw-def">Small signs of connection before making big promises.</span></div>
+      <div class="kw-row"><span class="kw-term">Desperate</span><span class="kw-jp">必死な</span><span class="kw-def">Wanting something very much and feeling worried you won't get it.</span></div>
+      <div class="kw-row"><span class="kw-term">Attitude</span><span class="kw-jp">態度</span><span class="kw-def">The way you think or feel about something.</span></div>
+      <div class="kw-row"><span class="kw-term">Connection</span><span class="kw-jp">つながり</span><span class="kw-def">A close relationship or feeling of understanding with someone.</span></div>
+      <div class="kw-row"><span class="kw-term">Idol</span><span class="kw-jp">アイドル</span><span class="kw-def">A very famous and popular singer, actor, or performer.</span></div>
+      <div class="kw-row"><span class="kw-term">Osmanthus</span><span class="kw-jp">金木犀 Kinmokusei</span><span class="kw-def">A tree with small, sweet-smelling flowers, common in Japan.</span></div>
+    </div>
+  </div>
+
+  <div class="sec-label">Comprehension Quiz</div>
+  <div id="quizContainer"></div>
+  <button class="btn btn-primary" onclick="submitQuiz()">Submit Quiz →</button>
+</div>
+
+<!-- ── Screen 8: Final Score ── -->
+<div class="screen" id="screen8">
+  <div class="total-box">
+    <div class="total-label">Total Score</div>
+    <div class="total-num" id="totalNum">—</div>
+    <div class="total-denom">out of 16</div>
+  </div>
+  <div class="split-scores">
+    <div class="split-card">
+      <div class="split-label">Jigsaw</div>
+      <div class="split-num" id="finalJigsaw">—</div>
+      <div class="split-denom">out of 6</div>
+    </div>
+    <div class="split-card">
+      <div class="split-label">Quiz</div>
+      <div class="split-num" id="finalQuiz">—</div>
+      <div class="split-denom">out of 10</div>
+    </div>
+  </div>
+  <div class="sec-label">Quiz Review</div>
+  <div class="card" id="quizReview"></div>
+  <div id="sheetStatus"></div>
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbz-hkiAPF2Ak91xLx-UpRPe_NKhhgLgxEna7nSwBLqZRLNQfs5UsTxVDTbii7V4D2xZ_Q/exec";
+
+// ── Full paragraph texts (for the reader) ─────────────────────
+const PARA = {
+  P1: `Gen-Z is changing dating rules around the world. They want deep connections but also want to protect their <strong>mental health</strong>. Many young people now use "6-7 dating," where they only talk or text for one hour a day. This helps them stay balanced with work and school. Experts say this style of dating is "manageable, low-pressure, and realistic" for busy young people. They also use "ick lists" to track things they do not like in a partner, such as being rude or having no hobbies.`,
+  P2: `In Japan, dating is becoming more relaxed. Many young Japanese people have an "if it happens, it happens" attitude. Instead of dating, some prefer "<strong>oshikatsu</strong>," which is spending time and money to support famous idols or actors. Professor Masahiro Yamada says some students even break up with partners to focus more on their hobbies. Because of this, Gen-Z in Japan is less desperate to find a partner than their parents were.`,
+  P3: `Dating apps are now a normal way to meet in Japan. About 25% of young married couples in Japan met through an app. Japanese apps focus on hobbies and "<strong>honne</strong>," which means honest feelings. For example, the app Pairs has "My Tags" for very specific interests like certain games or even "the smell of osmanthus trees". This helps people with <strong>niche</strong> hobbies find a good match more easily.`,
+  P4: `However, many Gen-Z daters feel nervous about starting deep conversations. Around 84% of daters want deeper connections, but they often wait for the other person to speak first. They prefer "<strong>micro-commitments</strong>," like adding someone to a "Close Friends" list on social media, before making big promises. Even with these challenges, 80% of Gen-Z still believe they will find true love in the future.`
+};
+
+// ── Jigsaw blanks ─────────────────────────────────────────────
+// Screen 2: Partner A reads P1, Partner B fills P1 blanks
+// Screen 3: Partner B reads P2, Partner A fills P2 blanks
+// Screen 4: Partner A reads P3, Partner B fills P3 blanks
+// Screen 5: Partner B reads P4, Partner A fills P4 blanks
+
+const BLANKS = {
+  P1: {
+    tagClass: "tag-p1", tagLabel: "Paragraph 1 — Fill in the blanks",
+    filledBy: "B",
+    blanks: [
+      { correct: "mental health",  options: ["mental health","mental wealth","mental help","mental hell"] },
+      { correct: "6-7 dating",     options: ["6-7 dating","6-7 waiting","6-7 mating","6-8 dating"] },
+      { correct: "ick lists",      options: ["ick lists","sick lists","tick lists","ick fists"] },
+    ],
+    segments: [
+      `Gen-Z is changing dating rules around the world. They want deep connections but also want to protect their `,
+      `. Many young people now use "`,
+      `," where they only talk or text for one hour a day. This helps them stay balanced with work and school. Experts say this style of dating is "manageable, low-pressure, and realistic" for busy young people. They also use "`,
+      `" to track things they do not like in a partner, such as being rude or having no hobbies.`,
+    ]
+  },
+  P2: {
+    tagClass: "tag-p2", tagLabel: "Paragraph 2 — Fill in the blanks",
+    filledBy: "A",
+    blanks: [
+      { correct: "if it happens, it happens", options: ["if it happens, it happens","if it happens, why not","if it works, it works","if it comes, it comes"] },
+      { correct: "oshikatsu",                 options: ["oshikatsu","ashikatsu","oshigatsu","oshikotsu"] },
+      { correct: "break up with partners",    options: ["break up with partners","make up with partners","wake up with partners","break up with parents"] },
+    ],
+    segments: [
+      `In Japan, dating is becoming more relaxed. Many young Japanese people have an "`,
+      `" attitude. Instead of dating, some prefer "<strong>`,
+      `</strong>," which is spending time and money to support famous idols or actors. Professor Masahiro Yamada says some students even `,
+      ` to focus more on their hobbies. Because of this, Gen-Z in Japan is less desperate to find a partner than their parents were.`,
+    ]
+  },
+  P3: {
+    tagClass: "tag-p3", tagLabel: "Paragraph 3 — Fill in the blanks",
+    filledBy: "B",
+    blanks: [
+      { correct: "25%",   options: ["25%","20%","15%","35%"] },
+      { correct: "honne", options: ["honne","honme","homme","honnē"] },
+      { correct: "Pairs", options: ["Pairs","Pears","Paris","Pares"] },
+    ],
+    segments: [
+      `Dating apps are now a normal way to meet in Japan. About `,
+      ` of young married couples in Japan met through an app. Japanese apps focus on hobbies and "<strong>`,
+      `</strong>," which means honest feelings. For example, the app `,
+      ` has "My Tags" for very specific interests like certain games or even "the smell of osmanthus trees". This helps people with <strong>niche</strong> hobbies find a good match more easily.`,
+    ]
+  },
+  P4: {
+    tagClass: "tag-p4", tagLabel: "Paragraph 4 — Fill in the blanks",
+    filledBy: "A",
+    blanks: [
+      { correct: "wait for the other person to speak first", options: ["wait for the other person to speak first","wait for the other person to leave first","wait for the other person to text first","wait for the other person to pay first"] },
+      { correct: "micro-commitments",                        options: ["micro-commitments","micro-comments","micro-compliments","micro-communications"] },
+      { correct: "80% of Gen-Z",                             options: ["80% of Gen-Z","80% of adults","84% of Gen-Z","70% of Gen-Z"] },
+    ],
+    segments: [
+      `However, many Gen-Z daters feel nervous about starting deep conversations. Around 84% of daters want deeper connections, but they often `,
+      `. They prefer "<strong>`,
+      `</strong>," like adding someone to a "Close Friends" list on social media, before making big promises. Even with these challenges, `,
+      ` still believe they will find true love in the future.`,
+    ]
+  }
+};
+
+// ── Quiz data ─────────────────────────────────────────────────
+const quizData = [
+  { type:"Topic",      q:"What is the main topic of the article?",
+    opts:["How to get married quickly in Japan.","New dating habits and trends for Gen-Z.","The history of social media and smartphones.","Why young people do not like technology."], correct:1 },
+  { type:"Main Idea",  q:"Why is the \"6-7 dating\" trend popular with young people?",
+    opts:["They want to talk on the phone all night.","They want to save money on expensive dates.","It helps them protect their mental health and stay balanced.","They only like to talk to people who live far away."], correct:2 },
+  { type:"Detail",     q:"In Japan, how many young married couples met through a dating app?",
+    opts:["About 10%","About 25%","About 50%","About 80%"], correct:1 },
+  { type:"Vocabulary", q:"What is an \"ick list\"?",
+    opts:["A list of favorite foods and restaurants.","A list of things you do not like in a partner.","A list of your best friends on social media.","A list of goals for your future career."], correct:1 },
+  { type:"Detail",     q:"In Japan, what does \"oshikatsu\" mean?",
+    opts:["Working very hard at a new job.","Spending time and money to support a favorite idol or actor.","Studying for many hours to pass an exam.","Traveling to different countries alone."], correct:1 },
+  { type:"Vocabulary", q:"What does the Japanese word \"honne\" mean?",
+    opts:["A person's true, honest feelings.","A very famous person on the internet.","A gift you give to someone on a first date.","A rule for behaving correctly in public."], correct:0 },
+  { type:"Detail",     q:"Which of these is an example of a \"micro-commitment\"?",
+    opts:["Buying an expensive diamond ring.","Moving into a new apartment together.","Adding someone to a \"Close Friends\" list on social media.","Having a big wedding with many guests."], correct:2 },
+  { type:"Inference",  q:"Why do many Gen-Z daters wait for the other person to speak first?",
+    opts:["They are too busy to have a conversation.","They are afraid of what the other person will think of them.","They do not think deep conversations are important.","They prefer to talk using only emojis."], correct:1 },
+  { type:"Purpose",    q:"Why does the article mention the dating app \"Pairs\"?",
+    opts:["To show that it is the most expensive app in the world.","To explain how apps use specific hobbies to help people match.","To say that only older people use dating apps in Japan.","To tell people how to delete their social media accounts."], correct:1 },
+  { type:"Main Idea",  q:"According to the text, do most Gen-Z singles believe in true love?",
+    opts:["No, they think love is a waste of time.","Yes, about 80% believe they will find true love.","They only believe in love if they meet in person.","They think only their parents can find true love."], correct:1 },
+];
+
+// ── State ─────────────────────────────────────────────────────
+let partner       = null;
+let jigsawScore   = 0;
+let jigsawResults = [];
+let quizSelected  = {};
+let quizLocked    = false;
+
+// screen → paragraph → which partner fills blanks
+const SCREEN_PARA = { 2:'P1', 3:'P2', 4:'P3', 5:'P4' };
+const SCREEN_READER = {
+  2: { A:'reader', B:'filler' },
+  3: { A:'filler', B:'reader' },
+  4: { A:'reader', B:'filler' },
+  5: { A:'filler', B:'reader' },
+};
+const PARA_TAG = { P1:'tag-p1', P2:'tag-p2', P3:'tag-p3', P4:'tag-p4' };
+const PARA_LABEL = { P1:'Paragraph 1', P2:'Paragraph 2', P3:'Paragraph 3', P4:'Paragraph 4' };
+
+// ── Navigation ────────────────────────────────────────────────
+function updateSteps(n) {
+  [1,2,3,4,5,6,7,8].forEach(i => {
+    const el = document.getElementById('s'+i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '✓' : i;
+  });
+}
+
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen'+n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0,0);
+  if (n>=2 && n<=5) buildJigsawScreen(n);
+  if (n===7) buildQuiz();
+}
+
+// ── Setup ─────────────────────────────────────────────────────
+function selectPartner(p) {
+  partner = p;
+  document.getElementById('btnA').className = 'partner-btn' + (p==='A' ? ' sel-A' : '');
+  document.getElementById('btnB').className = 'partner-btn' + (p==='B' ? ' sel-B' : '');
+  checkReady();
+}
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    partner &&
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', checkReady);
+document.getElementById('studentNumber').addEventListener('input', checkReady);
+
+// ── Build jigsaw screens 2–5 ──────────────────────────────────
+function buildJigsawScreen(screenNum) {
+  const para   = SCREEN_PARA[screenNum];
+  const role   = SCREEN_READER[screenNum][partner]; // 'reader' or 'filler'
+  const instrEl   = document.getElementById(`s${screenNum}instr`);
+  const contentEl = document.getElementById(`s${screenNum}content`);
+  const d = BLANKS[para];
+
+  if (role === 'reader') {
+    instrEl.innerHTML = `📖 <strong>Read ${PARA_LABEL[para]} aloud</strong> to your partner. Read slowly and clearly.`;
+    contentEl.innerHTML = `<div class="card"><div class="card-tag ${d.tagClass}">${PARA_LABEL[para]} — Read Aloud</div><p>${PARA[para]}</p></div>`;
+  } else {
+    instrEl.innerHTML = `👂 <strong>Listen</strong> to your partner read ${PARA_LABEL[para]}. Choose the missing words.`;
+    contentEl.innerHTML = buildBlankPara(para, `s${screenNum}`);
+  }
+}
+
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+function buildBlankPara(para, prefix) {
+  const d = BLANKS[para];
+  let html = `<div class="para-card"><div class="card-tag ${d.tagClass}">${d.tagLabel}</div>`;
+  d.segments.forEach((seg, i) => {
+    html += seg;
+    if (i < d.blanks.length) {
+      const b = d.blanks[i];
+      const opts = shuffle(b.options);
+      const w = Math.max(110, Math.max(...opts.map(o => o.length)) * 8) + 'px';
+      html += `<span class="blank-wrap"><select class="blank" id="${prefix}_b${i}" style="width:${w}"><option value="">—</option>`;
+      opts.forEach(o => { html += `<option value="${o}">${o}</option>`; });
+      html += `</select></span>`;
+    }
+  });
+  return html + '</div>';
+}
+
+// ── Finish a jigsaw screen ────────────────────────────────────
+function finishScreen(screenNum) {
+  const para = SCREEN_PARA[screenNum];
+  const role = SCREEN_READER[screenNum][partner];
+
+  if (role === 'filler') {
+    const d = BLANKS[para];
+    const unanswered = d.blanks.some((_,i) => !document.getElementById(`s${screenNum}_b${i}`)?.value);
+    if (unanswered) { alert('Please choose an answer for every blank.'); return; }
+  }
+
+  if (screenNum < 5) {
+    goTo(screenNum + 1);
+  } else {
+    scoreJigsaw();
+    goTo(6);
+  }
+}
+
+// ── Score jigsaw ──────────────────────────────────────────────
+function scoreJigsaw() {
+  jigsawScore   = 0;
+  jigsawResults = [];
+
+  // Each partner fills blanks on 2 screens
+  const myScreens = partner === 'A'
+    ? [ {screen:3, para:'P2'}, {screen:5, para:'P4'} ]
+    : [ {screen:2, para:'P1'}, {screen:4, para:'P3'} ];
+
+  myScreens.forEach(({screen, para}) => {
+    const d = BLANKS[para];
+    d.blanks.forEach((b, i) => {
+      const sel    = document.getElementById(`s${screen}_b${i}`);
+      const chosen = sel ? sel.value : '—';
+      const ok     = chosen === b.correct;
+      if (ok) jigsawScore++;
+      if (sel) sel.className = 'blank ' + (ok ? 'correct' : 'wrong');
+      jigsawResults.push({ num: jigsawResults.length + 1, para, chosen, correct: ok, answer: b.correct });
+    });
+  });
+
+  // Build score screen
+  const pct  = jigsawScore / 6 * 100;
+  const ring = document.getElementById('jigsawRing');
+  ring.className = 'score-ring ' + (pct>=80?'high':pct>=50?'mid':'low');
+  document.getElementById('jigsawNum').textContent = jigsawScore + '/6';
+  const [t,s] = pct===100 ? ['Perfect listening!','Every word correct.']
+    : pct>=80 ? ['Great listening!','You caught almost everything.']
+    : pct>=50 ? ['Good effort!','Check what you missed below.']
+    : ['Keep practising!','Listen carefully next time.'];
+  document.getElementById('jigsawTitle').textContent = t;
+  document.getElementById('jigsawSub').textContent   = s;
+  document.getElementById('jigsawReview').innerHTML  = jigsawResults.map(r => `
+    <div class="review-row">
+      <div class="review-num ${r.correct?'rn-ok':'rn-bad'}">${r.num}</div>
+      <div class="review-body">
+        <div class="review-label">${r.para}</div>
+        <div class="review-answer ${r.correct?'rev-ok':'rev-bad'}">${r.chosen}</div>
+        ${!r.correct?`<div class="review-correct">Correct: <span>${r.answer}</span></div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// ── Build quiz ────────────────────────────────────────────────
+function buildQuiz() {
+  if (document.getElementById('quizContainer').innerHTML) return;
+  const L = ['A','B','C','D'];
+  document.getElementById('quizContainer').innerHTML = quizData.map((q,qi) => `
+    <div class="q-block">
+      <div class="q-type">${q.type}</div>
+      <div class="q-text">${qi+1}. ${q.q}</div>
+      ${q.opts.map((opt,oi) => `
+        <div class="q-option" id="qo${qi}_${oi}" onclick="selectOpt(${qi},${oi})">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${opt}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function selectOpt(qi, oi) {
+  if (quizLocked) return;
+  quizData[qi].opts.forEach((_,o) => {
+    document.getElementById(`qo${qi}_${o}`).className = 'q-option';
+  });
+  quizSelected[qi] = oi;
+  document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+}
+
+// ── Submit quiz ───────────────────────────────────────────────
+function submitQuiz() {
+  if (Object.keys(quizSelected).length < quizData.length) {
+    alert('Please answer all 10 questions before submitting.'); return;
+  }
+  quizLocked = true;
+
+  let quizScore = 0;
+  const L = ['A','B','C','D'];
+  const quizResults = quizData.map((q,qi) => {
+    const chosen = quizSelected[qi];
+    const ok     = chosen === q.correct;
+    if (ok) quizScore++;
+    q.opts.forEach((_,oi) => {
+      const el = document.getElementById(`qo${qi}_${oi}`);
+      if (oi === chosen && ok)       el.className = 'q-option correct';
+      else if (oi === chosen && !ok) el.className = 'q-option wrong';
+      else if (oi === q.correct)     el.className = 'q-option show-correct';
+      else                           el.className = 'q-option';
+    });
+    return { num:qi+1, type:q.type, chosen:L[chosen], ok, correctLetter:L[q.correct] };
+  });
+
+  const total = jigsawScore + quizScore;
+  document.getElementById('totalNum').textContent    = total + '/16';
+  document.getElementById('finalJigsaw').textContent = jigsawScore;
+  document.getElementById('finalQuiz').textContent   = quizScore;
+  document.getElementById('quizReview').innerHTML    = quizResults.map(r => `
+    <div class="review-row">
+      <div class="review-num ${r.ok?'rn-ok':'rn-bad'}">${r.num}</div>
+      <div class="review-body">
+        <div class="review-label">${r.type}</div>
+        <div class="review-answer ${r.ok?'rev-ok':'rev-bad'}">${r.chosen}</div>
+        ${!r.ok?`<div class="review-correct">Correct: <span>${r.correctLetter}</span></div>`:''}
+      </div>
+    </div>`).join('');
+
+  goTo(8);
+  logToSheets(quizScore, total);
+}
+
+// ── Google Sheets ─────────────────────────────────────────────
+function logToSheets(quizScore, total) {
+  if (!SHEET_URL || SHEET_URL === 'PASTE_URL_HERE') {
+    document.getElementById('sheetStatus').textContent = '⚠️ No gradebook URL set.';
+    return;
+  }
+  document.getElementById('sheetStatus').textContent = '⏳ Saving to gradebook…';
+  const name  = document.getElementById('studentName').value.trim();
+  const num   = document.getElementById('studentNumber').value.trim();
+  const jDet  = jigsawResults.map(r=>`${r.num}:${r.chosen}(${r.correct?'✓':'✗'})`).join(' | ');
+  const qDet  = quizData.map((_,qi)=>`Q${qi+1}:${['A','B','C','D'][quizSelected[qi]]}(${quizSelected[qi]===quizData[qi].correct?'✓':'✗'})`).join(' | ');
+
+  const payload = JSON.stringify({
+    studentNumber: num,
+    studentName:   name,
+    partner,
+    score:         total + '/16',
+    percent:       Math.round(total/16*100),
+    jigsawScore:   jigsawScore + '/6',
+    quizScore:     quizScore + '/10',
+    response:      `${jDet} || ${qDet}`
+  });
+
+  const form   = document.createElement('form');
+  form.method  = 'POST';
+  form.action  = SHEET_URL;
+  form.target  = 'hidden_iframe';
+  form.style.display = 'none';
+  const input  = document.createElement('input');
+  input.type   = 'hidden';
+  input.name   = 'data';
+  input.value  = payload;
+  form.appendChild(input);
+
+  const iframe = document.createElement('iframe');
+  iframe.name  = 'hidden_iframe';
+  iframe.style.display = 'none';
+  iframe.onload = () => {
+    document.getElementById('sheetStatus').textContent = '✅ Saved to gradebook.';
+  };
+
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(() => {
+    const status = document.getElementById('sheetStatus');
+    if (status.textContent.includes('⏳')) status.textContent = '✅ Saved to gradebook.';
+  }, 3000);
+}
+</script>
+</body>
+</html>
