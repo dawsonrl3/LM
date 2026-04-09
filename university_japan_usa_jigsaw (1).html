@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Jigsaw Listening — University Life: Japan vs USA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0a0f1e;
+    --surface: #101828;
+    --surface2:#182030;
+    --border:  #1e2d42;
+    --accent:  #38bdf8;
+    --gold:    #fbbf24;
+    --white:   #FFFFFF;
+    --light:   #bfdbfe;
+    --muted:   #5b7fa6;
+    --success: #4CAF7D;
+    --error:   #E05C5C;
+    --A:       #38bdf8;
+    --B:       #f97316;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; padding-bottom: 60px; }
+
+  .header { background: linear-gradient(135deg, #0a0f1e 0%, #101828 100%); border-bottom: 1px solid var(--border); padding: 24px 20px 18px; text-align: center; }
+  .header-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+  .header h1 { font-family: 'Lora', serif; font-size: 1.25rem; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+  .header .sub { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+  .steps { display: flex; justify-content: center; align-items: center; padding: 12px 8px 0; gap: 0; overflow-x: auto; }
+  .step { display: flex; align-items: center; gap: 3px; font-size: 0.48rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); transition: color 0.3s; white-space: nowrap; }
+  .step.active { color: var(--accent); }
+  .step.done   { color: var(--success); }
+  .step-dot { width: 19px; height: 19px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.48rem; font-weight: 700; background: var(--surface); transition: all 0.3s; }
+  .step.active .step-dot { border-color: var(--accent); color: var(--accent); }
+  .step.done   .step-dot { border-color: var(--success); background: var(--success); color: #fff; }
+  .step-line { width: 6px; height: 2px; background: var(--border); margin: 0 1px; flex-shrink: 0; }
+
+  .screen { display: none; padding: 18px; max-width: 520px; margin: 0 auto; }
+  .screen.active { display: block; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .sec-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 9px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .card-tag { display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 9px; border-radius: 4px; margin-bottom: 9px; }
+  .tag-p1 { background: rgba(56,189,248,0.12); color: var(--accent); }
+  .tag-p2 { background: rgba(249,115,22,0.12); color: var(--B); }
+  .tag-p3 { background: rgba(56,189,248,0.12); color: var(--accent); }
+  .tag-p4 { background: rgba(249,115,22,0.12); color: var(--B); }
+  .tag-p5 { background: rgba(56,189,248,0.12); color: var(--accent); }
+  .tag-p6 { background: rgba(249,115,22,0.12); color: var(--B); }
+  .card p { font-family: 'Lora', serif; font-size: 0.88rem; line-height: 1.85; color: var(--light); }
+  .card p strong { color: var(--white); font-weight: 600; }
+
+  .instr { background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.18); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 0.78rem; color: #93c5fd; line-height: 1.6; }
+  .instr strong { color: var(--accent); }
+
+  .partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .partner-btn { background: var(--surface2); border: 2px solid var(--border); border-radius: 14px; padding: 16px 10px; text-align: center; cursor: pointer; transition: all 0.2s; color: var(--white); }
+  .partner-btn.sel-A { border-color: var(--A); background: rgba(56,189,248,0.07); }
+  .partner-btn.sel-B { border-color: var(--B); background: rgba(249,115,22,0.07); }
+  .partner-letter { font-size: 1.9rem; font-family: 'Lora', serif; font-weight: 600; margin-bottom: 4px; }
+  .pa { color: var(--A); } .pb { color: var(--B); }
+  .partner-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.45; }
+
+  .field { margin-bottom: 11px; }
+  .field label { display: block; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .field input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Sora', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .field input:focus { border-color: var(--accent); }
+
+  .para-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; font-family: 'Lora', serif; font-size: 0.9rem; line-height: 2.3; color: var(--light); }
+  .para-card strong { color: var(--white); font-weight: 600; }
+  .blank-wrap { display: inline-block; vertical-align: middle; margin: 0 1px; }
+  select.blank { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 7px; color: var(--accent); font-family: 'Sora', sans-serif; font-size: 0.74rem; font-weight: 600; padding: 3px 22px 3px 7px; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2338bdf8'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; }
+  select.blank.correct { border-color: var(--success); color: var(--success); background-color: rgba(76,175,125,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234CAF7D'/%3E%3C/svg%3E"); }
+  select.blank.wrong   { border-color: var(--error); color: var(--error); background-color: rgba(224,92,92,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23E05C5C'/%3E%3C/svg%3E"); }
+  select.blank option { background: #182030; color: var(--white); }
+
+  .fulltext { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; max-height: 260px; overflow-y: auto; }
+  .fulltext p { font-family: 'Lora', serif; font-size: 0.86rem; line-height: 1.85; color: var(--light); margin-bottom: 12px; }
+  .fulltext p:last-child { margin-bottom: 0; }
+  .fulltext p strong { color: var(--white); font-weight: 600; }
+
+  .kw-row { display: grid; grid-template-columns: auto auto 1fr; gap: 6px 10px; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .kw-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .kw-term { font-family: 'Sora', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .kw-jp   { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  .kw-def  { font-size: 0.78rem; color: var(--light); line-height: 1.45; }
+
+  .q-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 11px; }
+  .q-type { font-size: 0.57rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .q-text { font-family: 'Lora', serif; font-size: 0.88rem; color: var(--white); line-height: 1.5; margin-bottom: 10px; font-weight: 600; }
+  .q-option { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 9px; border: 1.5px solid var(--border); margin-bottom: 7px; cursor: pointer; transition: all 0.2s; background: var(--surface2); }
+  .q-option:last-child { margin-bottom: 0; }
+  .q-option:hover { border-color: var(--accent); }
+  .q-option.selected     { border-color: var(--accent);  background: rgba(56,189,248,0.08); }
+  .q-option.correct      { border-color: var(--success); background: rgba(76,175,125,0.1); }
+  .q-option.wrong        { border-color: var(--error);   background: rgba(224,92,92,0.08); }
+  .q-option.show-correct { border-color: var(--success); background: rgba(76,175,125,0.06); }
+  .opt-letter { min-width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
+  .q-option.selected .opt-letter     { background: var(--accent);  color: var(--bg); }
+  .q-option.correct  .opt-letter     { background: var(--success); color: #fff; }
+  .q-option.wrong    .opt-letter     { background: var(--error);   color: #fff; }
+  .q-option.show-correct .opt-letter { background: var(--success); color: #fff; }
+  .opt-text { font-size: 0.82rem; color: var(--light); line-height: 1.45; padding-top: 2px; }
+
+  .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); margin-top: 9px; }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--white); }
+
+  .score-wrap { display: flex; flex-direction: column; align-items: center; padding: 20px 0 12px; }
+  .score-ring { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .score-ring.high { border-color: var(--success); box-shadow: 0 0 22px rgba(76,175,125,0.25); }
+  .score-ring.mid  { border-color: var(--gold);    box-shadow: 0 0 20px rgba(251,191,36,0.2); }
+  .score-ring.low  { border-color: var(--error);   box-shadow: 0 0 20px rgba(224,92,92,0.2); }
+  .score-num   { font-family: 'Lora', serif; font-size: 2rem; font-weight: 600; line-height: 1; }
+  .score-small { font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+  .score-title { font-family: 'Lora', serif; font-size: 1rem; text-align: center; }
+  .score-sub   { font-size: 0.72rem; color: var(--muted); text-align: center; margin-top: 3px; }
+
+  .review-row { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .review-row:last-child { border-bottom: none; }
+  .review-num { min-width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+  .rn-ok  { background: rgba(76,175,125,0.18); color: var(--success); }
+  .rn-bad { background: rgba(224,92,92,0.18);  color: var(--error); }
+  .review-body { flex: 1; }
+  .review-label  { font-size: 0.62rem; color: var(--muted); margin-bottom: 2px; }
+  .review-answer { font-weight: 600; font-size: 0.82rem; }
+  .rev-ok  { color: var(--success); }
+  .rev-bad { color: var(--error); }
+  .review-correct { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .review-correct span { color: var(--success); font-weight: 600; }
+
+  .total-box { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 14px; }
+  .total-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .total-num   { font-family: 'Lora', serif; font-size: 2.6rem; font-weight: 600; line-height: 1; }
+  .total-denom { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .split-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .split-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+  .split-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .split-num   { font-family: 'Lora', serif; font-size: 1.6rem; font-weight: 600; }
+  .split-denom { font-size: 0.63rem; color: var(--muted); }
+
+  #sheetStatus { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Jigsaw Listening + Reading Quiz</div>
+  <h1>University Life: Japan vs USA</h1>
+  <p class="sub">Complete the activity with your partner</p>
+</div>
+
+<div class="steps" id="stepBar">
+  <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-dot">2</div><span>P1</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s3"><div class="step-dot">3</div><span>P2</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s4"><div class="step-dot">4</div><span>P3</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s5"><div class="step-dot">5</div><span>P4</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s6"><div class="step-dot">6</div><span>P5</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s7"><div class="step-dot">7</div><span>P6</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s8"><div class="step-dot">8</div><span>Score</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s9"><div class="step-dot">9</div><span>Quiz</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s10"><div class="step-dot">10</div><span>Final</span></div>
+</div>
+
+<!-- ── Screen 1: Setup ── -->
+<div class="screen active" id="screen1">
+  <div class="sec-label">Your details</div>
+  <div class="field"><label>Student Number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+  <div class="field"><label>Name (Romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+  <div class="sec-label">Your partner role</div>
+  <div class="partner-grid">
+    <div class="partner-btn" id="btnA" onclick="selectPartner('A')">
+      <div class="partner-letter pa">A</div>
+      <div class="partner-desc">Read <strong>P1, P3, P5</strong> aloud.<br>Fill blanks for <strong>P2, P4, P6</strong>.</div>
+    </div>
+    <div class="partner-btn" id="btnB" onclick="selectPartner('B')">
+      <div class="partner-letter pb">B</div>
+      <div class="partner-desc">Read <strong>P2, P4, P6</strong> aloud.<br>Fill blanks for <strong>P1, P3, P5</strong>.</div>
+    </div>
+  </div>
+  <br>
+  <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled>Next →</button>
+</div>
+
+<!-- ── Screens 2–7: Jigsaw ── -->
+<div class="screen" id="screen2"><div class="instr" id="s2instr"></div><div id="s2content"></div><button class="btn btn-primary" onclick="finishScreen(2)">Finished →</button><button class="btn btn-ghost" onclick="goTo(1)">← Back</button></div>
+<div class="screen" id="screen3"><div class="instr" id="s3instr"></div><div id="s3content"></div><button class="btn btn-primary" onclick="finishScreen(3)">Finished →</button><button class="btn btn-ghost" onclick="goTo(2)">← Back</button></div>
+<div class="screen" id="screen4"><div class="instr" id="s4instr"></div><div id="s4content"></div><button class="btn btn-primary" onclick="finishScreen(4)">Finished →</button><button class="btn btn-ghost" onclick="goTo(3)">← Back</button></div>
+<div class="screen" id="screen5"><div class="instr" id="s5instr"></div><div id="s5content"></div><button class="btn btn-primary" onclick="finishScreen(5)">Finished →</button><button class="btn btn-ghost" onclick="goTo(4)">← Back</button></div>
+<div class="screen" id="screen6"><div class="instr" id="s6instr"></div><div id="s6content"></div><button class="btn btn-primary" onclick="finishScreen(6)">Finished →</button><button class="btn btn-ghost" onclick="goTo(5)">← Back</button></div>
+<div class="screen" id="screen7"><div class="instr" id="s7instr"></div><div id="s7content"></div><button class="btn btn-primary" onclick="finishScreen(7)">Finished →</button><button class="btn btn-ghost" onclick="goTo(6)">← Back</button></div>
+
+<!-- ── Screen 8: Jigsaw Score ── -->
+<div class="screen" id="screen8">
+  <div class="score-wrap">
+    <div class="score-ring" id="jigsawRing">
+      <div class="score-num" id="jigsawNum">—</div>
+      <div class="score-small">out of 16</div>
+    </div>
+    <div class="score-title" id="jigsawTitle"></div>
+    <div class="score-sub"   id="jigsawSub"></div>
+  </div>
+  <div class="sec-label">Answer review</div>
+  <div class="card" id="jigsawReview"></div>
+  <br>
+  <button class="btn btn-primary" onclick="goTo(9)">Continue to Reading Quiz →</button>
+</div>
+
+<!-- ── Screen 9: Full text + Quiz ── -->
+<div class="screen" id="screen9">
+  <div class="instr">📄 Read the full article, then answer all 10 questions below.</div>
+  <div class="sec-label">Full Article</div>
+  <div class="fulltext">
+    <p><strong>Paragraph 1</strong><br>University life is very different in Japan and the United States. One student studied in both countries and shared his story. He found five main differences in the way students live and study. These differences include clothes, clubs, lessons, housing, and how hard they must study.</p>
+    <p><strong>Paragraph 2</strong><br>The first difference is <strong>fashion</strong>. In Japanese schools, students must wear <strong>uniforms</strong> for many years. When they go to university, they like to buy nice clothes and look good. In the United States, students usually wear simple and comfortable clothes. They often wear sweatshirts or T-shirts from the university shop.</p>
+    <p><strong>Paragraph 3</strong><br>Next, <strong>extracurricular</strong> clubs are different. Japanese universities have groups called "<strong>circles</strong>" where students go to have fun and meet friends. These are very social groups. In American universities, sports teams and clubs are more serious. Students must practice very hard every day, or they spend most of their time studying.</p>
+    <p><strong>Paragraph 4</strong><br>Academic <strong>pressure</strong> also changes between the two countries. In Japan, high school students study very hard for <strong>entrance exams</strong>. Once they enter university, they often have more free time. In the United States, university is very difficult every day. Students have to write many <strong>reports</strong> and read many books every week.</p>
+    <p><strong>Paragraph 5</strong><br>Living <strong>arrangements</strong> are another big difference. Many Japanese students live alone in their own apartments. They enjoy having their own space for the first time. In the United States, most students live in <strong>dorms</strong>. They usually share a room with another student. This is a good way to make friends, but it can be difficult if they are very different.</p>
+    <p><strong>Paragraph 6</strong><br>Finally, classroom <strong>participation</strong> is different. In Japan, the teacher speaks and the students listen quietly. Students do not usually ask questions during the lesson. In the United States, students talk a lot. They ask questions and have <strong>debates</strong> with the teacher and other students. Both systems help students learn in different ways.</p>
+  </div>
+
+  <div class="sec-label">Key Words</div>
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:grid; gap:9px;">
+      <div class="kw-row"><span class="kw-term">Divergence</span><span class="kw-jp">相違 / 分岐</span><span class="kw-def">When two things become different or move in different directions.</span></div>
+      <div class="kw-row"><span class="kw-term">Extracurricular</span><span class="kw-jp">課外の</span><span class="kw-def">Activities or clubs that are not part of regular school lessons.</span></div>
+      <div class="kw-row"><span class="kw-term">Circles</span><span class="kw-jp">サークル</span><span class="kw-def">Social groups in Japanese universities where students meet friends and have fun.</span></div>
+      <div class="kw-row"><span class="kw-term">Pressure</span><span class="kw-jp">プレッシャー</span><span class="kw-def">A feeling of stress because you have a lot of difficult work to do.</span></div>
+      <div class="kw-row"><span class="kw-term">Entrance exams</span><span class="kw-jp">入学試験</span><span class="kw-def">Very difficult tests that students must pass to get into a school or university.</span></div>
+      <div class="kw-row"><span class="kw-term">Arrangements</span><span class="kw-jp">準備 / 手配</span><span class="kw-def">The way things are organized or planned, such as where a student lives.</span></div>
+      <div class="kw-row"><span class="kw-term">Dorms</span><span class="kw-jp">寮</span><span class="kw-def">Special buildings at a university where many students live and often share rooms.</span></div>
+      <div class="kw-row"><span class="kw-term">Participation</span><span class="kw-jp">参加</span><span class="kw-def">The act of taking part in an activity, like asking questions during a lesson.</span></div>
+      <div class="kw-row"><span class="kw-term">Debates</span><span class="kw-jp">討論 / ディベート</span><span class="kw-def">Discussions where people share and talk about different ideas or opinions.</span></div>
+      <div class="kw-row"><span class="kw-term">Comfortable</span><span class="kw-jp">快適な Kaitekina</span><span class="kw-def">Feeling relaxed and at ease.</span></div>
+      <div class="kw-row"><span class="kw-term">Uniforms</span><span class="kw-jp">制服 Seifuku</span><span class="kw-def">Special clothes that all students in a school must wear.</span></div>
+      <div class="kw-row"><span class="kw-term">Housing</span><span class="kw-jp">住居 Jūkyo</span><span class="kw-def">The place where a person lives.</span></div>
+      <div class="kw-row"><span class="kw-term">Sweatshirts</span><span class="kw-jp">スウェットシャツ</span><span class="kw-def">Soft, warm tops often worn for sport or relaxing.</span></div>
+    </div>
+  </div>
+
+  <div class="sec-label">Comprehension Quiz</div>
+  <div id="quizContainer"></div>
+  <button class="btn btn-primary" onclick="submitQuiz()">Submit Quiz →</button>
+</div>
+
+<!-- ── Screen 10: Final Score ── -->
+<div class="screen" id="screen10">
+  <div class="total-box">
+    <div class="total-label">Total Score</div>
+    <div class="total-num" id="totalNum">—</div>
+    <div class="total-denom">out of 26</div>
+  </div>
+  <div class="split-scores">
+    <div class="split-card">
+      <div class="split-label">Jigsaw</div>
+      <div class="split-num" id="finalJigsaw">—</div>
+      <div class="split-denom">out of 16</div>
+    </div>
+    <div class="split-card">
+      <div class="split-label">Quiz</div>
+      <div class="split-num" id="finalQuiz">—</div>
+      <div class="split-denom">out of 10</div>
+    </div>
+  </div>
+  <div class="sec-label">Quiz Review</div>
+  <div class="card" id="quizReview"></div>
+  <div id="sheetStatus"></div>
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyIkgJPInvEHQY-1yGtHJrfnYyeaJ64vgGDzxyoT5DqaOoWXpTnoXYIzFLdqaBUzYHR/exec";
+
+// ── Full paragraph texts ──────────────────────────────────────
+const PARA = {
+  P1: `University life is very different in Japan and the United States. One student studied in both countries and shared his story. He found five main differences in the way students live and study. These differences include clothes, clubs, lessons, housing, and how hard they must study.`,
+  P2: `The first difference is <strong>fashion</strong>. In Japanese schools, students must wear <strong>uniforms</strong> for many years. When they go to university, they like to buy nice clothes and look good. In the United States, students usually wear simple and comfortable clothes. They often wear sweatshirts or T-shirts from the university shop.`,
+  P3: `Next, <strong>extracurricular</strong> clubs are different. Japanese universities have groups called "<strong>circles</strong>" where students go to have fun and meet friends. These are very social groups. In American universities, sports teams and clubs are more serious. Students must practice very hard every day, or they spend most of their time studying.`,
+  P4: `Academic <strong>pressure</strong> also changes between the two countries. In Japan, high school students study very hard for <strong>entrance exams</strong>. Once they enter university, they often have more free time. In the United States, university is very difficult every day. Students have to write many <strong>reports</strong> and read many books every week.`,
+  P5: `Living <strong>arrangements</strong> are another big difference. Many Japanese students live alone in their own apartments. They enjoy having their own space for the first time. In the United States, most students live in <strong>dorms</strong>. They usually share a room with another student. This is a good way to make friends, but it can be difficult if they are very different.`,
+  P6: `Finally, classroom <strong>participation</strong> is different. In Japan, the teacher speaks and the students listen quietly. Students do not usually ask questions during the lesson. In the United States, students talk a lot. They ask questions and have <strong>debates</strong> with the teacher and other students. Both systems help students learn in different ways.`
+};
+
+// ── Jigsaw blanks ─────────────────────────────────────────────
+const BLANKS = {
+  P1: {
+    tagClass: "tag-p1", tagLabel: "Paragraph 1", filledBy: "B",
+    blanks: [
+      { correct: "different",     options: ["different","difficult","different kinds","indifferent"] },
+      { correct: "United States", options: ["United States","United Nations","United Kingdom","United Schools"] },
+      { correct: "countries",     options: ["countries","counties","companies","centuries"] },
+      { correct: "differences",   options: ["differences","distances","difficulties","references"] },
+      { correct: "clothes",       options: ["clothes","clubs","clues","cloves"] },
+    ],
+    segments: [
+      `University life is very `,
+      ` in Japan and the `,
+      `. One student studied in both `,
+      ` and shared his story. He found five main `,
+      ` in the way students live and study. These differences include `,
+      `, clubs, lessons, housing, and how hard they must study.`,
+    ]
+  },
+  P2: {
+    tagClass: "tag-p2", tagLabel: "Paragraph 2", filledBy: "A",
+    blanks: [
+      { correct: "fashion",  options: ["fashion","passion","ration","nation"] },
+      { correct: "uniforms", options: ["uniforms","uniform rules","union forms","uniforms only"] },
+      { correct: "good",     options: ["good","good-looking","goods","great"] },
+      { correct: "simple",   options: ["simple","symbol","sample","single"] },
+      { correct: "shop",     options: ["shop","stop","ship","chop"] },
+    ],
+    segments: [
+      `The first difference is `,
+      `. In Japanese schools, students must wear `,
+      ` for many years. When they go to university, they like to buy nice clothes and look `,
+      `. In the United States, students usually wear `,
+      ` and comfortable clothes. They often wear sweatshirts or T-shirts from the university `,
+      `.`,
+    ]
+  },
+  P3: {
+    tagClass: "tag-p3", tagLabel: "Paragraph 3", filledBy: "B",
+    blanks: [
+      { correct: "extracurricular", options: ["extracurricular","extra circular","extra curricular time","extra curriculum"] },
+      { correct: "circles",         options: ["circles","circlers","circle groups","sirens"] },
+      { correct: "social",          options: ["social","special","spacial","crucial"] },
+      { correct: "sports",          options: ["sports","supports","reports","exports"] },
+      { correct: "practice",        options: ["practice","practise hard","practise daily","predict"] },
+    ],
+    segments: [
+      `Next, `,
+      ` clubs are different. Japanese universities have groups called "`,
+      `" where students go to have fun and meet friends. These are very `,
+      ` groups. In American universities, `,
+      ` teams and clubs are more serious. Students must `,
+      ` very hard every day, or they spend most of their time studying.`,
+    ]
+  },
+  P4: {
+    tagClass: "tag-p4", tagLabel: "Paragraph 4", filledBy: "A",
+    blanks: [
+      { correct: "pressure",   options: ["pressure","pleasure","treasure","measure"] },
+      { correct: "entrance",   options: ["entrance","entrance hall","entry","instance"] },
+      { correct: "free",       options: ["free","three","freeze","freed"] },
+      { correct: "difficult",  options: ["difficult","different","diffident","diligent"] },
+      { correct: "reports",    options: ["reports","resorts","retorts","supports"] },
+    ],
+    segments: [
+      `Academic `,
+      ` also changes between the two countries. In Japan, high school students study very hard for `,
+      ` exams. Once they enter university, they often have more `,
+      ` time. In the United States, university is very `,
+      ` every day. Students have to write many `,
+      ` and read many books every week.`,
+    ]
+  },
+  P5: {
+    tagClass: "tag-p5", tagLabel: "Paragraph 5", filledBy: "B",
+    blanks: [
+      { correct: "arrangements", options: ["arrangements","estrangements","engagements","managements"] },
+      { correct: "alone",        options: ["alone","along","aloud","a loan"] },
+      { correct: "space",        options: ["space","spare","spice","pace"] },
+      { correct: "dorms",        options: ["dorms","forms","dorms only","storms"] },
+      { correct: "share",        options: ["share","spare","stare","scare"] },
+      { correct: "different",    options: ["different","indifferent","difficult","diffident"] },
+    ],
+    segments: [
+      `Living `,
+      ` are another big difference. Many Japanese students live `,
+      ` in their own apartments. They enjoy having their own `,
+      ` for the first time. In the United States, most students live in `,
+      `. They usually `,
+      ` a room with another student. This is a good way to make friends, but it can be difficult if they are very `,
+      `.`,
+    ]
+  },
+  P6: {
+    tagClass: "tag-p6", tagLabel: "Paragraph 6", filledBy: "A",
+    blanks: [
+      { correct: "participation", options: ["participation","precipitation","anticipation","articulation"] },
+      { correct: "teacher",       options: ["teacher","preacher","creature","feature"] },
+      { correct: "quietly",       options: ["quietly","politely","slightly","nightly"] },
+      { correct: "questions",     options: ["questions","suggestions","estimations","mentions"] },
+      { correct: "talk",          options: ["talk","walk","chalk","stalk"] },
+      { correct: "debates",       options: ["debates","rebates","deflates","dictates"] },
+    ],
+    segments: [
+      `Finally, classroom `,
+      ` is different. In Japan, the `,
+      ` speaks and the students listen `,
+      `. Students do not usually ask `,
+      ` during the lesson. In the United States, students `,
+      ` a lot. They ask questions and have `,
+      ` with the teacher and other students. Both systems help students learn in different ways.`,
+    ]
+  }
+};
+
+// ── Quiz data ─────────────────────────────────────────────────
+const quizData = [
+  { type:"Main Idea",  q:"What is the main idea of this article?",
+    opts:["The history of schools in Japan and America.","The five main differences in university life between Japan and the United States.","How to study for difficult entrance exams.","Why students should live alone in apartments."], correct:1 },
+  { type:"Detail",     q:"Why do many Japanese university students like to buy and wear nice clothes?",
+    opts:["They are required to by the university.","They had to wear school uniforms for many years before university.","They want to look like American students.","It is a rule for joining university \"circles.\""], correct:1 },
+  { type:"Detail",     q:"What are \"circles\" in Japanese universities?",
+    opts:["Social groups where students have fun and meet friends.","Serious sports teams that practice every day.","Large rooms where students take their exams.","Special dorms where students share rooms."], correct:0 },
+  { type:"Detail",     q:"What do students in the United States often wear to class?",
+    opts:["Official school uniforms.","Professional suits and ties.","Simple and comfortable clothes like sweatshirts.","Expensive fashion from the university shop."], correct:2 },
+  { type:"Vocabulary", q:"Based on the article, what is a \"dorm\"?",
+    opts:["A private apartment where a student lives alone.","A building where many students live and often share a room.","A group of students who study together for exams.","A type of classroom where students listen quietly."], correct:1 },
+  { type:"Inference",  q:"Why might living in a dorm be \"difficult\" for some students?",
+    opts:["The rooms are located very far from the university.","They have to share a room with a student who is very different from them.","There is no space to study for their difficult reports.","They are not allowed to wear comfortable clothes."], correct:1 },
+  { type:"Detail",     q:"When is study usually the most difficult for students in Japan?",
+    opts:["Every week when they are at university.","When they are in their social \"circles\".","In high school when they prepare for entrance exams.","When they are living in their first apartment."], correct:2 },
+  { type:"Detail",     q:"How do students typically behave in a Japanese classroom?",
+    opts:["They talk a lot and ask many questions.","They listen quietly and do not usually ask questions.","They have many debates with the teacher.","They spend all their time practicing for sports teams."], correct:1 },
+  { type:"Detail",     q:"What is a common activity for students in American classrooms?",
+    opts:["Listening to the teacher without speaking.","Asking questions and having debates with others.","Buying T-shirts from the university shop.","Wearing uniforms every day."], correct:1 },
+  { type:"Gist",       q:"Which of these was NOT mentioned as one of the five main differences in the text?",
+    opts:["Student housing.","Classroom lessons and participation.","The price of food in the cafeteria.","Club activities and sports."], correct:2 },
+];
+
+// ── State ─────────────────────────────────────────────────────
+let partner       = null;
+let jigsawScore   = 0;
+let jigsawResults = [];
+let quizSelected  = {};
+let quizLocked    = false;
+
+const SCREEN_PARA   = { 2:'P1', 3:'P2', 4:'P3', 5:'P4', 6:'P5', 7:'P6' };
+const SCREEN_READER = {
+  2: { A:'reader', B:'filler' },
+  3: { A:'filler', B:'reader' },
+  4: { A:'reader', B:'filler' },
+  5: { A:'filler', B:'reader' },
+  6: { A:'reader', B:'filler' },
+  7: { A:'filler', B:'reader' },
+};
+const PARA_LABEL = { P1:'Paragraph 1', P2:'Paragraph 2', P3:'Paragraph 3', P4:'Paragraph 4', P5:'Paragraph 5', P6:'Paragraph 6' };
+
+// ── Navigation ────────────────────────────────────────────────
+function updateSteps(n) {
+  [1,2,3,4,5,6,7,8,9,10].forEach(i => {
+    const el = document.getElementById('s'+i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '✓' : i;
+  });
+}
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen'+n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0,0);
+  if (n>=2 && n<=7) buildJigsawScreen(n);
+  if (n===9) buildQuiz();
+}
+
+// ── Setup ─────────────────────────────────────────────────────
+function selectPartner(p) {
+  partner = p;
+  document.getElementById('btnA').className = 'partner-btn' + (p==='A' ? ' sel-A' : '');
+  document.getElementById('btnB').className = 'partner-btn' + (p==='B' ? ' sel-B' : '');
+  checkReady();
+}
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    partner &&
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', checkReady);
+document.getElementById('studentNumber').addEventListener('input', checkReady);
+
+// ── Build jigsaw screens ──────────────────────────────────────
+function buildJigsawScreen(screenNum) {
+  const para      = SCREEN_PARA[screenNum];
+  const role      = SCREEN_READER[screenNum][partner];
+  const instrEl   = document.getElementById(`s${screenNum}instr`);
+  const contentEl = document.getElementById(`s${screenNum}content`);
+  const d         = BLANKS[para];
+
+  if (role === 'reader') {
+    instrEl.innerHTML   = `📖 <strong>Read ${PARA_LABEL[para]} aloud</strong> to your partner. Read slowly and clearly.`;
+    contentEl.innerHTML = `<div class="card"><div class="card-tag ${d.tagClass}">${PARA_LABEL[para]} — Read Aloud</div><p>${PARA[para]}</p></div>`;
+  } else {
+    instrEl.innerHTML   = `👂 <strong>Listen</strong> to your partner read ${PARA_LABEL[para]}. Choose the missing words.`;
+    contentEl.innerHTML = buildBlankPara(para, `s${screenNum}`);
+  }
+}
+
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+function buildBlankPara(para, prefix) {
+  const d = BLANKS[para];
+  let html = `<div class="para-card"><div class="card-tag ${d.tagClass}">${d.tagLabel} — Fill in the blanks</div>`;
+  d.segments.forEach((seg, i) => {
+    html += seg;
+    if (i < d.blanks.length) {
+      const b    = d.blanks[i];
+      const opts = shuffle(b.options);
+      const w    = Math.max(110, Math.max(...opts.map(o => o.length)) * 8) + 'px';
+      html += `<span class="blank-wrap"><select class="blank" id="${prefix}_b${i}" style="width:${w}"><option value="">—</option>`;
+      opts.forEach(o => { html += `<option value="${o}">${o}</option>`; });
+      html += `</select></span>`;
+    }
+  });
+  return html + '</div>';
+}
+
+// ── Finish screen ─────────────────────────────────────────────
+function finishScreen(screenNum) {
+  const para = SCREEN_PARA[screenNum];
+  const role = SCREEN_READER[screenNum][partner];
+  if (role === 'filler') {
+    const unanswered = BLANKS[para].blanks.some((_,i) => !document.getElementById(`s${screenNum}_b${i}`)?.value);
+    if (unanswered) { alert('Please choose an answer for every blank.'); return; }
+  }
+  if (screenNum < 7) { goTo(screenNum + 1); }
+  else { scoreJigsaw(); goTo(8); }
+}
+
+// ── Score jigsaw ──────────────────────────────────────────────
+function scoreJigsaw() {
+  jigsawScore   = 0;
+  jigsawResults = [];
+
+  const myScreens = partner === 'A'
+    ? [ {screen:3, para:'P2'}, {screen:5, para:'P4'}, {screen:7, para:'P6'} ]
+    : [ {screen:2, para:'P1'}, {screen:4, para:'P3'}, {screen:6, para:'P5'} ];
+
+  myScreens.forEach(({screen, para}) => {
+    BLANKS[para].blanks.forEach((b, i) => {
+      const sel    = document.getElementById(`s${screen}_b${i}`);
+      const chosen = sel ? sel.value : '—';
+      const ok     = chosen === b.correct;
+      if (ok) jigsawScore++;
+      if (sel) sel.className = 'blank ' + (ok ? 'correct' : 'wrong');
+      jigsawResults.push({ num: jigsawResults.length + 1, para, chosen, correct: ok, answer: b.correct });
+    });
+  });
+
+  const pct  = jigsawScore / 16 * 100;
+  const ring = document.getElementById('jigsawRing');
+  ring.className = 'score-ring ' + (pct>=75?'high':pct>=50?'mid':'low');
+  document.getElementById('jigsawNum').textContent = jigsawScore + '/16';
+  const [t,s] = pct===100 ? ['Perfect listening!','Every word correct.']
+    : pct>=75 ? ['Great listening!','You caught almost everything.']
+    : pct>=50 ? ['Good effort!','Check what you missed below.']
+    : ['Keep practising!','Listen carefully next time.'];
+  document.getElementById('jigsawTitle').textContent = t;
+  document.getElementById('jigsawSub').textContent   = s;
+  document.getElementById('jigsawReview').innerHTML  = jigsawResults.map(r => `
+    <div class="review-row">
+      <div class="review-num ${r.correct?'rn-ok':'rn-bad'}">${r.num}</div>
+      <div class="review-body">
+        <div class="review-label">${r.para}</div>
+        <div class="review-answer ${r.correct?'rev-ok':'rev-bad'}">${r.chosen}</div>
+        ${!r.correct?`<div class="review-correct">Correct: <span>${r.answer}</span></div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// ── Build quiz ────────────────────────────────────────────────
+function buildQuiz() {
+  if (document.getElementById('quizContainer').innerHTML) return;
+  const L = ['A','B','C','D'];
+  document.getElementById('quizContainer').innerHTML = quizData.map((q,qi) => `
+    <div class="q-block">
+      <div class="q-type">${q.type}</div>
+      <div class="q-text">${qi+1}. ${q.q}</div>
+      ${q.opts.map((opt,oi) => `
+        <div class="q-option" id="qo${qi}_${oi}" onclick="selectOpt(${qi},${oi})">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${opt}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function selectOpt(qi, oi) {
+  if (quizLocked) return;
+  quizData[qi].opts.forEach((_,o) => { document.getElementById(`qo${qi}_${o}`).className = 'q-option'; });
+  quizSelected[qi] = oi;
+  document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+}
+
+// ── Submit quiz ───────────────────────────────────────────────
+function submitQuiz() {
+  if (Object.keys(quizSelected).length < quizData.length) {
+    alert('Please answer all 10 questions before submitting.'); return;
+  }
+  quizLocked = true;
+
+  let quizScore = 0;
+  const L = ['A','B','C','D'];
+  const quizResults = quizData.map((q,qi) => {
+    const chosen = quizSelected[qi];
+    const ok     = chosen === q.correct;
+    if (ok) quizScore++;
+    q.opts.forEach((_,oi) => {
+      const el = document.getElementById(`qo${qi}_${oi}`);
+      if (oi === chosen && ok)       el.className = 'q-option correct';
+      else if (oi === chosen && !ok) el.className = 'q-option wrong';
+      else if (oi === q.correct)     el.className = 'q-option show-correct';
+      else                           el.className = 'q-option';
+    });
+    return { num:qi+1, type:q.type, chosen:L[chosen], ok, correctLetter:L[q.correct] };
+  });
+
+  const total = jigsawScore + quizScore;
+  document.getElementById('totalNum').textContent    = total + '/26';
+  document.getElementById('finalJigsaw').textContent = jigsawScore;
+  document.getElementById('finalQuiz').textContent   = quizScore;
+  document.getElementById('quizReview').innerHTML    = quizResults.map(r => `
+    <div class="review-row">
+      <div class="review-num ${r.ok?'rn-ok':'rn-bad'}">${r.num}</div>
+      <div class="review-body">
+        <div class="review-label">${r.type}</div>
+        <div class="review-answer ${r.ok?'rev-ok':'rev-bad'}">${r.chosen}</div>
+        ${!r.ok?`<div class="review-correct">Correct: <span>${r.correctLetter}</span></div>`:''}
+      </div>
+    </div>`).join('');
+
+  goTo(10);
+  logToSheets(quizScore, total);
+}
+
+// ── Google Sheets ─────────────────────────────────────────────
+function logToSheets(quizScore, total) {
+  if (!SHEET_URL || SHEET_URL === 'PASTE_URL_HERE') {
+    document.getElementById('sheetStatus').textContent = '⚠️ No gradebook URL set.';
+    return;
+  }
+  document.getElementById('sheetStatus').textContent = '⏳ Saving to gradebook…';
+  const name  = document.getElementById('studentName').value.trim();
+  const num   = document.getElementById('studentNumber').value.trim();
+  const jDet  = jigsawResults.map(r=>`${r.num}:${r.chosen}(${r.correct?'✓':'✗'})`).join(' | ');
+  const qDet  = quizData.map((_,qi)=>`Q${qi+1}:${['A','B','C','D'][quizSelected[qi]]}(${quizSelected[qi]===quizData[qi].correct?'✓':'✗'})`).join(' | ');
+
+  const payload = JSON.stringify({
+    studentNumber: num,
+    studentName:   name,
+    partner,
+    score:         total + '/26',
+    percent:       Math.round(total/26*100),
+    jigsawScore:   jigsawScore + '/16',
+    quizScore:     quizScore + '/10',
+    response:      `${jDet} || ${qDet}`
+  });
+
+  const form   = document.createElement('form');
+  form.method  = 'POST';
+  form.action  = SHEET_URL;
+  form.target  = 'hidden_iframe';
+  form.style.display = 'none';
+  const input  = document.createElement('input');
+  input.type   = 'hidden';
+  input.name   = 'data';
+  input.value  = payload;
+  form.appendChild(input);
+
+  const iframe = document.createElement('iframe');
+  iframe.name  = 'hidden_iframe';
+  iframe.style.display = 'none';
+  iframe.onload = () => {
+    document.getElementById('sheetStatus').textContent = '✅ Saved to gradebook.';
+  };
+
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(() => {
+    const status = document.getElementById('sheetStatus');
+    if (status.textContent.includes('⏳')) status.textContent = '✅ Saved to gradebook.';
+  }, 3000);
+}
+</script>
+</body>
+</html>
