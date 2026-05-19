@@ -388,6 +388,98 @@ let jigsawScore   = 0;
 let jigsawResults = [];
 let quizSelected  = {};
 let quizLocked    = false;
+let currentScreen = 1;
+
+// ── localStorage key for this activity ───────────────────────
+const LS_KEY = 'nagasaki_jigsaw_state';
+
+function saveState() {
+  // Collect current blank selections
+  const blanks = {};
+  [3,4,5,6].forEach(sn => {
+    const para = SCREEN_PARA[sn];
+    if (para && BLANKS[para]) {
+      BLANKS[para].blanks.forEach((_,i) => {
+        const el = document.getElementById(`s${sn}_b${i}`);
+        if (el) blanks[`s${sn}_b${i}`] = el.value;
+      });
+    }
+  });
+  const state = {
+    partner, currentScreen,
+    studentName:   document.getElementById('studentName').value,
+    studentNumber: document.getElementById('studentNumber').value,
+    blanks,
+    jigsawScore, jigsawResults, quizSelected, quizLocked
+  };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch(e) { return null; }
+}
+
+function clearState() {
+  try { localStorage.removeItem(LS_KEY); } catch(e) {}
+}
+
+function restoreState(state) {
+  partner       = state.partner;
+  jigsawScore   = state.jigsawScore   || 0;
+  jigsawResults = state.jigsawResults || [];
+  quizSelected  = state.quizSelected  || {};
+  quizLocked    = state.quizLocked    || false;
+
+  if (state.studentName)   document.getElementById('studentName').value   = state.studentName;
+  if (state.studentNumber) document.getElementById('studentNumber').value = state.studentNumber;
+  if (partner) {
+    document.getElementById('btnA').className = 'partner-btn' + (partner==='A' ? ' sel-A' : '');
+    document.getElementById('btnB').className = 'partner-btn' + (partner==='B' ? ' sel-B' : '');
+  }
+  checkReady();
+
+  // Go to saved screen (rebuilds content)
+  const n = state.currentScreen || 1;
+  goTo(n);
+
+  // Restore blank selections after screen is built
+  if (state.blanks) {
+    setTimeout(() => {
+      Object.entries(state.blanks).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el && val) el.value = val;
+      });
+    }, 100);
+  }
+
+  // Restore quiz selections if on quiz screen
+  if (n === 8 && quizSelected) {
+    setTimeout(() => {
+      Object.entries(quizSelected).forEach(([qi, oi]) => {
+        const el = document.getElementById(`qo${qi}_${oi}`);
+        if (el) el.className = 'q-option selected';
+      });
+    }, 100);
+  }
+
+  // Restore final screen if already submitted
+  if (n === 9 && jigsawResults.length > 0) {
+    restoreFinalScreen();
+  }
+}
+
+function restoreFinalScreen() {
+  const quizScore = Object.keys(quizSelected).filter(qi => quizSelected[qi] === quizData[qi].correct).length;
+  const total = jigsawScore + quizScore;
+  document.getElementById('totalNum').textContent    = total + '/16';
+  document.getElementById('finalJigsaw').textContent = jigsawScore;
+  document.getElementById('finalQuiz').textContent   = quizScore;
+  document.getElementById('jigsawNum').textContent   = jigsawScore + '/6';
+}
 
 const SCREEN_PARA   = { 3:'P2', 4:'P3', 5:'P4', 6:'P5' };
 const SCREEN_READER = {
@@ -406,12 +498,14 @@ function updateSteps(n) {
   });
 }
 function goTo(n) {
+  currentScreen = n;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen'+n).classList.add('active');
   updateSteps(n);
   window.scrollTo(0,0);
   if (n>=3 && n<=6) buildJigsawScreen(n);
   if (n===8) buildQuiz();
+  saveState();
 }
 
 function selectPartner(p) {
@@ -419,6 +513,7 @@ function selectPartner(p) {
   document.getElementById('btnA').className = 'partner-btn' + (p==='A' ? ' sel-A' : '');
   document.getElementById('btnB').className = 'partner-btn' + (p==='B' ? ' sel-B' : '');
   checkReady();
+  saveState();
 }
 function checkReady() {
   document.getElementById('btnNext1').disabled = !(
@@ -427,8 +522,16 @@ function checkReady() {
     document.getElementById('studentNumber').value.trim()
   );
 }
-document.getElementById('studentName').addEventListener('input', checkReady);
-document.getElementById('studentNumber').addEventListener('input', checkReady);
+document.getElementById('studentName').addEventListener('input', () => { checkReady(); saveState(); });
+document.getElementById('studentNumber').addEventListener('input', () => { checkReady(); saveState(); });
+
+// ── On page load: restore or start fresh ─────────────────────
+window.addEventListener('load', () => {
+  const state = loadState();
+  if (state && state.partner && state.currentScreen > 1) {
+    restoreState(state);
+  }
+});
 
 function buildJigsawScreen(screenNum) {
   const para      = SCREEN_PARA[screenNum];
@@ -471,6 +574,7 @@ function finishScreen(screenNum) {
     const unanswered = BLANKS[para].blanks.some((_,i) => !document.getElementById(`s${screenNum}_b${i}`)?.value);
     if (unanswered) { alert('Please choose an answer for every blank.'); return; }
   }
+  saveState();
   if (screenNum < 6) { goTo(screenNum + 1); }
   else { scoreJigsaw(); goTo(7); }
 }
@@ -512,6 +616,7 @@ function scoreJigsaw() {
         ${!r.correct?`<div class="review-correct">Correct: <span>${r.answer}</span></div>`:''}
       </div>
     </div>`).join('');
+  saveState();
 }
 
 function buildQuiz() {
@@ -534,6 +639,7 @@ function selectOpt(qi, oi) {
   quizData[qi].opts.forEach((_,o) => { document.getElementById(`qo${qi}_${o}`).className = 'q-option'; });
   quizSelected[qi] = oi;
   document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+  saveState();
 }
 
 function submitQuiz() {
@@ -572,6 +678,7 @@ function submitQuiz() {
     </div>`).join('');
 
   goTo(9);
+  clearState();
   logToSheets(quizScore, total);
 }
 

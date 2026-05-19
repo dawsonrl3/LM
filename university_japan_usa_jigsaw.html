@@ -286,7 +286,7 @@
 </div>
 
 <script>
-const SHEET_URL = "PASTE_URL_HERE";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyIkgJPInvEHQY-1yGtHJrfnYyeaJ64vgGDzxyoT5DqaOoWXpTnoXYIzFLdqaBUzYHR/exec";
 
 // ── Full paragraph texts ──────────────────────────────────────
 const PARA = {
@@ -444,7 +444,102 @@ let jigsawScore   = 0;
 let jigsawResults = [];
 let quizSelected  = {};
 let quizLocked    = false;
+let currentScreen = 1;
 
+
+// ── localStorage key for this activity ───────────────────────
+const LS_KEY = 'university_state';
+
+function saveState() {
+  const blanks = {};
+  [2,3,4,5,6,7].forEach(sn => {
+    const para = SCREEN_PARA[sn];
+    if (para && BLANKS[para]) {
+      BLANKS[para].blanks.forEach((_,i) => {
+        const el = document.getElementById(`s${sn}_b${i}`);
+        if (el) blanks[`s${sn}_b${i}`] = el.value;
+      });
+    }
+  });
+  const state = {
+    partner, currentScreen,
+    studentName:   document.getElementById('studentName').value,
+    studentNumber: document.getElementById('studentNumber').value,
+    blanks,
+    jigsawScore, jigsawResults, quizSelected, quizLocked
+  };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch(e) { return null; }
+}
+
+function clearState() {
+  try { localStorage.removeItem(LS_KEY); } catch(e) {}
+}
+
+function restoreState(state) {
+  partner       = state.partner;
+  jigsawScore   = state.jigsawScore   || 0;
+  jigsawResults = state.jigsawResults || [];
+  quizSelected  = state.quizSelected  || {};
+  quizLocked    = state.quizLocked    || false;
+
+  if (state.studentName)   document.getElementById('studentName').value   = state.studentName;
+  if (state.studentNumber) document.getElementById('studentNumber').value = state.studentNumber;
+  if (partner) {
+    document.getElementById('btnA').className = 'partner-btn' + (partner==='A' ? ' sel-A' : '');
+    document.getElementById('btnB').className = 'partner-btn' + (partner==='B' ? ' sel-B' : '');
+  }
+  checkReady();
+
+  const n = state.currentScreen || 1;
+  goTo(n);
+
+  if (state.blanks) {
+    setTimeout(() => {
+      Object.entries(state.blanks).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el && val) el.value = val;
+      });
+    }, 100);
+  }
+
+  if (n === 9 && quizSelected) {
+    setTimeout(() => {
+      Object.entries(quizSelected).forEach(([qi, oi]) => {
+        const el = document.getElementById(`qo${qi}_${oi}`);
+        if (el) el.className = 'q-option selected';
+      });
+    }, 100);
+  }
+
+  if (n === 10 && jigsawResults.length > 0) {
+    restoreFinalScreen();
+  }
+}
+
+function restoreFinalScreen() {
+  const quizScore = Object.keys(quizSelected).filter(qi => quizSelected[qi] === quizData[qi].correct).length;
+  const total = jigsawScore + quizScore;
+  document.getElementById('totalNum').textContent    = total + '/26';
+  document.getElementById('finalJigsaw').textContent = jigsawScore;
+  document.getElementById('finalQuiz').textContent   = quizScore;
+  if (document.getElementById('jigsawNum')) document.getElementById('jigsawNum').textContent = jigsawScore + '/16';
+}
+
+// ── On page load: restore or start fresh ─────────────────────
+window.addEventListener('load', () => {
+  const state = loadState();
+  if (state && state.partner && state.currentScreen > 1) {
+    restoreState(state);
+  }
+});
 const SCREEN_PARA   = { 2:'P1', 3:'P2', 4:'P3', 5:'P4', 6:'P5', 7:'P6' };
 const SCREEN_READER = {
   2: { A:'reader', B:'filler' },
@@ -465,10 +560,12 @@ function updateSteps(n) {
   });
 }
 function goTo(n) {
+  currentScreen = n;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen'+n).classList.add('active');
   updateSteps(n);
   window.scrollTo(0,0);
+  saveState();
   if (n>=2 && n<=7) buildJigsawScreen(n);
   if (n===9) buildQuiz();
 }
@@ -479,6 +576,7 @@ function selectPartner(p) {
   document.getElementById('btnA').className = 'partner-btn' + (p==='A' ? ' sel-A' : '');
   document.getElementById('btnB').className = 'partner-btn' + (p==='B' ? ' sel-B' : '');
   checkReady();
+  saveState();
 }
 function checkReady() {
   document.getElementById('btnNext1').disabled = !(
@@ -487,8 +585,8 @@ function checkReady() {
     document.getElementById('studentNumber').value.trim()
   );
 }
-document.getElementById('studentName').addEventListener('input', checkReady);
-document.getElementById('studentNumber').addEventListener('input', checkReady);
+document.getElementById('studentName').addEventListener('input', () => { checkReady(); saveState(); });
+document.getElementById('studentNumber').addEventListener('input', () => { checkReady(); saveState(); });
 
 // ── Build jigsaw screens ──────────────────────────────────────
 function buildJigsawScreen(screenNum) {
@@ -600,6 +698,7 @@ function selectOpt(qi, oi) {
   quizData[qi].opts.forEach((_,o) => { document.getElementById(`qo${qi}_${o}`).className = 'q-option'; });
   quizSelected[qi] = oi;
   document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+  saveState();
 }
 
 // ── Submit quiz ───────────────────────────────────────────────
@@ -640,6 +739,7 @@ function submitQuiz() {
     </div>`).join('');
 
   goTo(10);
+  clearState();
   logToSheets(quizScore, total);
 }
 
