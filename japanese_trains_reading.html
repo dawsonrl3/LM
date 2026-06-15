@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Reading — The Secrets of Japanese Trains</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0c1420;
+    --surface: #14202f;
+    --surface2:#1b2a3d;
+    --border:  #25384f;
+    --accent:  #ef4444;
+    --gold:    #f59e0b;
+    --white:   #FFFFFF;
+    --light:   #cdd9e8;
+    --muted:   #6b88a8;
+    --success: #4CAF7D;
+    --error:   #E05C5C;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; padding-bottom: 60px; }
+
+  .header { background: linear-gradient(135deg, #0c1420 0%, #14202f 100%); border-bottom: 1px solid var(--border); padding: 24px 20px 18px; text-align: center; }
+  .header-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+  .header h1 { font-family: 'Lora', serif; font-size: 1.2rem; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+  .header .sub { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+  .steps { display: flex; justify-content: center; align-items: center; padding: 12px 8px 0; gap: 0; overflow-x: auto; }
+  .step { display: flex; align-items: center; gap: 4px; font-size: 0.55rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); transition: color 0.3s; white-space: nowrap; }
+  .step.active { color: var(--accent); }
+  .step.done   { color: var(--success); }
+  .step-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 700; background: var(--surface); transition: all 0.3s; }
+  .step.active .step-dot { border-color: var(--accent); color: var(--accent); }
+  .step.done   .step-dot { border-color: var(--success); background: var(--success); color: #fff; }
+  .step-line { width: 18px; height: 2px; background: var(--border); margin: 0 3px; flex-shrink: 0; }
+
+  .screen { display: none; padding: 18px; max-width: 540px; margin: 0 auto; }
+  .screen.active { display: block; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .sec-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 9px; }
+  .part-head { font-family: 'Lora', serif; font-size: 1.02rem; font-weight: 600; color: var(--white); margin: 18px 0 4px; }
+  .part-sub { font-size: 0.76rem; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .card-tag { display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 9px; border-radius: 4px; margin-bottom: 9px; background: rgba(239,68,68,0.12); color: var(--accent); }
+  .card p { font-family: 'Lora', serif; font-size: 0.88rem; line-height: 1.85; color: var(--light); }
+  .card p strong { color: var(--white); font-weight: 600; }
+  .skim-line { font-family: 'Lora', serif; font-size: 0.86rem; line-height: 1.7; color: var(--light); margin-bottom: 10px; padding-left: 12px; border-left: 2px solid var(--border); }
+  .skim-line .pl { display: block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 3px; font-family: 'Sora', sans-serif; }
+  .skim-ellipsis { color: var(--muted); font-style: italic; }
+
+  .instr { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.78rem; color: #f0a8a8; line-height: 1.6; }
+  .instr strong { color: var(--accent); }
+
+  .field { margin-bottom: 11px; }
+  .field label { display: block; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .field input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Sora', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .field input:focus { border-color: var(--accent); }
+
+  /* MCQ */
+  .q-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 11px; }
+  .q-type { font-size: 0.57rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .q-text { font-family: 'Lora', serif; font-size: 0.88rem; color: var(--white); line-height: 1.5; margin-bottom: 10px; font-weight: 600; }
+  .q-option { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 9px; border: 1.5px solid var(--border); margin-bottom: 7px; cursor: pointer; transition: all 0.2s; background: var(--surface2); }
+  .q-option:last-child { margin-bottom: 0; }
+  .q-option:hover { border-color: var(--accent); }
+  .q-option.selected     { border-color: var(--accent);  background: rgba(239,68,68,0.08); }
+  .q-option.correct      { border-color: var(--success); background: rgba(76,175,125,0.1); }
+  .q-option.wrong        { border-color: var(--error);   background: rgba(224,92,92,0.08); }
+  .q-option.show-correct { border-color: var(--success); background: rgba(76,175,125,0.06); }
+  .opt-letter { min-width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
+  .q-option.selected .opt-letter     { background: var(--accent);  color: var(--bg); }
+  .q-option.correct  .opt-letter     { background: var(--success); color: #fff; }
+  .q-option.wrong    .opt-letter     { background: var(--error);   color: #fff; }
+  .q-option.show-correct .opt-letter { background: var(--success); color: #fff; }
+  .opt-text { font-size: 0.82rem; color: var(--light); line-height: 1.45; padding-top: 2px; }
+
+  /* Matching rows with dropdowns */
+  .match-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; margin-bottom: 9px; }
+  .match-sentence { font-family: 'Lora', serif; font-size: 0.83rem; color: var(--light); line-height: 1.5; margin-bottom: 8px; }
+  .match-sentence strong { color: var(--white); }
+  select.match-sel, select.sort-sel { width: 100%; background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 8px; color: var(--accent); font-family: 'Sora', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 8px 28px 8px 12px; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23ef4444'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+  select.match-sel.correct, select.sort-sel.correct { border-color: var(--success); color: var(--success); background-color: rgba(76,175,125,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234CAF7D'/%3E%3C/svg%3E"); }
+  select.match-sel.wrong, select.sort-sel.wrong { border-color: var(--error); color: var(--error); background-color: rgba(224,92,92,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23E05C5C'/%3E%3C/svg%3E"); }
+  select.match-sel option, select.sort-sel option { background: #1b2a3d; color: var(--white); }
+  .opt-list { margin: 8px 0 4px; }
+  .opt-list .opt-item { font-size: 0.8rem; color: var(--light); line-height: 1.5; padding: 5px 0; display: flex; gap: 8px; }
+  .opt-item .ol { font-weight: 700; color: var(--accent); min-width: 18px; }
+
+  /* sorting: each sentence gets a position dropdown */
+  .sort-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; margin-bottom: 9px; display: flex; gap: 10px; align-items: flex-start; }
+  .sort-letter { font-weight: 700; color: var(--accent); font-family: 'Lora', serif; font-size: 1rem; min-width: 18px; padding-top: 2px; }
+  .sort-body { flex: 1; }
+  .sort-text { font-family: 'Lora', serif; font-size: 0.83rem; color: var(--light); line-height: 1.5; margin-bottom: 8px; }
+  .sort-sel { width: auto; min-width: 130px; }
+
+  .fixed-sentence { font-family: 'Lora', serif; font-size: 0.85rem; color: var(--white); line-height: 1.6; background: var(--surface2); border-radius: 8px; padding: 10px 13px; margin-bottom: 12px; border-left: 3px solid var(--accent); }
+  .fixed-sentence .fl { display: block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; font-family: 'Sora', sans-serif; }
+
+  .para-context { font-family: 'Lora', serif; font-size: 0.84rem; color: var(--light); line-height: 1.7; margin-bottom: 10px; }
+  .para-context strong { color: var(--white); }
+
+  .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); margin-top: 9px; }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--white); }
+
+  .score-wrap { display: flex; flex-direction: column; align-items: center; padding: 20px 0 12px; }
+  .score-ring { width: 116px; height: 116px; border-radius: 50%; border: 4px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .score-ring.high { border-color: var(--success); box-shadow: 0 0 22px rgba(76,175,125,0.25); }
+  .score-ring.mid  { border-color: var(--gold);    box-shadow: 0 0 20px rgba(245,158,11,0.2); }
+  .score-ring.low  { border-color: var(--error);   box-shadow: 0 0 20px rgba(224,92,92,0.2); }
+  .score-num   { font-family: 'Lora', serif; font-size: 2.4rem; font-weight: 600; line-height: 1; }
+  .score-small { font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+  .score-title { font-family: 'Lora', serif; font-size: 1.05rem; text-align: center; }
+  .score-sub   { font-size: 0.73rem; color: var(--muted); text-align: center; margin-top: 3px; }
+
+  .split-scores { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .split-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; }
+  .split-label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .split-num   { font-family: 'Lora', serif; font-size: 1.4rem; font-weight: 600; }
+  .split-denom { font-size: 0.6rem; color: var(--muted); }
+
+  .review-row { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .review-row:last-child { border-bottom: none; }
+  .review-num { min-width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+  .rn-ok  { background: rgba(76,175,125,0.18); color: var(--success); }
+  .rn-bad { background: rgba(224,92,92,0.18);  color: var(--error); }
+  .review-body { flex: 1; }
+  .review-label  { font-size: 0.62rem; color: var(--muted); margin-bottom: 2px; }
+  .review-answer { font-weight: 600; font-size: 0.82rem; }
+  .rev-ok  { color: var(--success); }
+  .rev-bad { color: var(--error); }
+  .review-correct { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .review-correct span { color: var(--success); font-weight: 600; }
+
+  .total-box { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 14px; }
+  .total-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .total-num   { font-family: 'Lora', serif; font-size: 2.6rem; font-weight: 600; line-height: 1; }
+  .total-denom { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  #sheetStatus { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Reading Activity</div>
+  <h1>The Secrets of Japanese Trains</h1>
+  <p class="sub">Skim, read, and think deeply</p>
+</div>
+
+<div class="steps" id="stepBar">
+  <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-dot">2</div><span>Skim</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s3"><div class="step-dot">3</div><span>Read</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s4"><div class="step-dot">4</div><span>Quiz</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s5"><div class="step-dot">5</div><span>Score</span></div>
+</div>
+
+<!-- ── Screen 1: Setup ── -->
+<div class="screen active" id="screen1">
+  <div class="sec-label">Your details</div>
+  <div class="field"><label>Student Number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+  <div class="field"><label>Name (Romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+  <div class="instr">📘 This is a 3-part reading activity. You will <strong>skim</strong> first, then <strong>read</strong> carefully, then answer a <strong>thinking quiz</strong>. Work alone.</div>
+  <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled>Start →</button>
+</div>
+
+<!-- ── Screen 2: Skimming ── -->
+<div class="screen" id="screen2">
+  <div class="instr">👀 <strong>Part 1: Skim only.</strong> Read the title and the sentences below. Do <strong>not</strong> look at the full article yet.</div>
+
+  <div class="card">
+    <div class="card-tag">Skimming Text</div>
+    <p style="font-family:'Lora',serif; font-weight:600; color:var(--white); margin-bottom:12px;">Fast, Smart, and Always on Time: The Secrets of Japanese Trains</p>
+    <div class="skim-line"><span class="pl">Paragraph 1</span>Japanese trains are very famous because they are always on time. <span class="skim-ellipsis">[...]</span> This great success comes from Japan's long history and the special needs of its busy people.</div>
+    <div class="skim-line"><span class="pl">Paragraph 2</span>The history of trains in Japan began a long time ago in 1872.</div>
+    <div class="skim-line"><span class="pl">Paragraph 3</span>Japan needs a great train system because the country has many people.</div>
+    <div class="skim-line"><span class="pl">Paragraph 4</span>There are many reasons why Japanese trains are so fast and reliable.</div>
+    <div class="skim-line"><span class="pl">Paragraph 5</span>The future of Japanese trains will be even faster and better for the planet.</div>
+  </div>
+
+  <div class="part-head">Part 2: Topic & Purpose</div>
+  <div class="part-sub">Based on what you read above, choose the best answer.</div>
+  <div id="part2Container"></div>
+
+  <div class="part-head">Part 3: Predicting Information</div>
+  <div class="part-sub">Match each topic sentence to the information you think will follow.</div>
+  <div class="card" style="margin-bottom:12px;">
+    <div class="sec-label" style="margin-top:0;">Information Options</div>
+    <div class="opt-list">
+      <div class="opt-item"><span class="ol">A</span> Facts about technology, planning, and being on time.</div>
+      <div class="opt-item"><span class="ol">B</span> Information about new trains like the Maglev and saving energy.</div>
+      <div class="opt-item"><span class="ol">C</span> Information about the first train lines and the start of the Shinkansen.</div>
+      <div class="opt-item"><span class="ol">D</span> Facts about the large population and why cars are difficult to use.</div>
+    </div>
+  </div>
+  <div id="part3Container"></div>
+
+  <button class="btn btn-primary" onclick="finishSkim()">Next: Read the Article →</button>
+  <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+</div>
+
+<!-- ── Screen 3: Reading with tasks ── -->
+<div class="screen" id="screen3">
+  <div class="instr">📖 <strong>Now read the full article</strong> and complete the tasks.</div>
+
+  <div class="card">
+    <div class="card-tag">Paragraph 1 — Introduction</div>
+    <p>Japanese trains are very famous because they are always on time. Many people who live in Japan and visitors use these trains every day to get around easily. The train system is high-tech and works very well, making it one of the most popular ways to travel in the world. This great success comes from Japan's long history and the special needs of its busy people.</p>
+  </div>
+
+  <div class="part-head">Task 1: Sentence Sorting</div>
+  <div class="part-sub">Paragraph 2's first sentence is fixed. Put sentences A, B, and C in the correct order using the dropdowns.</div>
+  <div class="fixed-sentence"><span class="fl">Paragraph 2 — fixed first sentence</span>The history of trains in Japan began a long time ago in 1872.</div>
+  <div id="sortContainer"></div>
+
+  <div class="part-head">Task 2: Choose the Best Ending</div>
+  <div class="part-sub">For each paragraph, choose the best sentence to complete the idea.</div>
+  <div id="endingContainer"></div>
+
+  <button class="btn btn-primary" onclick="finishReading()">Next: Thinking Quiz →</button>
+  <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+</div>
+
+<!-- ── Screen 4: Inference Quiz ── -->
+<div class="screen" id="screen4">
+  <div class="instr">🧠 <strong>Thinking Quiz.</strong> These questions ask you to think deeper about the article.</div>
+  <div id="quizContainer"></div>
+  <button class="btn btn-primary" onclick="submitAll()">Submit & See Score →</button>
+  <button class="btn btn-ghost" onclick="goTo(3)">← Back</button>
+</div>
+
+<!-- ── Screen 5: Score ── -->
+<div class="screen" id="screen5">
+  <div class="score-wrap">
+    <div class="score-ring" id="finalRing">
+      <div class="score-num" id="totalNum">—</div>
+      <div class="score-small">out of 16</div>
+    </div>
+    <div class="score-title" id="scoreTitle"></div>
+    <div class="score-sub"   id="scoreSub"></div>
+  </div>
+  <div class="split-scores">
+    <div class="split-card"><div class="split-label">Skim</div><div class="split-num" id="skimNum">—</div><div class="split-denom">out of 5</div></div>
+    <div class="split-card"><div class="split-label">Reading</div><div class="split-num" id="taskNum">—</div><div class="split-denom">out of 6</div></div>
+    <div class="split-card"><div class="split-label">Quiz</div><div class="split-num" id="quizNum">—</div><div class="split-denom">out of 5</div></div>
+  </div>
+  <div class="sec-label">Answer review</div>
+  <div class="card" id="reviewList"></div>
+  <div id="sheetStatus"></div>
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzOy_KufO0WsM-c8la3-zzIs97pX0Nvu7R1_LvczpI5ZPzr_hLzkxYmmgWAo44w_GI/exec";
+
+// ── Part 2: topic/purpose MCQ ─────────────────────────────────
+const part2 = {
+  q: "What is the main topic and purpose of this article?",
+  opts: [
+    "To teach travelers how to buy cheap train tickets in Tokyo.",
+    "To explain why Japanese trains are successful and how they will change.",
+    "To compare Japanese trains to trains in other countries like the UK.",
+    "To argue that driving a car is better than taking the train in Japan."
+  ],
+  correct: 1
+};
+
+// ── Part 3: matching topic sentences → info ───────────────────
+const part3 = [
+  { sentence: "<strong>Paragraph 2:</strong> The history of trains...", correct: "C" },
+  { sentence: "<strong>Paragraph 3:</strong> Japan needs a great system...", correct: "D" },
+  { sentence: "<strong>Paragraph 4:</strong> Many reasons why they are fast...", correct: "A" },
+  { sentence: "<strong>Paragraph 5:</strong> The future of Japanese trains...", correct: "B" },
+];
+
+// ── Task 1: sentence sorting (correct order B=1, C=2, A=3) ─────
+const sortSentences = [
+  { letter: "A", text: "This fast train connected the cities of Tokyo and Osaka in only four hours and changed how people travel.", correctPos: 3 },
+  { letter: "B", text: "The first train line was 29 kilometers long and went from Tokyo to Yokohama.", correctPos: 1 },
+  { letter: "C", text: "Later, in 1964, Japan started the Shinkansen, which people also call the \"bullet train.\"", correctPos: 2 },
+];
+
+// ── Task 2: best ending for P3, P4, P5 ────────────────────────
+const endings = [
+  {
+    label: "Paragraph 3",
+    context: "Japan needs a great train system because the country has many people. Japan is a small country, but it has one of the largest populations in the world. Tokyo is very crowded, so it is difficult for everyone to drive cars. (...)",
+    opts: [
+      "Because so many people use trains every day, the system must run smoothly and reliably to keep the country moving.",
+      "Most people in Tokyo prefer to walk to work instead of taking the train.",
+      "The trains are very colorful and have many pictures of cartoons on them."
+    ],
+    correct: 0
+  },
+  {
+    label: "Paragraph 4",
+    context: "There are many reasons why Japanese trains are so fast and reliable. The train companies use smart technology and plan everything carefully to avoid delays. In Japan, the culture believes that being on time is very important, especially for work. (...)",
+    opts: [
+      "If a train is late by only one or two minutes, the company often says sorry to the passengers because they care about their schedules.",
+      "Train drivers in Japan do not have to follow a schedule because they are very fast.",
+      "It is normal for trains to be thirty minutes late every single day in Japan."
+    ],
+    correct: 0
+  },
+  {
+    label: "Paragraph 5",
+    context: "The future of Japanese trains will be even faster and better for the planet. A new train called the Maglev is coming soon, and it can travel at 500 km/h. New technology like AI will help find problems early so trains do not have to stop for repairs. (...)",
+    opts: [
+      "In the future, people will stop using trains and only use airplanes.",
+      "Also, companies are building energy-efficient trains and using renewable energy to help protect the environment.",
+      "The old trains from 1872 will be used again to save money."
+    ],
+    correct: 1
+  }
+];
+
+// ── Inference quiz ────────────────────────────────────────────
+const quizData = [
+  { q: "Why did the first train line connect Tokyo and Yokohama in 1872?",
+    opts: ["Because those were the only two cities in Japan at the time.","Because connecting the capital (Tokyo) to a nearby port (Yokohama) was likely important for the country.","Because the first train was too slow to go any further than 29 kilometers."], correct: 1 },
+  { q: "How did the Shinkansen change life for people in 1964?",
+    opts: ["It made it possible for people to travel between major cities much faster than before.","It made people stop using cars completely in Tokyo and Osaka.","It showed that trains in the future would be more expensive than airplanes."], correct: 0 },
+  { q: "What would likely happen in Tokyo if the trains stopped working for one day?",
+    opts: ["People would enjoy the quiet streets because there are no cars.","The city would have a big problem because the population is too large for everyone to drive.","Everyone would stay home because Japanese people do not like to go to work."], correct: 1 },
+  { q: "Why is a one-minute delay considered a \"problem\" for Japanese train companies?",
+    opts: ["Because the train drivers lose their jobs if they are one minute late.","Because the culture values schedules and being on time very highly, especially for workers.","Because the high-tech smart technology breaks if the train is late."], correct: 1 },
+  { q: "What is a main goal for the future of Japanese transportation?",
+    opts: ["To make trains slower so that passengers can look at the scenery.","To stop using technology like AI so that more humans can have jobs.","To keep improving speed while also taking care of the environment."], correct: 2 },
+];
+
+// ── State ─────────────────────────────────────────────────────
+let currentScreen = 1;
+let part2Sel  = null;
+let part3Sel  = {};   // index → letter
+let sortSel   = {};   // letter → position
+let endingSel = {};   // index → option index
+let quizSel   = {};   // index → option index
+let locked    = false;
+
+const LS_KEY = 'japanese_trains_state';
+
+// ── localStorage ──────────────────────────────────────────────
+function saveState() {
+  const state = {
+    currentScreen,
+    studentName:   document.getElementById('studentName').value,
+    studentNumber: document.getElementById('studentNumber').value,
+    part2Sel, part3Sel, sortSel, endingSel, quizSel, locked
+  };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch(e) { return null; }
+}
+function clearState() { try { localStorage.removeItem(LS_KEY); } catch(e) {} }
+
+function restoreState(state) {
+  part2Sel  = state.part2Sel  ?? null;
+  part3Sel  = state.part3Sel  || {};
+  sortSel   = state.sortSel   || {};
+  endingSel = state.endingSel || {};
+  quizSel   = state.quizSel   || {};
+  locked    = state.locked    || false;
+  if (state.studentName)   document.getElementById('studentName').value   = state.studentName;
+  if (state.studentNumber) document.getElementById('studentNumber').value = state.studentNumber;
+  checkReady();
+  const n = state.currentScreen || 1;
+  goTo(n);
+  // restore widget selections after build
+  setTimeout(() => restoreSelections(n), 120);
+}
+
+function restoreSelections(n) {
+  if (n === 2) {
+    if (part2Sel !== null) {
+      const el = document.getElementById(`p2_${part2Sel}`);
+      if (el) el.className = 'q-option selected';
+    }
+    Object.entries(part3Sel).forEach(([i, letter]) => {
+      const sel = document.getElementById(`p3_${i}`);
+      if (sel) sel.value = letter;
+    });
+  }
+  if (n === 3) {
+    Object.entries(sortSel).forEach(([letter, pos]) => {
+      const sel = document.getElementById(`sort_${letter}`);
+      if (sel) sel.value = pos;
+    });
+    Object.entries(endingSel).forEach(([i, oi]) => {
+      const el = document.getElementById(`end_${i}_${oi}`);
+      if (el) el.className = 'q-option selected';
+    });
+  }
+  if (n === 4) {
+    Object.entries(quizSel).forEach(([i, oi]) => {
+      const el = document.getElementById(`qo${i}_${oi}`);
+      if (el) el.className = 'q-option selected';
+    });
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function updateSteps(n) {
+  [1,2,3,4,5].forEach(i => {
+    const el = document.getElementById('s'+i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '✓' : i;
+  });
+}
+function goTo(n) {
+  currentScreen = n;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen'+n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0,0);
+  if (n===2) buildSkim();
+  if (n===3) buildReading();
+  if (n===4) buildQuiz();
+  saveState();
+}
+
+// ── Setup ─────────────────────────────────────────────────────
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', () => { checkReady(); saveState(); });
+document.getElementById('studentNumber').addEventListener('input', () => { checkReady(); saveState(); });
+
+// ── Build Skim screen (Part 2 + Part 3) ───────────────────────
+function buildSkim() {
+  if (document.getElementById('part2Container').innerHTML) return;
+  const L = ['A','B','C','D'];
+  // Part 2 MCQ
+  document.getElementById('part2Container').innerHTML = `
+    <div class="q-block">
+      <div class="q-text">1. ${part2.q}</div>
+      ${part2.opts.map((opt,oi) => `
+        <div class="q-option" id="p2_${oi}" onclick="selectP2(${oi})">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${opt}</div>
+        </div>`).join('')}
+    </div>`;
+  // Part 3 matching dropdowns
+  document.getElementById('part3Container').innerHTML = part3.map((row,i) => `
+    <div class="match-row">
+      <div class="match-sentence">${row.sentence}</div>
+      <select class="match-sel" id="p3_${i}" onchange="selectP3(${i}, this.value)">
+        <option value="">— choose A, B, C, or D —</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+      </select>
+    </div>`).join('');
+}
+
+function selectP2(oi) {
+  if (locked) return;
+  part2.opts.forEach((_,o) => { document.getElementById(`p2_${o}`).className = 'q-option'; });
+  part2Sel = oi;
+  document.getElementById(`p2_${oi}`).className = 'q-option selected';
+  saveState();
+}
+function selectP3(i, val) {
+  part3Sel[i] = val;
+  saveState();
+}
+
+function finishSkim() {
+  if (part2Sel === null) { alert('Please answer the Part 2 question.'); return; }
+  if (part3.some((_,i) => !part3Sel[i])) { alert('Please match all four topic sentences in Part 3.'); return; }
+  goTo(3);
+}
+
+// ── Build Reading screen (Task 1 + Task 2) ────────────────────
+function buildReading() {
+  if (document.getElementById('sortContainer').innerHTML) return;
+  // Task 1 sorting
+  document.getElementById('sortContainer').innerHTML = sortSentences.map(s => `
+    <div class="sort-item">
+      <div class="sort-letter">${s.letter}</div>
+      <div class="sort-body">
+        <div class="sort-text">${s.text}</div>
+        <select class="sort-sel" id="sort_${s.letter}" onchange="selectSort('${s.letter}', this.value)">
+          <option value="">— position —</option>
+          <option value="1">1st</option>
+          <option value="2">2nd</option>
+          <option value="3">3rd</option>
+        </select>
+      </div>
+    </div>`).join('');
+
+  // Task 2 endings
+  const L = ['A','B','C'];
+  document.getElementById('endingContainer').innerHTML = endings.map((e,i) => `
+    <div class="q-block">
+      <div class="q-type">${e.label}</div>
+      <div class="para-context">${e.context}</div>
+      ${e.opts.map((opt,oi) => `
+        <div class="q-option" id="end_${i}_${oi}" onclick="selectEnding(${i},${oi})">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${opt}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function selectSort(letter, val) {
+  sortSel[letter] = val;
+  saveState();
+}
+function selectEnding(i, oi) {
+  if (locked) return;
+  endings[i].opts.forEach((_,o) => { document.getElementById(`end_${i}_${o}`).className = 'q-option'; });
+  endingSel[i] = oi;
+  document.getElementById(`end_${i}_${oi}`).className = 'q-option selected';
+  saveState();
+}
+
+function finishReading() {
+  if (sortSentences.some(s => !sortSel[s.letter])) { alert('Please choose a position for all three sentences in Task 1.'); return; }
+  // check no duplicate positions
+  const positions = sortSentences.map(s => sortSel[s.letter]);
+  if (new Set(positions).size !== 3) { alert('Each sentence must have a different position (1st, 2nd, 3rd).'); return; }
+  if (endings.some((_,i) => endingSel[i] === undefined)) { alert('Please choose an ending for all three paragraphs in Task 2.'); return; }
+  goTo(4);
+}
+
+// ── Build Quiz ────────────────────────────────────────────────
+function buildQuiz() {
+  if (document.getElementById('quizContainer').innerHTML) return;
+  const L = ['A','B','C'];
+  document.getElementById('quizContainer').innerHTML = quizData.map((q,qi) => `
+    <div class="q-block">
+      <div class="q-text">${qi+1}. ${q.q}</div>
+      ${q.opts.map((opt,oi) => `
+        <div class="q-option" id="qo${qi}_${oi}" onclick="selectQuiz(${qi},${oi})">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${opt}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+function selectQuiz(qi, oi) {
+  if (locked) return;
+  quizData[qi].opts.forEach((_,o) => { document.getElementById(`qo${qi}_${o}`).className = 'q-option'; });
+  quizSel[qi] = oi;
+  document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+  saveState();
+}
+
+// ── Submit & score everything ─────────────────────────────────
+function submitAll() {
+  if (quizData.some((_,i) => quizSel[i] === undefined)) { alert('Please answer all 5 quiz questions.'); return; }
+  locked = true;
+
+  const L4 = ['A','B','C','D'];
+  const L3 = ['A','B','C'];
+  const review = [];
+
+  // ── Skim score (Part 2 = 1, Part 3 = 4) → out of 5 ──
+  let skimScore = 0;
+  const p2ok = part2Sel === part2.correct;
+  if (p2ok) skimScore++;
+  review.push({ label: 'Part 2 — Topic & Purpose', chosen: L4[part2Sel], ok: p2ok, correct: L4[part2.correct] });
+
+  part3.forEach((row,i) => {
+    const ok = part3Sel[i] === row.correct;
+    if (ok) skimScore++;
+    review.push({ label: `Part 3 — Match ${row.sentence.replace(/<[^>]+>/g,'').split(':')[0]}`, chosen: part3Sel[i], ok, correct: row.correct });
+  });
+
+  // ── Reading task score (Task 1 = 3, Task 2 = 3) → out of 6 ──
+  let taskScore = 0;
+  sortSentences.forEach(s => {
+    const ok = parseInt(sortSel[s.letter]) === s.correctPos;
+    if (ok) taskScore++;
+    const posLabel = {1:'1st',2:'2nd',3:'3rd'};
+    review.push({ label: `Task 1 — Sentence ${s.letter}`, chosen: posLabel[sortSel[s.letter]], ok, correct: posLabel[s.correctPos] });
+  });
+  endings.forEach((e,i) => {
+    const ok = endingSel[i] === e.correct;
+    if (ok) taskScore++;
+    review.push({ label: `Task 2 — ${e.label} ending`, chosen: L3[endingSel[i]], ok, correct: L3[e.correct] });
+  });
+
+  // ── Quiz score → out of 5 ──
+  let quizScore = 0;
+  quizData.forEach((q,qi) => {
+    const chosen = quizSel[qi];
+    const ok = chosen === q.correct;
+    if (ok) quizScore++;
+    q.opts.forEach((_,oi) => {
+      const el = document.getElementById(`qo${qi}_${oi}`);
+      if (oi === chosen && ok)       el.className = 'q-option correct';
+      else if (oi === chosen && !ok) el.className = 'q-option wrong';
+      else if (oi === q.correct)     el.className = 'q-option show-correct';
+      else                           el.className = 'q-option';
+    });
+    review.push({ label: `Quiz ${qi+1}`, chosen: L3[chosen], ok, correct: L3[q.correct] });
+  });
+
+  const total = skimScore + taskScore + quizScore;
+  const pct = Math.round(total/16*100);
+
+  // Score ring
+  const ring = document.getElementById('finalRing');
+  ring.className = 'score-ring ' + (pct>=75?'high':pct>=50?'mid':'low');
+  document.getElementById('totalNum').textContent = total + '/16';
+  document.getElementById('skimNum').textContent  = skimScore;
+  document.getElementById('taskNum').textContent  = taskScore;
+  document.getElementById('quizNum').textContent  = quizScore;
+
+  const [t,s] = pct>=90 ? ['Excellent work!','You understood the article very well.']
+    : pct>=70 ? ['Great job!','You have a strong understanding.']
+    : pct>=50 ? ['Good effort!','Review the answers below.']
+    : ['Keep practising!','Look at the correct answers below.'];
+  document.getElementById('scoreTitle').textContent = t;
+  document.getElementById('scoreSub').textContent   = s;
+
+  document.getElementById('reviewList').innerHTML = review.map((r,idx) => `
+    <div class="review-row">
+      <div class="review-num ${r.ok?'rn-ok':'rn-bad'}">${r.ok?'✓':'✗'}</div>
+      <div class="review-body">
+        <div class="review-label">${r.label}</div>
+        <div class="review-answer ${r.ok?'rev-ok':'rev-bad'}">Your answer: ${r.chosen || '—'}</div>
+        ${!r.ok?`<div class="review-correct">Correct: <span>${r.correct}</span></div>`:''}
+      </div>
+    </div>`).join('');
+
+  goTo(5);
+  clearState();
+  logToSheets(skimScore, taskScore, quizScore, total, pct, review);
+}
+
+// ── Google Sheets ─────────────────────────────────────────────
+function logToSheets(skimScore, taskScore, quizScore, total, pct, review) {
+  document.getElementById('sheetStatus').textContent = '⏳ Saving to gradebook…';
+  const name = document.getElementById('studentName').value.trim();
+  const num  = document.getElementById('studentNumber').value.trim();
+  const detail = review.map(r => `${r.label}:${r.chosen||'—'}(${r.ok?'✓':'✗'})`).join(' | ');
+
+  const payload = JSON.stringify({
+    studentNumber: num,
+    studentName:   name,
+    score:         total + '/16',
+    percent:       pct,
+    skimScore:     skimScore + '/5',
+    taskScore:     taskScore + '/6',
+    quizScore:     quizScore + '/5',
+    response:      detail
+  });
+
+  const form   = document.createElement('form');
+  form.method  = 'POST';
+  form.action  = SHEET_URL;
+  form.target  = 'hidden_iframe';
+  form.style.display = 'none';
+  const input  = document.createElement('input');
+  input.type   = 'hidden';
+  input.name   = 'data';
+  input.value  = payload;
+  form.appendChild(input);
+
+  const iframe = document.createElement('iframe');
+  iframe.name  = 'hidden_iframe';
+  iframe.style.display = 'none';
+  iframe.onload = () => { document.getElementById('sheetStatus').textContent = '✅ Saved to gradebook.'; };
+
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(() => {
+    const status = document.getElementById('sheetStatus');
+    if (status.textContent.includes('⏳')) status.textContent = '✅ Saved to gradebook.';
+  }, 3000);
+}
+
+// ── On load: restore ──────────────────────────────────────────
+window.addEventListener('load', () => {
+  const state = loadState();
+  if (state && state.currentScreen > 1) restoreState(state);
+});
+</script>
+</body>
+</html>
