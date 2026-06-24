@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Reading — The Unhappy Workplace in Japan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #1c1410;
+    --surface: #271c16;
+    --surface2:#32251c;
+    --border:  #443227;
+    --accent:  #f0883e;
+    --gold:    #fbbf24;
+    --white:   #FFFFFF;
+    --light:   #ecd9c6;
+    --muted:   #a3866b;
+    --success: #4CAF7D;
+    --error:   #E05C5C;
+    --A:       #f0883e;
+    --B:       #56b3fa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; padding-bottom: 60px; }
+
+  .header { background: linear-gradient(135deg, #1c1410 0%, #271c16 100%); border-bottom: 1px solid var(--border); padding: 24px 20px 18px; text-align: center; }
+  .header-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+  .header h1 { font-family: 'Lora', serif; font-size: 1.22rem; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+  .header .sub { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+  .steps { display: flex; justify-content: center; align-items: center; padding: 12px 8px 0; gap: 0; overflow-x: auto; }
+  .step { display: flex; align-items: center; gap: 4px; font-size: 0.54rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); transition: color 0.3s; white-space: nowrap; }
+  .step.active { color: var(--accent); }
+  .step.done   { color: var(--success); }
+  .step-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.54rem; font-weight: 700; background: var(--surface); transition: all 0.3s; }
+  .step.active .step-dot { border-color: var(--accent); color: var(--accent); }
+  .step.done   .step-dot { border-color: var(--success); background: var(--success); color: #fff; }
+  .step-line { width: 16px; height: 2px; background: var(--border); margin: 0 3px; flex-shrink: 0; }
+
+  .screen { display: none; padding: 18px; max-width: 540px; margin: 0 auto; }
+  .screen.active { display: block; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .sec-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 9px; }
+  .part-head { font-family: 'Lora', serif; font-size: 1.02rem; font-weight: 600; color: var(--white); margin: 18px 0 4px; }
+  .part-sub { font-size: 0.76rem; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .card-tag { display: inline-block; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 9px; border-radius: 4px; margin-bottom: 9px; background: rgba(240,136,62,0.12); color: var(--accent); }
+  .card p { font-family: 'Lora', serif; font-size: 0.88rem; line-height: 1.85; color: var(--light); }
+  .card p strong { color: var(--white); font-weight: 600; }
+
+  .instr { background: rgba(240,136,62,0.06); border: 1px solid rgba(240,136,62,0.18); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.78rem; color: #f0c8a0; line-height: 1.6; }
+  .instr strong { color: var(--accent); }
+
+  .field { margin-bottom: 11px; }
+  .field label { display: block; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .field input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Sora', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .field input:focus { border-color: var(--accent); }
+
+  .partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .partner-btn { background: var(--surface2); border: 2px solid var(--border); border-radius: 14px; padding: 16px 10px; text-align: center; cursor: pointer; transition: all 0.2s; color: var(--white); }
+  .partner-btn.sel-A { border-color: var(--A); background: rgba(240,136,62,0.07); }
+  .partner-btn.sel-B { border-color: var(--B); background: rgba(86,179,250,0.07); }
+  .partner-letter { font-size: 1.9rem; font-family: 'Lora', serif; font-weight: 600; margin-bottom: 4px; }
+  .pa { color: var(--A); } .pb { color: var(--B); }
+  .partner-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.45; }
+
+  /* Cloze paragraph */
+  .cloze-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; font-family: 'Lora', serif; font-size: 0.9rem; line-height: 2.4; color: var(--light); }
+  .blank-wrap { display: inline-block; vertical-align: middle; margin: 0 1px; }
+  select.blank { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 7px; color: var(--accent); font-family: 'Sora', sans-serif; font-size: 0.74rem; font-weight: 600; padding: 3px 22px 3px 7px; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23f0883e'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; }
+  select.blank.correct { border-color: var(--success); color: var(--success); background-color: rgba(76,175,125,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234CAF7D'/%3E%3C/svg%3E"); }
+  select.blank.wrong { border-color: var(--error); color: var(--error); background-color: rgba(224,92,92,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23E05C5C'/%3E%3C/svg%3E"); }
+  select.blank option { background: #32251c; color: var(--white); }
+
+  /* Subheading matching */
+  .subhead-block { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  select.subhead-sel { width: 100%; background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 8px; color: var(--accent); font-family: 'Sora', sans-serif; font-size: 0.82rem; font-weight: 600; padding: 9px 28px 9px 12px; outline: none; cursor: pointer; margin-bottom: 11px; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23f0883e'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+  select.subhead-sel.correct { border-color: var(--success); color: var(--success); background-color: rgba(76,175,125,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234CAF7D'/%3E%3C/svg%3E"); }
+  select.subhead-sel.wrong { border-color: var(--error); color: var(--error); background-color: rgba(224,92,92,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23E05C5C'/%3E%3C/svg%3E"); }
+  select.subhead-sel option { background: #32251c; color: var(--white); }
+  .subhead-para { font-family: 'Lora', serif; font-size: 0.85rem; line-height: 1.75; color: var(--light); }
+
+  .fulltext { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; max-height: 280px; overflow-y: auto; }
+  .fulltext p { font-family: 'Lora', serif; font-size: 0.85rem; line-height: 1.8; color: var(--light); margin-bottom: 12px; }
+  .fulltext p:last-child { margin-bottom: 0; }
+  .fulltext p strong { color: var(--white); font-weight: 600; }
+
+  .kw-row { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: baseline; padding-bottom: 9px; border-bottom: 1px solid var(--border); }
+  .kw-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .kw-term { font-family: 'Sora', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--accent); }
+  .kw-jp { font-size: 0.72rem; color: var(--muted); }
+  .kw-def { grid-column: 1 / -1; font-size: 0.78rem; color: var(--light); line-height: 1.45; }
+
+  /* MCQ */
+  .q-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 11px; }
+  .q-type { font-size: 0.57rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .q-text { font-family: 'Lora', serif; font-size: 0.88rem; color: var(--white); line-height: 1.5; margin-bottom: 10px; font-weight: 600; }
+  .q-option { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 9px; border: 1.5px solid var(--border); margin-bottom: 7px; cursor: pointer; transition: all 0.2s; background: var(--surface2); }
+  .q-option:last-child { margin-bottom: 0; }
+  .q-option:hover { border-color: var(--accent); }
+  .q-option.selected     { border-color: var(--accent);  background: rgba(240,136,62,0.08); }
+  .q-option.correct      { border-color: var(--success); background: rgba(76,175,125,0.1); }
+  .q-option.wrong        { border-color: var(--error);   background: rgba(224,92,92,0.08); }
+  .q-option.show-correct { border-color: var(--success); background: rgba(76,175,125,0.06); }
+  .opt-letter { min-width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
+  .q-option.selected .opt-letter     { background: var(--accent);  color: var(--bg); }
+  .q-option.correct  .opt-letter     { background: var(--success); color: #fff; }
+  .q-option.wrong    .opt-letter     { background: var(--error);   color: #fff; }
+  .q-option.show-correct .opt-letter { background: var(--success); color: #fff; }
+  .opt-text { font-size: 0.82rem; color: var(--light); line-height: 1.45; padding-top: 2px; }
+
+  .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #1c1410; }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); margin-top: 9px; }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--white); }
+
+  .score-wrap { display: flex; flex-direction: column; align-items: center; padding: 20px 0 12px; }
+  .score-ring { width: 116px; height: 116px; border-radius: 50%; border: 4px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .score-ring.high { border-color: var(--success); box-shadow: 0 0 22px rgba(76,175,125,0.25); }
+  .score-ring.mid  { border-color: var(--gold);    box-shadow: 0 0 20px rgba(251,191,36,0.2); }
+  .score-ring.low  { border-color: var(--error);   box-shadow: 0 0 20px rgba(224,92,92,0.2); }
+  .score-num   { font-family: 'Lora', serif; font-size: 2.4rem; font-weight: 600; line-height: 1; }
+  .score-small { font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+  .score-title { font-family: 'Lora', serif; font-size: 1.05rem; text-align: center; }
+  .score-sub   { font-size: 0.73rem; color: var(--muted); text-align: center; margin-top: 3px; }
+
+  .split-scores { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .split-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; }
+  .split-label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .split-num   { font-family: 'Lora', serif; font-size: 1.4rem; font-weight: 600; }
+  .split-denom { font-size: 0.6rem; color: var(--muted); }
+
+  .review-row { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .review-row:last-child { border-bottom: none; }
+  .review-num { min-width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+  .rn-ok  { background: rgba(76,175,125,0.18); color: var(--success); }
+  .rn-bad { background: rgba(224,92,92,0.18);  color: var(--error); }
+  .review-body { flex: 1; }
+  .review-label  { font-size: 0.62rem; color: var(--muted); margin-bottom: 2px; }
+  .review-answer { font-weight: 600; font-size: 0.82rem; }
+  .rev-ok  { color: var(--success); }
+  .rev-bad { color: var(--error); }
+  .review-correct { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .review-correct span { color: var(--success); font-weight: 600; }
+
+  .total-box { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 14px; }
+  .total-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .total-num   { font-family: 'Lora', serif; font-size: 2.6rem; font-weight: 600; line-height: 1; }
+  .total-denom { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  #sheetStatus { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Video + Reading Activity</div>
+  <h1>The Unhappy Workplace in Japan</h1>
+  <p class="sub">Watch, read, and discuss with a partner</p>
+</div>
+
+<div class="steps" id="stepBar">
+  <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-dot">2</div><span>Cloze</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s3"><div class="step-dot">3</div><span>Headings</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s4"><div class="step-dot">4</div><span>Quiz</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s5"><div class="step-dot">5</div><span>Score</span></div>
+</div>
+
+<!-- ── Screen 1: Setup ── -->
+<div class="screen active" id="screen1">
+  <div class="sec-label">Your details</div>
+  <div class="field"><label>Student Number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+  <div class="field"><label>Name (Romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+  <div class="sec-label">Your partner role (for the quiz)</div>
+  <div class="partner-grid">
+    <div class="partner-btn" id="btnA" onclick="selectPartner('A')">
+      <div class="partner-letter pa">A</div>
+      <div class="partner-desc">You answer<br>quiz questions <strong>1–5</strong>.</div>
+    </div>
+    <div class="partner-btn" id="btnB" onclick="selectPartner('B')">
+      <div class="partner-letter pb">B</div>
+      <div class="partner-desc">You answer<br>quiz questions <strong>6–10</strong>.</div>
+    </div>
+  </div>
+  <div class="instr" style="margin-top:14px;">🎬 Part 1 is a <strong>cloze activity</strong>. Fill in the blanks <strong>while you watch the video</strong> in class.</div>
+  <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled>Start →</button>
+</div>
+
+<!-- ── Screen 2: Cloze ── -->
+<div class="screen" id="screen2">
+  <div class="instr">🎬 <strong>Watch the video</strong> and fill in each blank by choosing the word you hear.</div>
+  <div class="cloze-card" id="clozeContainer"></div>
+  <button class="btn btn-primary" onclick="finishCloze()">Next: Subheadings →</button>
+  <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+</div>
+
+<!-- ── Screen 3: Subheadings ── -->
+<div class="screen" id="screen3">
+  <div class="instr">📑 Read each paragraph and choose the best <strong>subheading</strong> from the dropdown at the top.</div>
+  <div id="subheadContainer"></div>
+
+  <div class="sec-label">Vocabulary</div>
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:grid; gap:10px;">
+      <div class="kw-row"><span class="kw-term">Global average</span><span class="kw-jp">世界平均 Sekai heikin</span><span class="kw-def">The typical amount or level when looking at the whole world.</span></div>
+      <div class="kw-row"><span class="kw-term">Dead last</span><span class="kw-jp">最下位 Saikai</span><span class="kw-def">In the very last position; the lowest rank.</span></div>
+      <div class="kw-row"><span class="kw-term">Lifetime employment</span><span class="kw-jp">終身雇用 Shūshin koyō</span><span class="kw-def">A system where a person works for the same company until they retire.</span></div>
+      <div class="kw-row"><span class="kw-term">Stuck</span><span class="kw-jp">行き詰まった Ikizumatta</span><span class="kw-def">Feeling like you cannot change your situation or move to a different job.</span></div>
+      <div class="kw-row"><span class="kw-term">A huge chunk</span><span class="kw-jp">大部分 Daibubun</span><span class="kw-def">A large part or a big percentage of something.</span></div>
+      <div class="kw-row"><span class="kw-term">Bare minimum</span><span class="kw-jp">最低限 Saiteigen</span><span class="kw-def">Doing only the smallest amount of work required and nothing more.</span></div>
+      <div class="kw-row"><span class="kw-term">Passion</span><span class="kw-jp">情熱 Jōnetsu</span><span class="kw-def">A strong feeling of excitement or interest in your work.</span></div>
+      <div class="kw-row"><span class="kw-term">Productive</span><span class="kw-jp">生産的 Seisanteki</span><span class="kw-def">Doing a lot of work or achieving good results in a short time.</span></div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" onclick="finishSubhead()">Next: Quiz →</button>
+  <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+</div>
+
+<!-- ── Screen 4: Paired Quiz ── -->
+<div class="screen" id="screen4">
+  <div class="instr" id="quizInstr"></div>
+  <div class="sec-label">Full Text</div>
+  <div class="fulltext">
+    <p>Welcome to this explainer. Today we're asking a big question. Why are Japanese workplaces so unhappy? Let me ask you, do you really like your job? Are you actually happy at work? Well, in Japan, that number is super low. Only 5% of workers feel excited today. That 5% is way, way lower than the <strong>global average</strong> of 23%. Compared to places like India, Japan actually ranks <strong>dead last</strong> for job happiness.</p>
+    <p>So why are workers there so sad? What exactly causes this huge office problem? The reasons are simple. Super long hours, strict bosses, no holidays, and zero chance to share ideas. There's also shushin coyo or <strong>lifetime employment</strong>. This old rule makes people feel totally <strong>stuck</strong>. Because they feel stuck, only 25% think it's a good time to find a new job.</p>
+    <p>Okay, let's dive in. What happens when people feel this unhappy? Let's look at the bad results. <strong>A huge chunk</strong>, 32% of workers feel high stress almost every single day. Happy workers learn new things, but sad workers just do the <strong>bare minimum</strong>. 73% of workers just show up. They bring zero energy or <strong>passion</strong> to the office. With that low energy, workers stop growing.</p>
+    <p>So, how can we fix it? How can companies make things better? First, listen to workers by holding open meetings. Next, make friendly rules and build real friendships. Bosses must include everyone. For example, they can even pay for outside classes to help workers learn. Fixing this helps everyone. Happy workers build a much stronger, faster, and more <strong>productive</strong> company.</p>
+  </div>
+
+  <div class="sec-label">Your Quiz Questions</div>
+  <div id="quizContainer"></div>
+  <button class="btn btn-primary" onclick="submitAll()">Submit & See Score →</button>
+  <button class="btn btn-ghost" onclick="goTo(3)">← Back</button>
+</div>
+
+<!-- ── Screen 5: Score ── -->
+<div class="screen" id="screen5">
+  <div class="total-box">
+    <div class="total-label">Total Score</div>
+    <div class="total-num" id="totalNum">—</div>
+    <div class="total-denom">out of 23</div>
+  </div>
+  <div class="split-scores">
+    <div class="split-card"><div class="split-label">Cloze</div><div class="split-num" id="clozeNum">—</div><div class="split-denom">out of 14</div></div>
+    <div class="split-card"><div class="split-label">Headings</div><div class="split-num" id="subheadNum">—</div><div class="split-denom">out of 4</div></div>
+    <div class="split-card"><div class="split-label">Quiz</div><div class="split-num" id="quizNum">—</div><div class="split-denom">out of 5</div></div>
+  </div>
+  <div class="sec-label">Answer review</div>
+  <div class="card" id="reviewList"></div>
+  <div id="sheetStatus"></div>
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzBeHovFt1KFdITm3um9wvnD7To9hs5DlcWt44y48_S_3FJT4yKxEbQFqm0hMajhK_qZw/exec";
+
+// ── Cloze data: 14 blanks ─────────────────────────────────────
+const clozeBlanks = [
+  { correct: "5%",                  options: ["5%","15%","50%"] },
+  { correct: "23%",                 options: ["23%","13%","33%"] },
+  { correct: "dead last",           options: ["dead last","first place","near the top"] },
+  { correct: "long",                options: ["long","short","flexible"] },
+  { correct: "ideas",               options: ["ideas","money","food"] },
+  { correct: "lifetime employment", options: ["lifetime employment","part-time work","high salary"] },
+  { correct: "new job",             options: ["new job","new house","new boss"] },
+  { correct: "stress",              options: ["stress","energy","success"] },
+  { correct: "bare minimum",        options: ["bare minimum","extra work","best work"] },
+  { correct: "73%",                 options: ["73%","37%","17%"] },
+  { correct: "listening",           options: ["listening","shouting","talking"] },
+  { correct: "friendships",         options: ["friendships","buildings","schedules"] },
+  { correct: "classes",             options: ["classes","lunches","parties"] },
+  { correct: "productive",          options: ["productive","expensive","quiet"] },
+];
+
+const clozeSegments = [
+  `Welcome to this explainer. Today we're asking a big question. Why are Japanese workplaces so unhappy? Let me ask you, do you really like your job? Are you actually happy at work? Well, in Japan, that number is super low. Only `,
+  ` of workers feel excited today. That number is way, way lower than the global average of `,
+  `. Compared to places like India, Japan actually ranks `,
+  ` for job happiness. So why are workers there so sad? What exactly causes this huge office problem? The reasons are simple: `,
+  ` hours, strict bosses, no holidays, and zero chance to share `,
+  `. There is also shushin coyo, or `,
+  `, which makes people feel totally stuck. Because they feel stuck, only 25% think it is a good time to find a `,
+  `. What happens when people feel this unhappy? Let's look at the bad results. A huge chunk — 32% of workers — feel high `,
+  ` almost every single day. While happy workers learn new things, sad workers just do the `,
+  `. In fact, `,
+  ` of workers just show up without energy or passion. So, how can we fix it? Companies can start by `,
+  ` to workers during open meetings and building real `,
+  `. Bosses can even pay for outside `,
+  ` to help workers learn. Fixing this helps everyone because happy workers build a much stronger and more `,
+  ` company.`,
+];
+
+// ── Subheadings ───────────────────────────────────────────────
+const SUBHEAD_BANK = ["Low Happiness in Japan","The Reasons for the Problem","The Bad Results","How to Fix the Problem"];
+const subheads = [
+  { correct: "Low Happiness in Japan",
+    para: `Welcome to this explainer. Today we're asking a big question. Why are Japanese workplaces so unhappy? Let me ask you, do you really like your job? Are you actually happy at work? Well, in Japan, that number is super low. Only 5% of workers feel excited today. That 5% is way, way lower than the global average of 23%. Compared to places like India, Japan actually ranks dead last for job happiness. Crazy, right?` },
+  { correct: "The Reasons for the Problem",
+    para: `So why are workers there so sad? What exactly causes this huge office problem? The reasons are simple. Super long hours, strict bosses, no holidays, and zero chance to share ideas. There's also shushin coyo or lifetime employment. This old rule makes people feel totally stuck. Because they feel stuck, only 25% think it's a good time to find a new job.` },
+  { correct: "The Bad Results",
+    para: `Okay, let's dive in. What happens when people feel this unhappy? Let's look at the bad results. A huge chunk, 32% of workers feel high stress almost every single day. See, happy workers learn new things, but sad workers, they just do the bare minimum. 73% of workers just show up. They bring zero energy or passion to the office. With that low energy, workers stop growing. They just don't get better at their jobs. It's a huge problem.` },
+  { correct: "How to Fix the Problem",
+    para: `So, how can we fix it? How can companies make things better? First, listen to workers by holding open meetings. Next, make friendly rules and build real friendships. Bosses must include everyone. For example, they can even pay for outside classes to help workers learn. Fixing this helps everyone. Happy workers build a much stronger, faster, and more productive company. So, think about your own happiness. What makes a job truly good for you?` },
+];
+
+// ── Quiz (all 10) ─────────────────────────────────────────────
+const allQuiz = [
+  { q:"How many workers in Japan feel excited about their jobs?", opts:["23%","5%","73%"], correct:1 },
+  { q:"Is job happiness in Japan higher or lower than the global average?", opts:["Higher","Lower","It is the same"], correct:1 },
+  { q:"Which of these is a reason why Japanese workers are unhappy?", opts:["Too many holidays","Strict bosses and long hours","Too many new ideas"], correct:1 },
+  { q:"What does \"shushin coyo\" mean?", opts:["High salary","Lifetime employment","Part-time work"], correct:1 },
+  { q:"How many workers in Japan think it is a good time to find a new job?", opts:["5%","25%","32%"], correct:1 },
+  { q:"How do \"sad workers\" behave at the office?", opts:["They learn many new things.","They do the bare minimum.","They bring a lot of energy."], correct:1 },
+  { q:"What percentage of workers feel high stress every day?", opts:["23%","32%","73%"], correct:1 },
+  { q:"What happens to workers who have \"low energy\" at work?", opts:["They stop growing and don't get better at their jobs.","They find new jobs very quickly.","They become bosses."], correct:0 },
+  { q:"What is one way bosses can make the workplace better?", opts:["By having fewer meetings.","By paying for outside classes to help workers learn.","By giving workers more work."], correct:1 },
+  { q:"Why is it good for a company to have happy workers?", opts:["The company becomes stronger and more productive.","The company can close earlier.","The workers will never leave."], correct:0 },
+];
+
+// ── State ─────────────────────────────────────────────────────
+let currentScreen = 1;
+let partner    = null;
+let clozeSel   = {};   // index → value
+let subheadSel = {};   // index → value
+let quizSel    = {};   // global quiz index → option index
+let locked     = false;
+
+const LS_KEY = 'workplace_japan_state';
+
+// ── localStorage ──────────────────────────────────────────────
+function saveState() {
+  const state = { currentScreen, partner,
+    studentName: document.getElementById('studentName').value,
+    studentNumber: document.getElementById('studentNumber').value,
+    clozeSel, subheadSel, quizSel, locked };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch(e) { return null; }
+}
+function clearState() { try { localStorage.removeItem(LS_KEY); } catch(e) {} }
+
+function restoreState(state) {
+  partner    = state.partner;
+  clozeSel   = state.clozeSel   || {};
+  subheadSel = state.subheadSel || {};
+  quizSel    = state.quizSel    || {};
+  locked     = state.locked     || false;
+  if (state.studentName)   document.getElementById('studentName').value   = state.studentName;
+  if (state.studentNumber) document.getElementById('studentNumber').value = state.studentNumber;
+  if (partner) {
+    document.getElementById('btnA').className = 'partner-btn' + (partner==='A' ? ' sel-A' : '');
+    document.getElementById('btnB').className = 'partner-btn' + (partner==='B' ? ' sel-B' : '');
+  }
+  checkReady();
+  const n = state.currentScreen || 1;
+  goTo(n);
+  setTimeout(() => restoreSelections(n), 120);
+}
+
+function restoreSelections(n) {
+  if (n === 2) {
+    Object.entries(clozeSel).forEach(([i,val]) => { const el = document.getElementById(`cloze_${i}`); if (el) el.value = val; });
+  }
+  if (n === 3) {
+    Object.entries(subheadSel).forEach(([i,val]) => { const el = document.getElementById(`subhead_${i}`); if (el) el.value = val; });
+  }
+  if (n === 4) {
+    Object.entries(quizSel).forEach(([qi,oi]) => { const el = document.getElementById(`qo${qi}_${oi}`); if (el) el.className = 'q-option selected'; });
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function updateSteps(n) {
+  [1,2,3,4,5].forEach(i => {
+    const el = document.getElementById('s'+i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '✓' : i;
+  });
+}
+function goTo(n) {
+  currentScreen = n;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen'+n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0,0);
+  if (n===2) buildCloze();
+  if (n===3) buildSubhead();
+  if (n===4) buildQuiz();
+  saveState();
+}
+
+// ── Setup ─────────────────────────────────────────────────────
+function selectPartner(p) {
+  partner = p;
+  document.getElementById('btnA').className = 'partner-btn' + (p==='A' ? ' sel-A' : '');
+  document.getElementById('btnB').className = 'partner-btn' + (p==='B' ? ' sel-B' : '');
+  checkReady();
+  saveState();
+}
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    partner &&
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', () => { checkReady(); saveState(); });
+document.getElementById('studentNumber').addEventListener('input', () => { checkReady(); saveState(); });
+
+// ── Build Cloze ───────────────────────────────────────────────
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+function buildCloze() {
+  if (document.getElementById('clozeContainer').innerHTML) return;
+  let html = '';
+  clozeSegments.forEach((seg, i) => {
+    html += seg;
+    if (i < clozeBlanks.length) {
+      const b = clozeBlanks[i];
+      const opts = shuffle(b.options);
+      const w = Math.max(95, Math.max(...opts.map(o => o.length)) * 8) + 'px';
+      html += `<span class="blank-wrap"><select class="blank" id="cloze_${i}" style="width:${w}" onchange="onCloze(${i}, this.value)"><option value="">(${i+1})</option>`;
+      opts.forEach(o => { html += `<option value="${o}">${o}</option>`; });
+      html += `</select></span>`;
+    }
+  });
+  document.getElementById('clozeContainer').innerHTML = html;
+}
+function onCloze(i, val) { clozeSel[i] = val; saveState(); }
+
+function finishCloze() {
+  if (clozeBlanks.some((_,i) => !clozeSel[i])) { alert('Please fill in all 14 blanks.'); return; }
+  goTo(3);
+}
+
+// ── Build Subheadings ─────────────────────────────────────────
+function buildSubhead() {
+  if (document.getElementById('subheadContainer').innerHTML) return;
+  document.getElementById('subheadContainer').innerHTML = subheads.map((sh,i) => `
+    <div class="subhead-block">
+      <select class="subhead-sel" id="subhead_${i}" onchange="onSubhead(${i}, this.value)">
+        <option value="">— choose a subheading —</option>
+        ${SUBHEAD_BANK.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+      </select>
+      <div class="subhead-para">${sh.para}</div>
+    </div>`).join('');
+}
+function onSubhead(i, val) { subheadSel[i] = val; saveState(); }
+
+function finishSubhead() {
+  if (subheads.some((_,i) => !subheadSel[i])) { alert('Please choose a subheading for all four paragraphs.'); return; }
+  goTo(4);
+}
+
+// ── Build Quiz (partner-specific) ─────────────────────────────
+function myQuizIndices() {
+  return partner === 'A' ? [0,1,2,3,4] : [5,6,7,8,9];
+}
+function buildQuiz() {
+  document.getElementById('quizInstr').innerHTML = partner === 'A'
+    ? '🧠 You are <strong>Partner A</strong>. Answer questions <strong>1–5</strong>. Work with your partner using the full text.'
+    : '🧠 You are <strong>Partner B</strong>. Answer questions <strong>6–10</strong>. Work with your partner using the full text.';
+  if (document.getElementById('quizContainer').innerHTML) return;
+  const L = ['A','B','C'];
+  const indices = myQuizIndices();
+  document.getElementById('quizContainer').innerHTML = indices.map(qi => {
+    const q = allQuiz[qi];
+    return `
+    <div class="q-block">
+      <div class="q-type">Question ${qi+1}</div>
+      <div class="q-text">${q.q}</div>
+      ${q.opts.map((opt,oi) => `
+        <div class="q-option" id="qo${qi}_${oi}" onclick="selectQuiz(${qi},${oi})">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${opt}</div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+function selectQuiz(qi, oi) {
+  if (locked) return;
+  allQuiz[qi].opts.forEach((_,o) => { document.getElementById(`qo${qi}_${o}`).className = 'q-option'; });
+  quizSel[qi] = oi;
+  document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+  saveState();
+}
+
+// ── Submit & score ────────────────────────────────────────────
+function submitAll() {
+  const indices = myQuizIndices();
+  if (indices.some(qi => quizSel[qi] === undefined)) { alert('Please answer all 5 of your quiz questions.'); return; }
+  locked = true;
+
+  const L3 = ['A','B','C'];
+  const review = [];
+
+  // Cloze (14)
+  let clozeScore = 0;
+  clozeBlanks.forEach((b,i) => {
+    const sel = document.getElementById(`cloze_${i}`);
+    const chosen = clozeSel[i];
+    const ok = chosen === b.correct;
+    if (ok) clozeScore++;
+    if (sel) sel.className = 'blank ' + (ok ? 'correct' : 'wrong');
+    review.push({ label: `Cloze ${i+1}`, chosen, ok, correct: b.correct });
+  });
+
+  // Subheadings (4)
+  let subheadScore = 0;
+  subheads.forEach((sh,i) => {
+    const sel = document.getElementById(`subhead_${i}`);
+    const chosen = subheadSel[i];
+    const ok = chosen === sh.correct;
+    if (ok) subheadScore++;
+    if (sel) sel.className = 'subhead-sel ' + (ok ? 'correct' : 'wrong');
+    review.push({ label: `Subheading ${i+1}`, chosen, ok, correct: sh.correct });
+  });
+
+  // Quiz (5 for this partner)
+  let quizScore = 0;
+  indices.forEach(qi => {
+    const q = allQuiz[qi];
+    const chosen = quizSel[qi];
+    const ok = chosen === q.correct;
+    if (ok) quizScore++;
+    q.opts.forEach((_,oi) => {
+      const el = document.getElementById(`qo${qi}_${oi}`);
+      if (oi === chosen && ok)       el.className = 'q-option correct';
+      else if (oi === chosen && !ok) el.className = 'q-option wrong';
+      else if (oi === q.correct)     el.className = 'q-option show-correct';
+      else                           el.className = 'q-option';
+    });
+    review.push({ label: `Quiz ${qi+1}`, chosen: L3[chosen], ok, correct: L3[q.correct] });
+  });
+
+  const total = clozeScore + subheadScore + quizScore;
+  const pct = Math.round(total/23*100);
+
+  document.getElementById('totalNum').textContent   = total + '/23';
+  document.getElementById('clozeNum').textContent   = clozeScore;
+  document.getElementById('subheadNum').textContent = subheadScore;
+  document.getElementById('quizNum').textContent    = quizScore;
+
+  document.getElementById('reviewList').innerHTML = review.map(r => `
+    <div class="review-row">
+      <div class="review-num ${r.ok?'rn-ok':'rn-bad'}">${r.ok?'✓':'✗'}</div>
+      <div class="review-body">
+        <div class="review-label">${r.label}</div>
+        <div class="review-answer ${r.ok?'rev-ok':'rev-bad'}">Your answer: ${r.chosen || '—'}</div>
+        ${!r.ok?`<div class="review-correct">Correct: <span>${r.correct}</span></div>`:''}
+      </div>
+    </div>`).join('');
+
+  goTo(5);
+  clearState();
+  logToSheets(clozeScore, subheadScore, quizScore, total, pct, review);
+}
+
+// ── Google Sheets ─────────────────────────────────────────────
+function logToSheets(clozeScore, subheadScore, quizScore, total, pct, review) {
+  document.getElementById('sheetStatus').textContent = '⏳ Saving to gradebook…';
+  const name = document.getElementById('studentName').value.trim();
+  const num  = document.getElementById('studentNumber').value.trim();
+  const detail = review.map(r => `${r.label}:${r.chosen||'—'}(${r.ok?'✓':'✗'})`).join(' | ');
+
+  const payload = JSON.stringify({
+    studentNumber: num, studentName: name, partner,
+    score: total + '/23', percent: pct,
+    clozeScore: clozeScore + '/14',
+    subheadScore: subheadScore + '/4',
+    quizScore: quizScore + '/5',
+    response: detail
+  });
+
+  const form = document.createElement('form');
+  form.method = 'POST'; form.action = SHEET_URL; form.target = 'hidden_iframe'; form.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'hidden'; input.name = 'data'; input.value = payload;
+  form.appendChild(input);
+  const iframe = document.createElement('iframe');
+  iframe.name = 'hidden_iframe'; iframe.style.display = 'none';
+  iframe.onload = () => { document.getElementById('sheetStatus').textContent = '✅ Saved to gradebook.'; };
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(() => {
+    const status = document.getElementById('sheetStatus');
+    if (status.textContent.includes('⏳')) status.textContent = '✅ Saved to gradebook.';
+  }, 3000);
+}
+
+// ── On load ───────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const state = loadState();
+  if (state && state.currentScreen > 1) restoreState(state);
+});
+</script>
+</body>
+</html>
