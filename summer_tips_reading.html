@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Reading — 10 Ways to Have a Great Summer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0a1c1e;
+    --surface: #10282b;
+    --surface2:#163438;
+    --border:  #1f474c;
+    --accent:  #2dd4bf;
+    --gold:    #fbbf24;
+    --white:   #FFFFFF;
+    --light:   #c4e8e5;
+    --muted:   #5c9490;
+    --success: #4CAF7D;
+    --error:   #E05C5C;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; padding-bottom: 60px; }
+
+  .header { background: linear-gradient(135deg, #0a1c1e 0%, #10282b 100%); border-bottom: 1px solid var(--border); padding: 24px 20px 18px; text-align: center; }
+  .header-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+  .header h1 { font-family: 'Lora', serif; font-size: 1.22rem; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+  .header .sub { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+  .steps { display: flex; justify-content: center; align-items: center; padding: 12px 8px 0; }
+  .step { display: flex; align-items: center; gap: 5px; font-size: 0.58rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); transition: color 0.3s; white-space: nowrap; }
+  .step.active { color: var(--accent); }
+  .step.done   { color: var(--success); }
+  .step-dot { width: 21px; height: 21px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.56rem; font-weight: 700; background: var(--surface); transition: all 0.3s; }
+  .step.active .step-dot { border-color: var(--accent); color: var(--accent); }
+  .step.done   .step-dot { border-color: var(--success); background: var(--success); color: #fff; }
+  .step-line { width: 22px; height: 2px; background: var(--border); margin: 0 4px; }
+
+  .screen { display: none; padding: 18px; max-width: 540px; margin: 0 auto; }
+  .screen.active { display: block; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .sec-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 9px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .card p { font-family: 'Lora', serif; font-size: 0.88rem; line-height: 1.8; color: var(--light); }
+
+  .instr { background: rgba(45,212,191,0.06); border: 1px solid rgba(45,212,191,0.18); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.78rem; color: #8fded4; line-height: 1.6; }
+  .instr strong { color: var(--accent); }
+
+  .field { margin-bottom: 11px; }
+  .field label { display: block; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .field input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Sora', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .field input:focus { border-color: var(--accent); }
+
+  .bank-item { display: flex; gap: 9px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .bank-item:last-child { border-bottom: none; }
+  .bank-letter { min-width: 22px; height: 22px; border-radius: 6px; background: rgba(45,212,191,0.14); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; flex-shrink: 0; }
+  .bank-text { font-family: 'Lora', serif; font-size: 0.8rem; line-height: 1.5; color: var(--light); padding-top: 2px; }
+
+  .tip-block { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 14px 16px; margin-bottom: 11px; }
+  .tip-head { display: flex; gap: 9px; align-items: baseline; margin-bottom: 7px; }
+  .tip-num { font-family: 'Lora', serif; font-size: 1.05rem; font-weight: 600; color: var(--accent); min-width: 22px; }
+  .tip-title { font-family: 'Lora', serif; font-size: 0.95rem; font-weight: 600; color: var(--white); line-height: 1.35; }
+  .tip-body { font-family: 'Lora', serif; font-size: 0.85rem; line-height: 1.75; color: var(--light); margin-bottom: 10px; }
+  .match-prompt { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+
+  select.match-sel, select.head-sel { width: 100%; background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 8px; color: var(--accent); font-family: 'Sora', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 9px 28px 9px 12px; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%232dd4bf'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+  select.match-sel.correct, select.head-sel.correct { border-color: var(--success); color: var(--success); background-color: rgba(76,175,125,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234CAF7D'/%3E%3C/svg%3E"); }
+  select.match-sel.wrong, select.head-sel.wrong { border-color: var(--error); color: var(--error); background-color: rgba(224,92,92,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23E05C5C'/%3E%3C/svg%3E"); }
+  select.match-sel option, select.head-sel option { background: #163438; color: var(--white); }
+
+  .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #0a1c1e; }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); margin-top: 9px; }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--white); }
+
+  .total-box { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 14px; }
+  .total-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .total-num   { font-family: 'Lora', serif; font-size: 2.6rem; font-weight: 600; line-height: 1; }
+  .total-denom { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .split-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .split-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px; text-align: center; }
+  .split-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .split-num   { font-family: 'Lora', serif; font-size: 1.55rem; font-weight: 600; }
+  .split-denom { font-size: 0.62rem; color: var(--muted); }
+
+  .review-row { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .review-row:last-child { border-bottom: none; }
+  .review-num { min-width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+  .rn-ok  { background: rgba(76,175,125,0.18); color: var(--success); }
+  .rn-bad { background: rgba(224,92,92,0.18);  color: var(--error); }
+  .review-body { flex: 1; }
+  .review-label  { font-size: 0.66rem; color: var(--muted); margin-bottom: 2px; }
+  .review-answer { font-weight: 600; font-size: 0.82rem; }
+  .rev-ok  { color: var(--success); }
+  .rev-bad { color: var(--error); }
+  .review-correct { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .review-correct span { color: var(--success); font-weight: 600; }
+
+  #sheetStatus { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Reading Activity</div>
+  <h1>10 Ways to Have a Great Summer</h1>
+  <p class="sub">Skim for headings, then infer the missing details</p>
+</div>
+
+<div class="steps" id="stepBar">
+  <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-dot">2</div><span>Headings</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s3"><div class="step-dot">3</div><span>Details</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s4"><div class="step-dot">4</div><span>Score</span></div>
+</div>
+
+<!-- ── Screen 1: Setup ── -->
+<div class="screen active" id="screen1">
+  <div class="sec-label">Your details</div>
+  <div class="field"><label>Student Number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+  <div class="field"><label>Name (Romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+  <div class="instr">☀️ This activity has two parts. <strong>Part 1:</strong> skim each paragraph and choose its missing heading. <strong>Part 2:</strong> read carefully and choose the missing detail sentence.</div>
+  <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled>Start →</button>
+</div>
+
+<!-- ── Screen 2: Heading cloze (skimming) ── -->
+<div class="screen" id="screen2">
+  <div class="card">
+    <p>Summer is here. You might want to relax and watch TV, but there are better ways to spend your time. These 10 tips will help you have a useful and fun summer.</p>
+  </div>
+
+  <div class="instr">👀 <strong>Part 1: Skim.</strong> Each tip is missing its heading. Read the sentences quickly, then choose the best heading from the dropdown. Use each heading only once.</div>
+
+  <div class="sec-label">Heading Bank</div>
+  <div class="card" id="headBankContainer"></div>
+
+  <div id="headingContainer"></div>
+
+  <button class="btn btn-primary" onclick="finishHeadings()">Next: Add the Details →</button>
+</div>
+
+<!-- ── Screen 3: Detail matching (inference) ── -->
+<div class="screen" id="screen3">
+  <div class="instr">🔍 <strong>Part 2: Infer.</strong> Now read each tip carefully. Choose the extra detail sentence (A–J) that best completes it. Use each letter only once.</div>
+
+  <div class="sec-label">Detail Bank</div>
+  <div class="card" id="bankContainer"></div>
+
+  <div id="tipContainer"></div>
+
+  <button class="btn btn-primary" onclick="submitAll()">Submit & See Score →</button>
+  <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+</div>
+
+<!-- ── Screen 4: Score ── -->
+<div class="screen" id="screen4">
+  <div class="total-box">
+    <div class="total-label">Total Score</div>
+    <div class="total-num" id="totalNum">—</div>
+    <div class="total-denom">out of 20</div>
+  </div>
+  <div class="split-scores">
+    <div class="split-card"><div class="split-label">Headings</div><div class="split-num" id="headNum">—</div><div class="split-denom">out of 10</div></div>
+    <div class="split-card"><div class="split-label">Details</div><div class="split-num" id="detailNum">—</div><div class="split-denom">out of 10</div></div>
+  </div>
+  <div class="sec-label">Answer review</div>
+  <div class="card" id="reviewList"></div>
+  <div id="sheetStatus"></div>
+</div>
+
+<script>
+const SHEET_URL = "PASTE_URL_HERE";
+
+const TIPS = [
+  { n:1,  title:"Work Hard at Your Job",
+    body:"A summer job or an internship is a great way to get work experience. If you do not have a job, you can volunteer to help people in your town. This helps you learn new things and meet people.",
+    detailCorrect:"C" },
+  { n:2,  title:"Learn New Things",
+    body:"Do not stop learning during the break. You can use an app to learn a new language or try a new skill like coding. You can also read about different countries.",
+    detailCorrect:"I" },
+  { n:3,  title:"Read for Fun",
+    body:"Read books that you enjoy. This is good for your memory and helps you feel less stressed.",
+    detailCorrect:"E" },
+  { n:4,  title:"Learn to Cook",
+    body:"Try to cook basic meals or family recipes. You can also learn \u201cmeal prep,\u201d which means making food early to save time later.",
+    detailCorrect:"A" },
+  { n:5,  title:"Go on an Adventure",
+    body:"Go to a new place with your friends by bus, train, or car. If you stay home, you can use student discounts to visit museums or music festivals.",
+    detailCorrect:"J" },
+  { n:6,  title:"Enjoy Your Hobbies",
+    body:"Spend time on things you love, like art, music, or dancing. You can also try a new hobby, like sewing or puzzles.",
+    detailCorrect:"G" },
+  { n:7,  title:"Review Your Notes",
+    body:"Look at your notes from last year. You only need to look at them for a short time to help your brain get ready for new classes.",
+    detailCorrect:"F" },
+  { n:8,  title:"Join a Club",
+    body:"Look at the clubs and activities at your college. Choose the ones you want to join next semester to make new friends.",
+    detailCorrect:"D" },
+  { n:9,  title:"Go Outside",
+    body:"Put your phone away and go outdoors. You can go for a swim or read in a park. This is very healthy for your mind.",
+    detailCorrect:"H" },
+  { n:10, title:"Relax",
+    body:"Make time to rest and do nothing. It is important to recharge your energy so you do not feel too tired when school starts again.",
+    detailCorrect:"B" },
+];
+
+const BANK = [
+  { letter: "A", text: "Ask your grandmother or grandfather to teach you one special dish." },
+  { letter: "B", text: "Your brain needs quiet time to remember what you have learned." },
+  { letter: "C", text: "Even a few hours a week can look good on your future r\u00e9sum\u00e9." },
+  { letter: "D", text: "Clubs are one of the easiest ways to meet people with the same interests." },
+  { letter: "E", text: "Reading before bed can also help you sleep better." },
+  { letter: "F", text: "Twenty minutes a week is enough; do not study all day." },
+  { letter: "G", text: "You do not need to be good at it \u2014 just enjoy the time." },
+  { letter: "H", text: "Even a short walk after dinner is good for you." },
+  { letter: "I", text: "Free websites and videos can teach you almost anything you want to know." },
+  { letter: "J", text: "Plan your budget early so you do not spend too much money." },
+];
+
+let currentScreen = 1;
+let headSel   = {};
+let matchSel  = {};
+let locked    = false;
+
+const LS_KEY = 'summer_tips_state_v2';
+
+function saveState() {
+  const state = { currentScreen, headSel, matchSel, locked,
+    studentName:   document.getElementById('studentName').value,
+    studentNumber: document.getElementById('studentNumber').value };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch(e) { return null; }
+}
+function clearState() { try { localStorage.removeItem(LS_KEY); } catch(e) {} }
+
+function restoreState(state) {
+  headSel  = state.headSel  || {};
+  matchSel = state.matchSel || {};
+  locked   = state.locked   || false;
+  if (state.studentName)   document.getElementById('studentName').value   = state.studentName;
+  if (state.studentNumber) document.getElementById('studentNumber').value = state.studentNumber;
+  checkReady();
+  const n = state.currentScreen || 1;
+  goTo(n);
+  setTimeout(() => {
+    if (n === 2) {
+      Object.entries(headSel).forEach(([i, val]) => {
+        const el = document.getElementById(`head_${i}`);
+        if (el) el.value = val;
+      });
+    }
+    if (n === 3) {
+      Object.entries(matchSel).forEach(([i, letter]) => {
+        const el = document.getElementById(`match_${i}`);
+        if (el) el.value = letter;
+      });
+    }
+  }, 120);
+}
+
+function updateSteps(n) {
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById('s'+i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '\u2713' : i;
+  });
+}
+function goTo(n) {
+  currentScreen = n;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen'+n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0,0);
+  if (n === 2) buildHeadings();
+  if (n === 3) buildMatching();
+  saveState();
+}
+
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', () => { checkReady(); saveState(); });
+document.getElementById('studentNumber').addEventListener('input', () => { checkReady(); saveState(); });
+
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+function buildHeadings() {
+  if (document.getElementById('headingContainer').innerHTML) return;
+  const headingList = TIPS.map(t => t.title);
+
+  document.getElementById('headBankContainer').innerHTML = shuffle(headingList).map((h,i) => `
+    <div class="bank-item">
+      <div class="bank-letter">${i+1}</div>
+      <div class="bank-text">${h}</div>
+    </div>`).join('');
+
+  document.getElementById('headingContainer').innerHTML = TIPS.map((t,i) => `
+    <div class="tip-block">
+      <div class="tip-head">
+        <div class="tip-num">${t.n}.</div>
+        <div class="match-prompt" style="margin:0;">Choose the heading</div>
+      </div>
+      <select class="head-sel" id="head_${i}" onchange="onHead(${i}, this.value)">
+        <option value="">\u2014 choose a heading \u2014</option>
+        ${shuffle(headingList).map(h => `<option value="${h}">${h}</option>`).join('')}
+      </select>
+      <div class="tip-body" style="margin-top:9px;">${t.body}</div>
+    </div>`).join('');
+}
+function onHead(i, val) { headSel[i] = val; saveState(); }
+
+function finishHeadings() {
+  if (TIPS.some((_,i) => !headSel[i])) { alert('Please choose a heading for all 10 tips.'); return; }
+  goTo(3);
+}
+
+function buildMatching() {
+  if (document.getElementById('tipContainer').innerHTML) return;
+
+  document.getElementById('bankContainer').innerHTML = BANK.map(b => `
+    <div class="bank-item">
+      <div class="bank-letter">${b.letter}</div>
+      <div class="bank-text">${b.text}</div>
+    </div>`).join('');
+
+  document.getElementById('tipContainer').innerHTML = TIPS.map((t,i) => `
+    <div class="tip-block">
+      <div class="tip-head">
+        <div class="tip-num">${t.n}.</div>
+        <div class="tip-title">${t.title}</div>
+      </div>
+      <div class="tip-body">${t.body}</div>
+      <div class="match-prompt">Which detail belongs here?</div>
+      <select class="match-sel" id="match_${i}" onchange="onMatch(${i}, this.value)">
+        <option value="">\u2014 choose a letter \u2014</option>
+        ${BANK.map(b => `<option value="${b.letter}">${b.letter}</option>`).join('')}
+      </select>
+    </div>`).join('');
+}
+function onMatch(i, val) { matchSel[i] = val; saveState(); }
+
+function submitAll() {
+  if (TIPS.some((_,i) => !matchSel[i])) { alert('Please choose a detail for all 10 tips.'); return; }
+  locked = true;
+
+  const review = [];
+
+  let headScore = 0;
+  TIPS.forEach((t,i) => {
+    const chosen = headSel[i];
+    const ok = chosen === t.title;
+    if (ok) headScore++;
+    const sel = document.getElementById(`head_${i}`);
+    if (sel) sel.className = 'head-sel ' + (ok ? 'correct' : 'wrong');
+    review.push({ label: `Heading \u2014 Tip ${t.n}`, chosen, ok, correct: t.title });
+  });
+
+  let detailScore = 0;
+  TIPS.forEach((t,i) => {
+    const chosen = matchSel[i];
+    const ok = chosen === t.detailCorrect;
+    if (ok) detailScore++;
+    const sel = document.getElementById(`match_${i}`);
+    if (sel) sel.className = 'match-sel ' + (ok ? 'correct' : 'wrong');
+    review.push({ label: `Detail \u2014 Tip ${t.n}`, chosen, ok, correct: t.detailCorrect });
+  });
+
+  const total = headScore + detailScore;
+  const pct = Math.round(total/20*100);
+
+  document.getElementById('totalNum').textContent = total + '/20';
+  document.getElementById('headNum').textContent   = headScore;
+  document.getElementById('detailNum').textContent = detailScore;
+
+  document.getElementById('reviewList').innerHTML = review.map(r => `
+    <div class="review-row">
+      <div class="review-num ${r.ok?'rn-ok':'rn-bad'}">${r.ok?'\u2713':'\u2717'}</div>
+      <div class="review-body">
+        <div class="review-label">${r.label}</div>
+        <div class="review-answer ${r.ok?'rev-ok':'rev-bad'}">Your answer: ${r.chosen}</div>
+        ${!r.ok?`<div class="review-correct">Correct: <span>${r.correct}</span></div>`:''}
+      </div>
+    </div>`).join('');
+
+  goTo(4);
+  clearState();
+  logToSheets(headScore, detailScore, total, pct, review);
+}
+
+function logToSheets(headScore, detailScore, total, pct, review) {
+  if (!SHEET_URL || SHEET_URL === 'PASTE_URL_HERE') {
+    document.getElementById('sheetStatus').textContent = '\u26a0\ufe0f No gradebook URL set.';
+    return;
+  }
+  document.getElementById('sheetStatus').textContent = '\u23f3 Saving to gradebook\u2026';
+  const name = document.getElementById('studentName').value.trim();
+  const num  = document.getElementById('studentNumber').value.trim();
+  const detail = review.map(r => `${r.label}:${r.chosen}(${r.ok?'\u2713':'\u2717'})`).join(' | ');
+
+  const payload = JSON.stringify({
+    studentNumber: num, studentName: name,
+    score: total + '/20', percent: pct,
+    headScore: headScore + '/10',
+    detailScore: detailScore + '/10',
+    response: detail
+  });
+
+  const form = document.createElement('form');
+  form.method = 'POST'; form.action = SHEET_URL; form.target = 'hidden_iframe'; form.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'hidden'; input.name = 'data'; input.value = payload;
+  form.appendChild(input);
+  const iframe = document.createElement('iframe');
+  iframe.name = 'hidden_iframe'; iframe.style.display = 'none';
+  iframe.onload = () => { document.getElementById('sheetStatus').textContent = '\u2705 Saved to gradebook.'; };
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(() => {
+    const st = document.getElementById('sheetStatus');
+    if (st.textContent.includes('\u23f3')) st.textContent = '\u2705 Saved to gradebook.';
+  }, 3000);
+}
+
+window.addEventListener('load', () => {
+  const state = loadState();
+  if (state && state.currentScreen > 1) restoreState(state);
+});
+</script>
+</body>
+</html>
