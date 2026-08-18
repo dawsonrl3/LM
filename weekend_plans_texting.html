@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Text Message Activity — Weekend Plans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #1a0f1c;
+    --surface: #241527;
+    --surface2:#2e1c31;
+    --border:  #402340;
+    --accent:  #f472b6;
+    --gold:    #fbbf24;
+    --white:   #FFFFFF;
+    --light:   #ecd3ea;
+    --muted:   #a679a3;
+    --success: #4CAF7D;
+    --error:   #E05C5C;
+    --mei:     #f472b6;
+    --jun:     #60a5fa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; padding-bottom: 60px; }
+
+  .header { background: linear-gradient(135deg, #1a0f1c 0%, #241527 100%); border-bottom: 1px solid var(--border); padding: 24px 20px 18px; text-align: center; }
+  .header-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+  .header h1 { font-family: 'Lora', serif; font-size: 1.22rem; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+  .header .sub { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+  .steps { display: flex; justify-content: center; align-items: center; padding: 12px 8px 0; overflow-x: auto; }
+  .step { display: flex; align-items: center; gap: 4px; font-size: 0.56rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); transition: color 0.3s; white-space: nowrap; }
+  .step.active { color: var(--accent); }
+  .step.done   { color: var(--success); }
+  .step-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.54rem; font-weight: 700; background: var(--surface); transition: all 0.3s; }
+  .step.active .step-dot { border-color: var(--accent); color: var(--accent); }
+  .step.done   .step-dot { border-color: var(--success); background: var(--success); color: #fff; }
+  .step-line { width: 18px; height: 2px; background: var(--border); margin: 0 3px; }
+
+  .screen { display: none; padding: 18px; max-width: 540px; margin: 0 auto; }
+  .screen.active { display: block; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .sec-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 9px; }
+  .instr { background: rgba(244,114,182,0.06); border: 1px solid rgba(244,114,182,0.18); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.78rem; color: #f0b8dc; line-height: 1.6; }
+  .instr strong { color: var(--accent); }
+
+  .field { margin-bottom: 11px; }
+  .field label { display: block; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .field input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Sora', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .field input:focus { border-color: var(--accent); }
+
+  .partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .partner-btn { background: var(--surface2); border: 2px solid var(--border); border-radius: 14px; padding: 16px 10px; text-align: center; cursor: pointer; transition: all 0.2s; color: var(--white); }
+  .partner-btn.sel-A { border-color: var(--mei); background: rgba(244,114,182,0.07); }
+  .partner-btn.sel-B { border-color: var(--jun); background: rgba(96,165,250,0.07); }
+  .partner-letter { font-size: 1.9rem; font-family: 'Lora', serif; font-weight: 600; margin-bottom: 4px; }
+  .pa { color: var(--mei); } .pb { color: var(--jun); }
+  .partner-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.45; }
+
+  /* Matching (Section A) */
+  .match-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; margin-bottom: 9px; }
+  .match-phrase { font-family: 'Lora', serif; font-size: 0.85rem; color: var(--white); font-weight: 600; margin-bottom: 8px; }
+  .opt-list { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+  .opt-item { display: flex; gap: 8px; font-size: 0.8rem; color: var(--light); line-height: 1.5; padding: 5px 0; }
+  .opt-item .ol { font-weight: 700; color: var(--accent); min-width: 18px; }
+
+  select.match-sel, select.blank-sel, select.d-sel { width: 100%; background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 8px; color: var(--accent); font-family: 'Sora', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 8px 26px 8px 12px; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23f472b6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+  select.match-sel.correct, select.blank-sel.correct, select.d-sel.correct { border-color: var(--success); color: var(--success); background-color: rgba(76,175,125,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234CAF7D'/%3E%3C/svg%3E"); }
+  select.match-sel.wrong, select.blank-sel.wrong, select.d-sel.wrong { border-color: var(--error); color: var(--error); background-color: rgba(224,92,92,0.1); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23E05C5C'/%3E%3C/svg%3E"); }
+  select.match-sel option, select.blank-sel option, select.d-sel option { background: #2e1c31; color: var(--white); }
+
+  /* Chat bubbles (Section B) */
+  .chat-thread { margin-bottom: 10px; }
+  .chat-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; text-align: center; }
+  .bubble-row { display: flex; margin-bottom: 10px; }
+  .bubble-row.mei { justify-content: flex-start; }
+  .bubble-row.jun { justify-content: flex-end; }
+  .bubble { max-width: 78%; border-radius: 14px; padding: 10px 13px; font-family: 'Lora', serif; font-size: 0.84rem; line-height: 1.5; }
+  .bubble.mei { background: rgba(244,114,182,0.14); border: 1px solid rgba(244,114,182,0.3); color: var(--light); border-bottom-left-radius: 3px; }
+  .bubble.jun { background: rgba(96,165,250,0.14); border: 1px solid rgba(96,165,250,0.3); color: var(--light); border-bottom-right-radius: 3px; }
+  .bubble-speaker { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+  .bubble-speaker.mei { color: var(--mei); }
+  .bubble-speaker.jun { color: var(--jun); }
+  .bubble select.blank-sel { display: inline-block; width: auto; min-width: 90px; margin: 2px 0; }
+
+  /* Fill-in-blank message (Section D) */
+  .msg-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .word-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .word-chip { background: rgba(244,114,182,0.12); color: var(--accent); border: 1px solid rgba(244,114,182,0.3); border-radius: 20px; padding: 5px 12px; font-size: 0.75rem; font-weight: 600; }
+  .msg-text { font-family: 'Lora', serif; font-size: 0.9rem; line-height: 2.3; color: var(--light); }
+  .msg-text strong { color: var(--white); }
+  select.d-sel { display: inline-block; width: auto; min-width: 100px; margin: 0 2px; }
+
+  .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: 'Sora', sans-serif; font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #1a0f1c; }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); margin-top: 9px; }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--white); }
+
+  /* MCQ (Section C) */
+  .q-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 11px; }
+  .q-text { font-family: 'Lora', serif; font-size: 0.88rem; color: var(--white); line-height: 1.5; margin-bottom: 10px; font-weight: 600; }
+  .q-option { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 9px; border: 1.5px solid var(--border); margin-bottom: 7px; cursor: pointer; transition: all 0.2s; background: var(--surface2); }
+  .q-option:last-child { margin-bottom: 0; }
+  .q-option:hover { border-color: var(--accent); }
+  .q-option.selected     { border-color: var(--accent);  background: rgba(244,114,182,0.08); }
+  .q-option.correct      { border-color: var(--success); background: rgba(76,175,125,0.1); }
+  .q-option.wrong        { border-color: var(--error);   background: rgba(224,92,92,0.08); }
+  .q-option.show-correct { border-color: var(--success); background: rgba(76,175,125,0.06); }
+  .opt-letter { min-width: 22px; height: 22px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; transition: all 0.2s; }
+  .q-option.selected .opt-letter     { background: var(--accent);  color: var(--bg); }
+  .q-option.correct  .opt-letter     { background: var(--success); color: #fff; }
+  .q-option.wrong    .opt-letter     { background: var(--error);   color: #fff; }
+  .q-option.show-correct .opt-letter { background: var(--success); color: #fff; }
+  .opt-text { font-size: 0.82rem; color: var(--light); line-height: 1.45; padding-top: 2px; }
+
+  .total-box { background: var(--surface2); border: 1.5px solid var(--accent); border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 14px; }
+  .total-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .total-num   { font-family: 'Lora', serif; font-size: 2.6rem; font-weight: 600; line-height: 1; }
+  .total-denom { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .split-scores { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom: 14px; }
+  .split-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 6px; text-align: center; }
+  .split-label { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+  .split-num   { font-family: 'Lora', serif; font-size: 1.25rem; font-weight: 600; }
+  .split-denom { font-size: 0.56rem; color: var(--muted); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .review-row { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .review-row:last-child { border-bottom: none; }
+  .review-num { min-width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+  .rn-ok  { background: rgba(76,175,125,0.18); color: var(--success); }
+  .rn-bad { background: rgba(224,92,92,0.18);  color: var(--error); }
+  .review-body { flex: 1; }
+  .review-label  { font-size: 0.66rem; color: var(--muted); margin-bottom: 2px; }
+  .review-answer { font-weight: 600; font-size: 0.82rem; }
+  .rev-ok  { color: var(--success); }
+  .rev-bad { color: var(--error); }
+  .review-correct { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .review-correct span { color: var(--success); font-weight: 600; }
+
+  #sheetStatus { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Text Message Activity</div>
+  <h1>Weekend Plans</h1>
+  <p class="sub">Read, listen, and complete the conversation with your partner</p>
+</div>
+
+<div class="steps" id="stepBar">
+  <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-dot">2</div><span>A</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s3"><div class="step-dot">3</div><span>B</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s4"><div class="step-dot">4</div><span>C</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s5"><div class="step-dot">5</div><span>D</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s6"><div class="step-dot">6</div><span>Score</span></div>
+</div>
+
+<!-- ── Screen 1: Setup ── -->
+<div class="screen active" id="screen1">
+  <div class="sec-label">Your details</div>
+  <div class="field"><label>Student Number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+  <div class="field"><label>Name (Romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+  <div class="sec-label">Your partner role</div>
+  <div class="partner-grid">
+    <div class="partner-btn" id="btnA" onclick="selectPartner('A')">
+      <div class="partner-letter pa">A</div>
+      <div class="partner-desc">You play <strong>Mei</strong>.<br>Read Mei's lines aloud, fill in Jun's blanks.</div>
+    </div>
+    <div class="partner-btn" id="btnB" onclick="selectPartner('B')">
+      <div class="partner-letter pb">B</div>
+      <div class="partner-desc">You play <strong>Jun</strong>.<br>Read Jun's lines aloud, fill in Mei's blanks.</div>
+    </div>
+  </div>
+  <br>
+  <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled>Start →</button>
+</div>
+
+<!-- ── Screen 2: Section A — Matching ── -->
+<div class="screen" id="screen2">
+  <div class="instr">📖 <strong>Section A.</strong> Before reading, match each phrase with its meaning.</div>
+  <div class="sec-label">Meanings</div>
+  <div class="opt-list">
+    <div class="opt-item"><span class="ol">a</span> to feel excited about something coming up</div>
+    <div class="opt-item"><span class="ol">b</span> to have no other plans</div>
+    <div class="opt-item"><span class="ol">c</span> to arrive earlier than someone else</div>
+    <div class="opt-item"><span class="ol">d</span> to decide what you will do</div>
+    <div class="opt-item"><span class="ol">e</span> to carry something with you</div>
+    <div class="opt-item"><span class="ol">f</span> it's okay, don't worry</div>
+  </div>
+  <div id="matchContainer"></div>
+  <button class="btn btn-primary" onclick="finishMatch()">Next: Text Conversation →</button>
+  <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+</div>
+
+<!-- ── Screen 3: Section B — Gap-fill jigsaw ── -->
+<div class="screen" id="screen3">
+  <div class="instr" id="s3instr"></div>
+  <div id="chatContainer"></div>
+  <button class="btn btn-primary" onclick="finishChat()">Next: Comprehension Questions →</button>
+  <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+</div>
+
+<!-- ── Screen 4: Section C — MCQ ── -->
+<div class="screen" id="screen4">
+  <div class="instr">✅ <strong>Section C.</strong> Circle the best answer for each question.</div>
+  <div id="mcqContainer"></div>
+  <button class="btn btn-primary" onclick="finishMCQ()">Next: Fill in the Blanks →</button>
+  <button class="btn btn-ghost" onclick="goTo(3)">← Back</button>
+</div>
+
+<!-- ── Screen 5: Section D — Fill in the blanks ── -->
+<div class="screen" id="screen5">
+  <div class="instr" id="s5instr"></div>
+  <div class="msg-box">
+    <div class="sec-label" style="margin-top:0;">Word Bank</div>
+    <div class="word-bank" id="wordBank"></div>
+    <div class="msg-text" id="msgText"></div>
+  </div>
+  <button class="btn btn-primary" onclick="submitAll()">Submit & See Score →</button>
+  <button class="btn btn-ghost" onclick="goTo(4)">← Back</button>
+</div>
+
+<!-- ── Screen 6: Score ── -->
+<div class="screen" id="screen6">
+  <div class="total-box">
+    <div class="total-label">Total Score</div>
+    <div class="total-num" id="totalNum">—</div>
+    <div class="total-denom">out of 25</div>
+  </div>
+  <div class="split-scores">
+    <div class="split-card"><div class="split-label">A</div><div class="split-num" id="aNum">—</div><div class="split-denom">/6</div></div>
+    <div class="split-card"><div class="split-label">B</div><div class="split-num" id="bNum">—</div><div class="split-denom">/7</div></div>
+    <div class="split-card"><div class="split-label">C</div><div class="split-num" id="cNum">—</div><div class="split-denom">/6</div></div>
+    <div class="split-card"><div class="split-label">D</div><div class="split-num" id="dNum">—</div><div class="split-denom">/6</div></div>
+  </div>
+  <div class="sec-label">Answer review</div>
+  <div class="card" id="reviewList"></div>
+  <div id="sheetStatus"></div>
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbz0gVJg8mP3E98tp368-ugkr8y91FfKpz5AyBfB9hVqkmm4BXh4BPNC1mUdunxyhj4akw/exec";
+
+// ── Section A: matching ────────────────────────────────────────
+const matchItems = [
+  { phrase: "to be free",            correct: "b" },
+  { phrase: "to make plans",         correct: "d" },
+  { phrase: "to look forward to",    correct: "a" },
+  { phrase: "to bring",              correct: "e" },
+  { phrase: "to get there first",    correct: "c" },
+  { phrase: "no worries",            correct: "f" },
+];
+
+// ── Section B: chat conversation with blanks ──────────────────
+// speaker: 'mei' or 'jun'. blank: {correct, options} or null (no blank)
+const chatLines = [
+  { thread: 1, speaker:'mei', text:"Hey Jun, are you", blank:{correct:"free",options:["free","busy","home"]}, after:"this weekend?" },
+  { thread: 1, speaker:'jun', text:"Hi Mei! Yes, I'm", blank:{correct:"free",options:["free","busy","tired"]}, after:"What's up?" },
+  { thread: 1, speaker:'mei', text:"A few of us are going to the", blank:{correct:"beach",options:["beach","festival","mountains"]}, after:"on Sunday. Do you want to come?" },
+  { thread: 1, speaker:'jun', text:"That sounds fun! What time should I", blank:{correct:"get",options:["get","leave","meet"]}, after:"there?" },
+  { thread: 1, speaker:'mei', text:"Let's meet at the station at", blank:{correct:"9:30",options:["9:30","9:15","9:45"]}, after:"We can take the bus together." },
+  { thread: 1, speaker:'jun', text:"Sure. Should I", blank:{correct:"bring",options:["bring","buy","pack"]}, after:"anything?" },
+  { thread: 1, speaker:'mei', text:"Just bring a towel and some", blank:{correct:"sunscreen",options:["sunscreen","sandwiches","drinks"]}, after:"I'll bring snacks for everyone." },
+  { thread: 1, speaker:'jun', text:"Perfect. I'm really looking forward to", blank:{correct:"it",options:["it","this","today"]}, after:"!" },
+
+  { thread: 2, speaker:'mei', text:"Hi Jun, quick change of plan. The bus at 9:30 is", blank:{correct:"full",options:["full","late","cancelled"]}, after:"" },
+  { thread: 2, speaker:'jun', text:"Oh no. What should we", blank:{correct:"do",options:["do","say","choose"]}, after:"?" },
+  { thread: 2, speaker:'mei', text:"Can you get to the station a bit earlier? There's another bus at", blank:{correct:"8:50",options:["8:50","8:30","9:00"]}, after:"" },
+  { thread: 2, speaker:'jun', text:"No worries, I can", blank:{correct:"do",options:["do","bring","try"]}, after:"that." },
+  { thread: 2, speaker:'mei', text:"Great! See you at the station at", blank:{correct:"8:40",options:["8:40","8:30","8:50"]}, after:"then." },
+  { thread: 2, speaker:'jun', text:"Sounds good. See you", blank:{correct:"tomorrow",options:["tomorrow","soon","later"]}, after:"!" },
+];
+
+// ── Section C: MCQ ─────────────────────────────────────────────
+const mcqData = [
+  { q:"What does Mei invite Jun to do? She invites him to", opts:["go to a festival.","go to the beach.","go to the station."], correct:1 },
+  { q:"What time do they first plan to meet? They plan to meet at", opts:["8:40.","8:50.","9:30."], correct:2 },
+  { q:"What should Jun bring? He should bring", opts:["snacks and drinks.","a towel and sunscreen.","a bus ticket."], correct:1 },
+  { q:"Why does Mei text again in the evening? Because", opts:["the weather changed.","the bus is full.","Jun cannot come."], correct:1 },
+  { q:"What time do they meet in the end? They meet at", opts:["8:40.","8:50.","9:30."], correct:0 },
+  { q:"How does Jun feel about the change of plan? He feels", opts:["annoyed.","confused.","okay with it."], correct:2 },
+];
+
+// ── Section D: fill in the blanks (partner-specific standalone) ──
+const sectionD = {
+  A: {
+    words: ["free","bring","looking forward to","meet","plans","no worries"],
+    segments: [
+      "Hey Jun! Are you ", "&&&", " on Monday too? A few of us are making ", "&&&", " to go hiking. Can you ", "&&&", " your camera? We can ", "&&&", " at the station again at 9am. I'm already ", "&&&", " it! Let me know \u2014 ", "&&&", " if you can't come."
+    ],
+    blanks: ["free","plans","bring","meet","looking forward to","no worries"]
+  },
+  B: {
+    words: ["free","invite","meet","bring","looking forward to","Let me know"],
+    segments: [
+      "Hi Mei! I hope you're ", "&&&", " this weekend. I want to ", "&&&", " you to a summer festival on Saturday. Can we ", "&&&", " at the station at 6pm? Please ", "&&&", " some money for food. I'm really ", "&&&", " it! ", "&&&", " if you can come."
+    ],
+    blanks: ["free","invite","meet","bring","looking forward to","Let me know"]
+  }
+};
+
+// ── State ─────────────────────────────────────────────────────
+let currentScreen = 1;
+let partner   = null;
+let matchSel  = {};
+let chatSel   = {};   // global line index → chosen value
+let mcqSel    = {};
+let dSel      = {};
+let locked    = false;
+
+const LS_KEY = 'weekend_plans_state';
+
+function saveState() {
+  const state = { currentScreen, partner, matchSel, chatSel, mcqSel, dSel, locked,
+    studentName:   document.getElementById('studentName').value,
+    studentNumber: document.getElementById('studentNumber').value };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch(e) { return null; }
+}
+function clearState() { try { localStorage.removeItem(LS_KEY); } catch(e) {} }
+
+function restoreState(state) {
+  partner  = state.partner;
+  matchSel = state.matchSel || {};
+  chatSel  = state.chatSel  || {};
+  mcqSel   = state.mcqSel   || {};
+  dSel     = state.dSel     || {};
+  locked   = state.locked   || false;
+  if (state.studentName)   document.getElementById('studentName').value   = state.studentName;
+  if (state.studentNumber) document.getElementById('studentNumber').value = state.studentNumber;
+  if (partner) {
+    document.getElementById('btnA').className = 'partner-btn' + (partner==='A' ? ' sel-A' : '');
+    document.getElementById('btnB').className = 'partner-btn' + (partner==='B' ? ' sel-B' : '');
+  }
+  checkReady();
+  const n = state.currentScreen || 1;
+  goTo(n);
+  setTimeout(() => {
+    if (n===2) Object.entries(matchSel).forEach(([i,v]) => { const el=document.getElementById(`match_${i}`); if(el) el.value=v; });
+    if (n===3) Object.entries(chatSel).forEach(([i,v]) => { const el=document.getElementById(`chat_${i}`); if(el) el.value=v; });
+    if (n===4) Object.entries(mcqSel).forEach(([qi,oi]) => { const el=document.getElementById(`qo${qi}_${oi}`); if(el) el.className='q-option selected'; });
+    if (n===5) Object.entries(dSel).forEach(([i,v]) => { const el=document.getElementById(`d_${i}`); if(el) el.value=v; });
+  }, 120);
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function updateSteps(n) {
+  [1,2,3,4,5,6].forEach(i => {
+    const el = document.getElementById('s'+i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '✓' : i;
+  });
+}
+function goTo(n) {
+  currentScreen = n;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen'+n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0,0);
+  if (n===2) buildMatch();
+  if (n===3) buildChat();
+  if (n===4) buildMCQ();
+  if (n===5) buildD();
+  saveState();
+}
+
+function selectPartner(p) {
+  partner = p;
+  document.getElementById('btnA').className = 'partner-btn' + (p==='A' ? ' sel-A' : '');
+  document.getElementById('btnB').className = 'partner-btn' + (p==='B' ? ' sel-B' : '');
+  checkReady();
+  saveState();
+}
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    partner &&
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', () => { checkReady(); saveState(); });
+document.getElementById('studentNumber').addEventListener('input', () => { checkReady(); saveState(); });
+
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+// ── Build Section A ───────────────────────────────────────────
+function buildMatch() {
+  if (document.getElementById('matchContainer').innerHTML) return;
+  document.getElementById('matchContainer').innerHTML = matchItems.map((m,i) => `
+    <div class="match-row">
+      <div class="match-phrase">${i+1}. ${m.phrase}</div>
+      <select class="match-sel" id="match_${i}" onchange="onMatch(${i}, this.value)">
+        <option value="">\u2014 choose a, b, c, d, e, or f \u2014</option>
+        <option value="a">a</option><option value="b">b</option><option value="c">c</option>
+        <option value="d">d</option><option value="e">e</option><option value="f">f</option>
+      </select>
+    </div>`).join('');
+}
+function onMatch(i, val) { matchSel[i] = val; saveState(); }
+function finishMatch() {
+  if (matchItems.some((_,i) => !matchSel[i])) { alert('Please match all 6 phrases.'); return; }
+  goTo(3);
+}
+
+// ── Build Section B (chat) ────────────────────────────────────
+function buildChat() {
+  document.getElementById('s3instr').innerHTML = partner === 'A'
+    ? '💬 <strong>Section B.</strong> You play <strong>Mei</strong>. Read Mei\'s lines aloud to your partner. Listen to Jun\'s lines and choose the missing word.'
+    : '💬 <strong>Section B.</strong> You play <strong>Jun</strong>. Read Jun\'s lines aloud to your partner. Listen to Mei\'s lines and choose the missing word.';
+
+  if (document.getElementById('chatContainer').innerHTML) return;
+
+  const myReadSpeaker = partner === 'A' ? 'mei' : 'jun';
+  let html = '';
+  let lastThread = 0;
+  chatLines.forEach((line, i) => {
+    if (line.thread !== lastThread) {
+      html += `<div class="chat-label">Conversation ${line.thread} \u2014 ${line.thread===1 ? 'Saturday 10:12' : 'Saturday 18:40'}</div>`;
+      lastThread = line.thread;
+    }
+    const isMine = line.speaker === myReadSpeaker;
+    let content;
+    if (isMine) {
+      content = `${line.text} ${line.blank.correct} ${line.after}`;
+    } else {
+      const opts = shuffle(line.blank.options);
+      content = `${line.text} <select class="blank-sel" id="chat_${i}" onchange="onChat(${i}, this.value)"><option value="">\u2014</option>${opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select> ${line.after}`;
+    }
+    html += `
+      <div class="bubble-row ${line.speaker}">
+        <div class="bubble ${line.speaker}">
+          <div class="bubble-speaker ${line.speaker}">${line.speaker === 'mei' ? 'Mei' : 'Jun'}</div>
+          ${content}
+        </div>
+      </div>`;
+  });
+  document.getElementById('chatContainer').innerHTML = html;
+}
+function onChat(i, val) { chatSel[i] = val; saveState(); }
+function finishChat() {
+  const myReadSpeaker = partner === 'A' ? 'mei' : 'jun';
+  const missing = chatLines.some((line,i) => line.speaker !== myReadSpeaker && !chatSel[i]);
+  if (missing) { alert('Please fill in all the blanks you can hear.'); return; }
+  goTo(4);
+}
+
+// ── Build Section C (MCQ) ─────────────────────────────────────
+function buildMCQ() {
+  if (document.getElementById('mcqContainer').innerHTML) return;
+  const L = ['a','b','c'];
+  document.getElementById('mcqContainer').innerHTML = mcqData.map((q,qi) => `
+    <div class="q-block">
+      <div class="q-text">${qi+1}. ${q.q}</div>
+      ${q.opts.map((opt,oi) => `
+        <div class="q-option" id="qo${qi}_${oi}" onclick="selectMCQ(${qi},${oi})">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${opt}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+function selectMCQ(qi, oi) {
+  if (locked) return;
+  mcqData[qi].opts.forEach((_,o) => { document.getElementById(`qo${qi}_${o}`).className = 'q-option'; });
+  mcqSel[qi] = oi;
+  document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+  saveState();
+}
+function finishMCQ() {
+  if (mcqData.some((_,i) => mcqSel[i] === undefined)) { alert('Please answer all 6 questions.'); return; }
+  goTo(5);
+}
+
+// ── Build Section D ────────────────────────────────────────────
+function buildD() {
+  document.getElementById('s5instr').innerHTML = partner === 'A'
+    ? '✏️ <strong>Section D.</strong> Fill in the blanks in Mei\'s new message using the word bank.'
+    : '✏️ <strong>Section D.</strong> Fill in the blanks in Jun\'s new message using the word bank.';
+
+  const d = sectionD[partner];
+  document.getElementById('wordBank').innerHTML = d.words.map(w => `<span class="word-chip">${w}</span>`).join('');
+
+  if (document.getElementById('msgText').innerHTML) return;
+  let html = '';
+  let blankIdx = 0;
+  d.segments.forEach(seg => {
+    if (seg === '&&&') {
+      html += `<select class="d-sel" id="d_${blankIdx}" onchange="onD(${blankIdx}, this.value)"><option value="">(${blankIdx+1})</option>${d.words.map(w=>`<option value="${w}">${w}</option>`).join('')}</select>`;
+      blankIdx++;
+    } else {
+      html += seg;
+    }
+  });
+  document.getElementById('msgText').innerHTML = html;
+}
+function onD(i, val) { dSel[i] = val; saveState(); }
+
+// ── Submit & score ────────────────────────────────────────────
+function submitAll() {
+  const d = sectionD[partner];
+  if (d.blanks.some((_,i) => !dSel[i])) { alert('Please fill in all 6 blanks.'); return; }
+  locked = true;
+
+  const review = [];
+
+  // A
+  let aScore = 0;
+  matchItems.forEach((m,i) => {
+    const chosen = matchSel[i];
+    const ok = chosen === m.correct;
+    if (ok) aScore++;
+    const sel = document.getElementById(`match_${i}`);
+    if (sel) sel.className = 'match-sel ' + (ok ? 'correct' : 'wrong');
+    review.push({ label: `A${i+1}. ${m.phrase}`, chosen, ok, correct: m.correct });
+  });
+
+  // B
+  const myReadSpeaker = partner === 'A' ? 'mei' : 'jun';
+  let bScore = 0;
+  chatLines.forEach((line,i) => {
+    if (line.speaker === myReadSpeaker) return;
+    const chosen = chatSel[i];
+    const ok = chosen === line.blank.correct;
+    if (ok) bScore++;
+    const sel = document.getElementById(`chat_${i}`);
+    if (sel) sel.className = 'blank-sel ' + (ok ? 'correct' : 'wrong');
+    review.push({ label: `B \u2014 ${line.speaker === 'mei' ? 'Mei' : 'Jun'} line`, chosen, ok, correct: line.blank.correct });
+  });
+
+  // C
+  const L = ['a','b','c'];
+  let cScore = 0;
+  mcqData.forEach((q,qi) => {
+    const chosen = mcqSel[qi];
+    const ok = chosen === q.correct;
+    if (ok) cScore++;
+    q.opts.forEach((_,oi) => {
+      const el = document.getElementById(`qo${qi}_${oi}`);
+      if (oi === chosen && ok)       el.className = 'q-option correct';
+      else if (oi === chosen && !ok) el.className = 'q-option wrong';
+      else if (oi === q.correct)     el.className = 'q-option show-correct';
+      else                           el.className = 'q-option';
+    });
+    review.push({ label: `C${qi+1}`, chosen: L[chosen], ok, correct: L[q.correct] });
+  });
+
+  // D
+  let dScore = 0;
+  d.blanks.forEach((correct,i) => {
+    const chosen = dSel[i];
+    const ok = chosen === correct;
+    if (ok) dScore++;
+    const sel = document.getElementById(`d_${i}`);
+    if (sel) sel.className = 'd-sel ' + (ok ? 'correct' : 'wrong');
+    review.push({ label: `D${i+1}`, chosen, ok, correct });
+  });
+
+  const total = aScore + bScore + cScore + dScore;
+  const pct = Math.round(total/25*100);
+
+  document.getElementById('totalNum').textContent = total + '/25';
+  document.getElementById('aNum').textContent = aScore;
+  document.getElementById('bNum').textContent = bScore;
+  document.getElementById('cNum').textContent = cScore;
+  document.getElementById('dNum').textContent = dScore;
+
+  document.getElementById('reviewList').innerHTML = review.map(r => `
+    <div class="review-row">
+      <div class="review-num ${r.ok?'rn-ok':'rn-bad'}">${r.ok?'\u2713':'\u2717'}</div>
+      <div class="review-body">
+        <div class="review-label">${r.label}</div>
+        <div class="review-answer ${r.ok?'rev-ok':'rev-bad'}">Your answer: ${r.chosen || '\u2014'}</div>
+        ${!r.ok?`<div class="review-correct">Correct: <span>${r.correct}</span></div>`:''}
+      </div>
+    </div>`).join('');
+
+  goTo(6);
+  clearState();
+  logToSheets(aScore, bScore, cScore, dScore, total, pct, review);
+}
+
+// ── Google Sheets ─────────────────────────────────────────────
+function logToSheets(aScore, bScore, cScore, dScore, total, pct, review) {
+  if (!SHEET_URL || SHEET_URL === 'PASTE_URL_HERE') {
+    document.getElementById('sheetStatus').textContent = '\u26a0\ufe0f No gradebook URL set.';
+    return;
+  }
+  document.getElementById('sheetStatus').textContent = '\u23f3 Saving to gradebook\u2026';
+  const name = document.getElementById('studentName').value.trim();
+  const num  = document.getElementById('studentNumber').value.trim();
+  const detail = review.map(r => `${r.label}:${r.chosen||'\u2014'}(${r.ok?'\u2713':'\u2717'})`).join(' | ');
+
+  const payload = JSON.stringify({
+    studentNumber: num, studentName: name, partner,
+    score: total + '/25', percent: pct,
+    aScore: aScore + '/6', bScore: bScore + '/7', cScore: cScore + '/6', dScore: dScore + '/6',
+    response: detail
+  });
+
+  const form = document.createElement('form');
+  form.method = 'POST'; form.action = SHEET_URL; form.target = 'hidden_iframe'; form.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'hidden'; input.name = 'data'; input.value = payload;
+  form.appendChild(input);
+  const iframe = document.createElement('iframe');
+  iframe.name = 'hidden_iframe'; iframe.style.display = 'none';
+  iframe.onload = () => { document.getElementById('sheetStatus').textContent = '\u2705 Saved to gradebook.'; };
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(() => {
+    const st = document.getElementById('sheetStatus');
+    if (st.textContent.includes('\u23f3')) st.textContent = '\u2705 Saved to gradebook.';
+  }, 3000);
+}
+
+// ── On load ───────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const state = loadState();
+  if (state && state.currentScreen > 1) restoreState(state);
+});
+</script>
+</body>
+</html>
