@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading: Many People in Japan Are Not Happy with Their Looks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,400&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --desk:#eef2f7; --grid:#dce4ee; --sheet:#ffffff;
+    --ink:#16233b; --muted:#59687f; --rule:#cdd7e3;
+    --hl:#ffe46b; --hl-edge:#e6b800;
+    --teal:#1f8a9e; --amber:#d9822b;
+    --ok:#2b9468; --ok-soft:#e3f4ec; --bad:#d04545; --bad-soft:#fae8e8;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    font-family:'Sora',sans-serif; color:var(--ink);
+    background-color:var(--desk);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:22px 22px;
+    min-height:100vh; padding:18px 12px 56px;
+  }
+  button:focus-visible, select:focus-visible, input:focus-visible, .q-option:focus-visible {
+    outline:3px solid var(--teal); outline-offset:2px;
+  }
+
+  .sheet { max-width:640px; margin:0 auto; background:var(--sheet); border:1px solid var(--rule); border-radius:6px; padding:24px 20px 28px; }
+  .masthead h1 { font-family:'Newsreader',serif; font-size:1.6rem; font-weight:600; line-height:1.25; }
+  .masthead p { font-size:.8rem; color:var(--muted); margin-top:6px; line-height:1.5; }
+
+  .steps { display:flex; align-items:center; margin:18px 0 22px; }
+  .step { display:flex; align-items:center; gap:5px; font-size:.64rem; font-weight:600; color:var(--muted); }
+  .step-dot { width:22px; height:22px; border-radius:50%; border:2px solid var(--rule); display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:700; background:#fff; flex-shrink:0; }
+  .step.active { color:var(--ink); }
+  .step.active .step-dot { border-color:var(--ink); background:var(--hl); color:var(--ink); }
+  .step.done { color:var(--ok); }
+  .step.done .step-dot { border-color:var(--ok); background:var(--ok); color:#fff; }
+  .step-line { flex:1; height:2px; background:var(--rule); margin:0 6px; min-width:8px; }
+
+  .screen { display:none; }
+  .screen.active { display:block; }
+
+  .h2 { font-family:'Newsreader',serif; font-size:1.15rem; font-weight:600; margin:22px 0 10px; }
+  .h2:first-child { margin-top:0; }
+  .instr { border-left:4px solid var(--hl-edge); background:#fffbe6; padding:12px 14px; font-size:.8rem; line-height:1.7; margin-bottom:18px; }
+
+  .field { margin-bottom:12px; }
+  .field label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); margin-bottom:5px; }
+  .field input { width:100%; background:#fff; border:1.5px solid var(--rule); border-radius:6px; padding:11px 13px; color:var(--ink); font-family:'Sora',sans-serif; font-size:.9rem; -webkit-appearance:none; }
+  .field input:focus { border-color:var(--teal); }
+
+  .partner-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .partner-btn { background:#fff; border:2px solid var(--rule); border-radius:6px; padding:14px 12px; text-align:left; cursor:pointer; color:var(--ink); font-family:'Sora',sans-serif; display:block; }
+  .partner-btn.sel-A { border-color:var(--teal); background:#e9f6f8; }
+  .partner-btn.sel-B { border-color:var(--amber); background:#fdf1e3; }
+  .partner-letter { display:block; font-family:'Newsreader',serif; font-size:2rem; font-weight:600; line-height:1; margin-bottom:6px; }
+  .partner-btn .pa { color:var(--teal); } .partner-btn .pb { color:var(--amber); }
+  .partner-desc { display:block; font-size:.74rem; color:var(--muted); line-height:1.55; }
+
+  .btn { width:100%; padding:14px; border:none; border-radius:8px; font-family:'Sora',sans-serif; font-size:.88rem; font-weight:600; cursor:pointer; }
+  .btn-primary { background:var(--ink); color:#fff; }
+  .btn-primary:hover { background:#0e1828; }
+  .btn-primary:disabled { opacity:.35; cursor:not-allowed; }
+  .btn-ghost { background:transparent; border:1.5px solid var(--rule); color:var(--muted); margin-top:10px; }
+  .btn-ghost:hover { border-color:var(--muted); color:var(--ink); }
+
+  /* Reading */
+  .para { display:grid; grid-template-columns:54px 1fr; gap:8px; padding:16px 0; border-top:1px solid var(--rule); }
+  #articleContainer > :first-child { border-top:none; padding-top:4px; }
+  .para-side { text-align:center; }
+  .para-num { font-family:'Newsreader',serif; font-size:1.8rem; font-weight:600; line-height:1; }
+  .para.own-A .para-num { color:var(--teal); }
+  .para.own-B .para-num { color:var(--amber); }
+  .para-role { font-size:.62rem; color:var(--muted); margin-top:5px; line-height:1.35; }
+  .para-text { font-family:'Newsreader',serif; font-size:1.05rem; line-height:2.1; }
+  .source { font-size:.68rem; color:var(--muted); line-height:1.6; margin:6px 0 20px; }
+
+  select.gap-sel {
+    display:inline-block; background:var(--hl); border:1px solid var(--hl-edge); border-radius:4px;
+    color:var(--ink); font-family:'Sora',sans-serif; font-size:.78rem; font-weight:700;
+    padding:3px 24px 3px 8px; margin:0 2px; cursor:pointer;
+    -webkit-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2316233b'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 7px center;
+  }
+  select.gap-sel:disabled { cursor:default; opacity:1; color:var(--ink); }
+  select.gap-sel option { background:#fff; color:#16233b; }
+
+  .blank { display:inline-block; height:1.15em; vertical-align:-0.2em; background:var(--hl); border:1px solid var(--hl-edge); border-radius:4px; margin:0 3px; }
+  .nav-end { margin-top:18px; }
+
+  /* Headings */
+  .headlist { border:1px solid var(--rule); border-radius:4px; padding:10px 14px; margin-bottom:14px; }
+  .headlist-title { font-family:'Newsreader',serif; font-size:1rem; font-weight:600; margin-bottom:4px; }
+  .headlist-item { font-size:.84rem; line-height:1.9; }
+  .hpara { padding:16px 0; border-top:1px solid var(--rule); }
+  #skimContainer > :first-child { border-top:none; padding-top:4px; }
+  .hhead { display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+  .hnum { font-family:'Newsreader',serif; font-size:1.6rem; font-weight:600; line-height:1; }
+  .hpara .para-text { line-height:1.85; margin-bottom:12px; }
+  select.head-sel {
+    width:100%; background:var(--hl); border:1px solid var(--hl-edge); border-radius:4px;
+    color:var(--ink); font-family:'Sora',sans-serif; font-size:.82rem; font-weight:700;
+    padding:10px 32px 10px 12px; cursor:pointer;
+    -webkit-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2316233b'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center;
+  }
+  select.head-sel option { background:#fff; color:#16233b; }
+  .head-end { margin-top:18px; }
+
+  /* Quiz */
+  .toggle-btn { width:100%; padding:12px 14px; border:1.5px solid var(--rule); background:#fff; color:var(--ink); border-radius:8px; font-family:'Sora',sans-serif; font-size:.82rem; font-weight:600; cursor:pointer; text-align:left; margin-bottom:12px; }
+  .full-article { display:none; border:1px solid var(--rule); border-radius:6px; padding:2px 14px 6px; margin-bottom:18px; background:#fbfcfe; }
+  .full-article.open { display:block; }
+  .fa-title { font-family:'Newsreader',serif; font-size:1.05rem; font-weight:600; padding:10px 0 4px; }
+  .fa-para { font-family:'Newsreader',serif; font-size:1rem; line-height:1.85; padding:10px 0; border-top:1px solid var(--rule); }
+  .fa-para mark { background:var(--hl); padding:0 2px; color:var(--ink); }
+
+  .q { padding:16px 0; border-top:1px solid var(--rule); }
+  #quizContainer > :first-child { border-top:none; padding-top:4px; }
+  .q-text { font-family:'Newsreader',serif; font-size:1.06rem; font-weight:600; line-height:1.5; margin-bottom:10px; }
+  .q-option { display:flex; gap:10px; align-items:flex-start; padding:11px 12px; border:1.5px solid var(--rule); border-radius:6px; margin-bottom:7px; cursor:pointer; background:#fff; }
+  .q-option:hover { border-color:var(--muted); }
+  .q-option.selected { background:var(--hl); border-color:var(--hl-edge); }
+  .opt-letter { min-width:22px; height:22px; border-radius:50%; border:1.5px solid var(--rule); font-size:.68rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; background:#fff; }
+  .q-option.selected .opt-letter { border-color:var(--ink); background:var(--ink); color:#fff; }
+  .opt-text { font-size:.85rem; line-height:1.5; padding-top:2px; }
+  .quiz-end { margin-top:18px; }
+
+  /* Score */
+  .score-big { font-family:'Newsreader',serif; font-size:3.4rem; font-weight:600; line-height:1; }
+  .score-sub { font-size:.82rem; color:var(--muted); margin:6px 0 18px; }
+  .score-row { display:flex; justify-content:space-between; padding:10px 0; border-top:1px solid var(--rule); font-size:.9rem; }
+  .score-row:last-of-type { border-bottom:1px solid var(--rule); }
+  .review-h { font-family:'Newsreader',serif; font-size:1.12rem; font-weight:600; margin:22px 0 4px; }
+  .review-row { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--rule); }
+  .review-mark { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.66rem; font-weight:700; flex-shrink:0; margin-top:1px; }
+  .review-mark.ok { background:var(--ok-soft); color:var(--ok); }
+  .review-mark.no { background:var(--bad-soft); color:var(--bad); }
+  .review-label { font-size:.7rem; color:var(--muted); }
+  .review-answer { font-size:.85rem; font-weight:600; }
+  .review-correct { font-size:.75rem; color:var(--muted); margin-top:2px; }
+  .review-correct b { color:var(--ok); font-weight:700; }
+  #sheetStatus { font-size:.74rem; color:var(--muted); padding:14px 0 0; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="masthead">
+    <h1>Many People in Japan Are Not Happy with Their Looks</h1>
+    <p>Read with a partner, find the main ideas, then answer the quiz.</p>
+  </header>
+
+  <div class="steps" id="stepBar">
+    <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div><div class="step-line"></div>
+    <div class="step" id="s2"><div class="step-dot">2</div><span>Skim</span></div><div class="step-line"></div>
+    <div class="step" id="s3"><div class="step-dot">3</div><span>Reading</span></div><div class="step-line"></div>
+    <div class="step" id="s4"><div class="step-dot">4</div><span>Quiz</span></div><div class="step-line"></div>
+    <div class="step" id="s5"><div class="step-dot">5</div><span>Score</span></div>
+  </div>
+
+  <!-- Screen 1: Setup -->
+  <div class="screen active" id="screen1">
+    <h2 class="h2">Your details</h2>
+    <div class="field"><label for="studentNumber">Student number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+    <div class="field"><label for="studentName">Name (romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+    <h2 class="h2">Which partner are you?</h2>
+    <div class="partner-grid">
+      <button type="button" class="partner-btn" id="btnA" onclick="selectPartner('A')">
+        <span class="partner-letter pa">A</span>
+        <span class="partner-desc">You read paragraphs 1 and 3 aloud. You fill the gaps in paragraphs 2 and 4.</span>
+      </button>
+      <button type="button" class="partner-btn" id="btnB" onclick="selectPartner('B')">
+        <span class="partner-letter pb">B</span>
+        <span class="partner-desc">You read paragraphs 2 and 4 aloud. You fill the gaps in paragraphs 1 and 3.</span>
+      </button>
+    </div>
+    <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled style="margin-top:22px;">Start</button>
+  </div>
+
+  <!-- Screen 2: Skim (match headings) -->
+  <div class="screen" id="screen2">
+    <div class="instr">Skim the article. <strong>Skim</strong> means read quickly to find the main idea. Some words are missing. You will fill them in on the next page. Read the first sentence of each paragraph, then choose a heading for it. Use each heading only once. Two headings do not match any paragraph.</div>
+    <div class="headlist" id="headList"></div>
+    <div id="skimContainer"></div>
+    <div class="nav-end">
+      <button class="btn btn-primary" onclick="finishSkim()">Go to the reading page</button>
+      <button class="btn btn-ghost" onclick="goTo(1)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Reading (cloze) -->
+  <div class="screen" id="screen3">
+    <div class="instr" id="s3instr"></div>
+    <div id="articleContainer"></div>
+    <p class="source">Adapted from "Japanese people aren't happy with their looks: survey" by Evie Lund, RocketNews24 (Japan Today, 2015), and GfK's 2015 survey results.</p>
+    <button class="btn btn-primary" onclick="finishReading()">Go to the quiz</button>
+    <button class="btn btn-ghost" onclick="goTo(2)">Back</button>
+  </div>
+
+  <!-- Screen 4: Quiz -->
+  <div class="screen" id="screen4">
+    <div class="instr">Answer all 10 questions on your own. You can open the article to check. It shows the words you chose.</div>
+    <button class="toggle-btn" id="toggleArticleBtn" onclick="toggleArticle()">Show the article</button>
+    <div class="full-article" id="fullArticle"></div>
+    <div id="quizContainer"></div>
+    <div class="quiz-end">
+      <button class="btn btn-primary" onclick="submitAll()">Submit and see my score</button>
+      <button class="btn btn-ghost" onclick="goTo(3)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 5: Score (no Back button: the score is already saved) -->
+  <div class="screen" id="screen5">
+    <div class="score-big" id="totalNum">0</div>
+    <div class="score-sub" id="totalDenom">out of 26</div>
+    <div class="score-row"><span>Reading gaps</span><strong id="clozeNum">0/12</strong></div>
+    <div class="score-row"><span>Headings</span><strong id="headNum">0/4</strong></div>
+    <div class="score-row"><span>Quiz</span><strong id="quizNum">0/10</strong></div>
+    <h2 class="review-h">Reading gaps</h2>
+    <div id="reviewCloze"></div>
+    <h2 class="review-h">Headings</h2>
+    <div id="reviewHead"></div>
+    <h2 class="review-h">Quiz</h2>
+    <div id="reviewQuiz"></div>
+    <div id="sheetStatus"></div>
+  </div>
+
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxBKz5iGoBkxk4fITD7gxtjJ34xO_BR-TSVfudjawSFjk9YQ__ycdGPWGd631R8PlvK/exec";
+
+// Each gap has one correct answer and two wrong options.
+const GAPS = {
+  1:  { correct:"dressed",    options:["dressed","known","paid"] },
+  2:  { correct:"neat",       options:["neat","loud","quiet"] },
+  3:  { correct:"a few",      options:["a few","two","ten"] },
+  4:  { correct:"2015",       options:["2015","2005","2012"] },
+  5:  { correct:"27,000",     options:["27,000","22,000","270,000"] },
+  6:  { correct:"least",      options:["least","most","less"] },
+  7:  { correct:"Mexico",     options:["Mexico","Spain","Canada"] },
+  8:  { correct:"Ukraine",    options:["Ukraine","Poland","Germany"] },
+  9:  { correct:"middle",     options:["middle","front","back"] },
+  10: { correct:"55%",        options:["55%","45%","15%"] },
+  11: { correct:"3%",         options:["3%","13%","33%"] },
+  12: { correct:"38%",        options:["38%","28%","83%"] },
+  13: { correct:"satisfied",  options:["satisfied","tired","young"] },
+  14: { correct:"surprising", options:["surprising","boring","lucky"] },
+  15: { correct:"many",       options:["many","few","no"] },
+  16: { correct:"time",       options:["time","food","help"] },
+  17: { correct:"looks",      options:["looks","hobbies","cars"] },
+  18: { correct:"standards",  options:["standards","prices","marks"] },
+  19: { correct:"media",      options:["media","school","weather"] },
+  20: { correct:"five",       options:["five","two","ten"] },
+  21: { correct:"2021",       options:["2021","2012","2001"] },
+  22: { correct:"pressure",   options:["pressure","pride","luck"] },
+  23: { correct:"weak",       options:["weak","strong","small"] },
+  24: { correct:"themselves", options:["themselves","others","everyone"] }
+};
+
+// Numbers in segs are gap ids. Partner A owns paragraphs 1 and 3. Partner B owns 2 and 4.
+const PARAS = [
+  { n:1, owner:'A', segs:["People in Japan often look great, but a survey found that many of them are not happy with their looks. Visitors to Japan often notice how well ",1," people are. Men wear suits well, and women dress in a ",2," and stylish way. Many foreigners who stay in Japan start to dress better after only ",3," weeks, because they see how well people dress there. But in ",4,", a German company called GfK did a survey in 22 countries. It asked more than ",5," people, aged 15 and older, how happy they were with their own looks. In this survey, people in Japan were the ",6," happy of all."] },
+  { n:2, owner:'B', segs:["In other countries, people were happier with their looks. ",7," was number one. Turkey, Brazil, and ",8," also did very well, and China was in the ",9,". Across all 22 countries, ",10," of people said they were satisfied with their looks. Only ",11," said they were \u201cnot at all satisfied.\u201d"] },
+  { n:3, owner:'A', segs:["In Japan, the results were very different. There, ",12," of people said they were \u201cnot very ",13,"\u201d or \u201cnot at all satisfied\u201d with their looks. This is ",14,", because ",15," people in Japan spend a lot of ",16," and money on their ",17,"."] },
+  { n:4, owner:'B', segs:["There are several possible reasons why many people in Japan are not happy with their looks. One idea is that people in Japan have very high ",18," for good looks, so they feel they are never good enough. The ",19," may also play a part. In one study, Japanese teenagers felt more unhappy about their bodies than teenagers in ",20," other countries. They also said the media strongly affects how they see their bodies. In a ",21," study, female university students in Japan said they feel ",22," from Japanese and Western ideas of beauty. Some researchers also say that people in Japan often focus on their own ",23," points. So they may not say that they are very happy with ",24,"."] }
+];
+
+const HEADINGS = {
+  a:"Looking Great but Not Happy",
+  b:"How Other Countries Feel",
+  c:"Japan\u2019s Surprising Results",
+  d:"Possible Reasons for the Results",
+  e:"Why Japanese Fashion Is Famous",
+  f:"How to Feel Better About Your Looks"
+};
+const HEAD_ORDER = ['c','e','a','f','d','b'];
+const HEAD_ANSWER = { 1:'a', 2:'b', 3:'c', 4:'d' };
+
+const QUIZ = [
+  { type:"gist", q:"What is this article mostly about?", opts:["How people in Japan dress for work","A survey about how happy people are with their looks","Why people in Mexico are so happy"], correct:1 },
+  { type:"main idea", q:"What is the main idea of the article?", opts:["Many people in Japan are not happy with their looks, and there may be several reasons.","People in Japan do not care about their looks.","People in Japan spend too much money on clothes."], correct:0 },
+  { type:"detail", q:"How many countries were in the survey?", opts:["12","27","22"], correct:2 },
+  { type:"detail", q:"Which country was number one?", opts:["Japan","Mexico","China"], correct:1 },
+  { type:"detail", q:"What percent of people in Japan said they were \u201cnot very satisfied\u201d or \u201cnot at all satisfied\u201d with their looks?", opts:["38%","55%","3%"], correct:0 },
+  { type:"detail", q:"What did female university students in Japan say in the 2021 study?", opts:["They are happier than students in other countries.","They spend too little time on their looks.","They feel pressure from Japanese and Western ideas of beauty."], correct:2 },
+  { type:"vocabulary", q:"A \u201csurvey\u201d is a way to ...", opts:["watch a TV show about people","ask many people the same questions","start a new company"], correct:1 },
+  { type:"vocabulary", q:"\u201cFemale university students in Japan said they feel pressure.\u201d What does \u201cpressure\u201d mean?", opts:["a strong feeling that you must do something","a feeling of being proud","a kind of fashion"], correct:0 },
+  { type:"inference", q:"What can we guess from the article?", opts:["People who spend more time on their looks are always happier.","Spending time and money on looks does not always make people happy.","People in Japan do not care about their looks."], correct:1 },
+  { type:"inference", q:"Why does the last paragraph use words like \u201cmay\u201d and \u201csome researchers say\u201d?", opts:["The writer does not like the researchers.","The researchers know the exact reason.","The reasons are possible ideas, but nobody knows for sure."], correct:2 }
+];
+
+// State
+let currentScreen = 1;
+let partner = null;
+let sel = {};
+let headSel = {};
+let quizSel = {};
+let quizBuilt = false;
+
+const LS_KEY = 'looks_reading_state_v3';
+
+function saveState() {
+  const state = { currentScreen, partner, sel, headSel, quizSel,
+    studentName: document.getElementById('studentName').value,
+    studentNumber: document.getElementById('studentNumber').value };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch(e) { return null; }
+}
+function clearState() { try { localStorage.removeItem(LS_KEY); } catch(e) {} }
+
+function restoreState(state) {
+  partner = state.partner;
+  sel = state.sel || {};
+  headSel = state.headSel || {};
+  quizSel = state.quizSel || {};
+  if (state.studentName) document.getElementById('studentName').value = state.studentName;
+  if (state.studentNumber) document.getElementById('studentNumber').value = state.studentNumber;
+  if (partner) paintPartner();
+  checkReady();
+  goTo(state.currentScreen || 1);
+}
+
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+// Navigation
+function updateSteps(n) {
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('s' + i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '\u2713' : i;
+  }
+}
+function goTo(n) {
+  currentScreen = n;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen' + n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0, 0);
+  if (n === 2) buildSkim();
+  if (n === 3) buildReading();
+  if (n === 4) { buildQuiz(); buildArticlePanel(); }
+  saveState();
+}
+
+// Setup
+function paintPartner() {
+  document.getElementById('btnA').className = 'partner-btn' + (partner === 'A' ? ' sel-A' : '');
+  document.getElementById('btnB').className = 'partner-btn' + (partner === 'B' ? ' sel-B' : '');
+}
+function resetBuiltPages() {
+  document.getElementById('skimContainer').innerHTML = '';
+  document.getElementById('headList').innerHTML = '';
+  document.getElementById('articleContainer').innerHTML = '';
+}
+function selectPartner(p) {
+  if (partner && partner !== p) { sel = {}; resetBuiltPages(); }
+  partner = p;
+  paintPartner(); checkReady(); saveState();
+}
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    partner &&
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', () => { checkReady(); saveState(); });
+document.getElementById('studentNumber').addEventListener('input', () => { checkReady(); saveState(); });
+
+// A blank spot (not fillable): used on the Skim page and in the quiz article
+function blankSpan(n) {
+  const b = document.createElement('span');
+  b.className = 'blank';
+  b.setAttribute('aria-label', 'missing word');
+  b.style.width = Math.max(56, GAPS[n].correct.length * 9 + 28) + 'px';
+  return b;
+}
+
+// Skim page (match headings)
+function buildSkim() {
+  const cont = document.getElementById('skimContainer');
+  if (cont.innerHTML) return;
+  document.getElementById('headList').innerHTML =
+    '<div class="headlist-title">Headings</div>' +
+    HEAD_ORDER.map(id => `<div class="headlist-item">${HEADINGS[id]}</div>`).join('');
+
+  PARAS.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'hpara';
+
+    const head = document.createElement('div');
+    head.className = 'hhead';
+    const num = document.createElement('div');
+    num.className = 'hnum'; num.textContent = 'Paragraph ' + p.n;
+    head.appendChild(num);
+
+    const text = document.createElement('div');
+    text.className = 'para-text';
+    p.segs.forEach(seg => {
+      if (typeof seg === 'number') {
+        if (p.owner === partner) text.appendChild(document.createTextNode(GAPS[seg].correct));
+        else text.appendChild(blankSpan(seg));
+      } else {
+        text.appendChild(document.createTextNode(seg));
+      }
+    });
+
+    const s = document.createElement('select');
+    s.className = 'head-sel'; s.id = 'head_' + p.n;
+    s.setAttribute('aria-label', 'Heading for paragraph ' + p.n);
+    const blank = document.createElement('option');
+    blank.value = ''; blank.textContent = 'Choose a heading';
+    s.appendChild(blank);
+    HEAD_ORDER.forEach(id => {
+      const op = document.createElement('option');
+      op.value = id; op.textContent = HEADINGS[id];
+      s.appendChild(op);
+    });
+    if (headSel[p.n]) s.value = headSel[p.n];
+    s.addEventListener('change', () => { headSel[p.n] = s.value; saveState(); });
+
+    div.appendChild(head); div.appendChild(text); div.appendChild(s);
+    cont.appendChild(div);
+  });
+}
+
+function finishSkim() {
+  const vals = PARAS.map(p => headSel[p.n]);
+  if (vals.some(v => !v)) { alert('Please choose a heading for every paragraph.'); return; }
+  if (new Set(vals).size !== vals.length) { alert('You used the same heading twice. Use each heading only once.'); return; }
+  goTo(3);
+}
+
+// Reading page (cloze)
+function makeSelect(n) {
+  const g = GAPS[n];
+  const s = document.createElement('select');
+  s.className = 'gap-sel';
+  s.id = 'gap_' + n;
+  s.setAttribute('aria-label', 'Missing word ' + n);
+  const longest = Math.max.apply(null, g.options.map(o => o.length));
+  s.style.width = Math.max(80, longest * 9 + 34) + 'px';
+  const blank = document.createElement('option');
+  blank.value = ''; blank.textContent = '\u2014';
+  s.appendChild(blank);
+  shuffle(g.options).forEach(o => {
+    const op = document.createElement('option');
+    op.value = o; op.textContent = o;
+    s.appendChild(op);
+  });
+  if (sel[n]) s.value = sel[n];
+  s.addEventListener('change', () => { sel[n] = s.value; saveState(); });
+  return s;
+}
+
+function renderPara(p) {
+  const mine = (p.owner === partner);
+  const div = document.createElement('div');
+  div.className = 'para own-' + p.owner;
+
+  const side = document.createElement('div');
+  side.className = 'para-side';
+  const num = document.createElement('div');
+  num.className = 'para-num'; num.textContent = p.n;
+  const role = document.createElement('div');
+  role.className = 'para-role';
+  role.textContent = mine ? 'Read aloud' : 'Listen and choose';
+  side.appendChild(num); side.appendChild(role);
+
+  const text = document.createElement('div');
+  text.className = 'para-text';
+  p.segs.forEach(seg => {
+    if (typeof seg === 'number') {
+      if (mine) text.appendChild(document.createTextNode(GAPS[seg].correct));
+      else text.appendChild(makeSelect(seg));
+    } else {
+      text.appendChild(document.createTextNode(seg));
+    }
+  });
+
+  div.appendChild(side); div.appendChild(text);
+  return div;
+}
+
+function buildReading() {
+  document.getElementById('s3instr').innerHTML = partner === 'A'
+    ? 'You are <strong>Partner A</strong>. Read paragraphs 1 and 3 aloud to your partner. Listen to your partner read paragraphs 2 and 4, and choose the missing words. Do not show your screen.'
+    : 'You are <strong>Partner B</strong>. Read paragraphs 2 and 4 aloud to your partner. Listen to your partner read paragraphs 1 and 3, and choose the missing words. Do not show your screen.';
+  const cont = document.getElementById('articleContainer');
+  if (cont.innerHTML) return;
+  PARAS.forEach(p => cont.appendChild(renderPara(p)));
+}
+
+function finishReading() {
+  const missing = PARAS.some(p => p.owner !== partner && p.segs.some(seg => typeof seg === 'number' && !sel[seg]));
+  if (missing) { alert('Please choose a word for every gap.'); return; }
+  goTo(4);
+}
+
+// Quiz
+function buildArticlePanel() {
+  // Shows the student's own version: their own paragraphs, plus the words they chose.
+  const cont = document.getElementById('fullArticle');
+  cont.innerHTML = '';
+  const t = document.createElement('div');
+  t.className = 'fa-title';
+  t.textContent = 'Many People in Japan Are Not Happy with Their Looks';
+  cont.appendChild(t);
+  PARAS.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'fa-para';
+    p.segs.forEach(seg => {
+      if (typeof seg === 'number') {
+        if (p.owner === partner) {
+          d.appendChild(document.createTextNode(GAPS[seg].correct));
+        } else if (sel[seg]) {
+          const m = document.createElement('mark');
+          m.textContent = sel[seg];
+          d.appendChild(m);
+        } else {
+          d.appendChild(blankSpan(seg));
+        }
+      } else {
+        d.appendChild(document.createTextNode(seg));
+      }
+    });
+    cont.appendChild(d);
+  });
+}
+
+function buildQuiz() {
+  if (quizBuilt) return;
+  const L = ['a', 'b', 'c'];
+  document.getElementById('quizContainer').innerHTML = QUIZ.map((q, qi) => `
+    <div class="q">
+      <div class="q-text">${qi + 1}. ${q.q}</div>
+      ${q.opts.map((o, oi) => `
+        <div class="q-option${quizSel[qi] === oi ? ' selected' : ''}" id="qo${qi}_${oi}" role="button" tabindex="0"
+             onclick="selectQuiz(${qi},${oi})"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectQuiz(${qi},${oi});}">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${o}</div>
+        </div>`).join('')}
+    </div>`).join('');
+  quizBuilt = true;
+}
+function selectQuiz(qi, oi) {
+  QUIZ[qi].opts.forEach((_, o) => { document.getElementById(`qo${qi}_${o}`).className = 'q-option'; });
+  quizSel[qi] = oi;
+  document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+  saveState();
+}
+function toggleArticle() {
+  const box = document.getElementById('fullArticle');
+  const open = box.classList.toggle('open');
+  document.getElementById('toggleArticleBtn').textContent = open ? 'Hide the article' : 'Show the article';
+}
+
+// Score
+function reviewRow(r) {
+  return `
+    <div class="review-row">
+      <div class="review-mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '\u2713' : '\u2717'}</div>
+      <div>
+        <div class="review-label">${r.label}</div>
+        <div class="review-answer">Your answer: ${r.chosen || '\u2014'}</div>
+        ${r.ok ? '' : `<div class="review-correct">Correct answer: <b>${r.correct}</b></div>`}
+      </div>
+    </div>`;
+}
+
+function submitAll() {
+  if (QUIZ.some((_, i) => quizSel[i] === undefined)) { alert('Please answer all 10 questions.'); return; }
+
+  const clozeReview = [];
+  let clozeScore = 0, clozeMax = 0;
+  PARAS.forEach(p => {
+    if (p.owner === partner) return;
+    p.segs.forEach(seg => {
+      if (typeof seg !== 'number') return;
+      clozeMax++;
+      const chosen = sel[seg];
+      const ok = chosen === GAPS[seg].correct;
+      if (ok) clozeScore++;
+      clozeReview.push({ label: `Paragraph ${p.n}, gap ${seg}`, chosen, ok, correct: GAPS[seg].correct });
+    });
+  });
+
+  const headReview = [];
+  let headScore = 0;
+  PARAS.forEach(p => {
+    const c = headSel[p.n];
+    const ok = c === HEAD_ANSWER[p.n];
+    if (ok) headScore++;
+    headReview.push({ label: `Paragraph ${p.n}`, chosen: HEADINGS[c], ok, correct: HEADINGS[HEAD_ANSWER[p.n]] });
+  });
+
+  const L = ['a', 'b', 'c'];
+  const quizReview = [];
+  let quizScore = 0;
+  QUIZ.forEach((q, i) => {
+    const c = quizSel[i];
+    const ok = c === q.correct;
+    if (ok) quizScore++;
+    quizReview.push({
+      label: `Question ${i + 1} (${q.type})`,
+      chosen: `${L[c]}. ${q.opts[c]}`, ok,
+      correct: `${L[q.correct]}. ${q.opts[q.correct]}`
+    });
+  });
+
+  const total = clozeScore + headScore + quizScore;
+  const totalMax = clozeMax + PARAS.length + QUIZ.length;
+  const pct = Math.round(total / totalMax * 100);
+
+  document.getElementById('totalNum').textContent = total;
+  document.getElementById('totalDenom').textContent = 'out of ' + totalMax;
+  document.getElementById('clozeNum').textContent = clozeScore + '/' + clozeMax;
+  document.getElementById('headNum').textContent = headScore + '/' + PARAS.length;
+  document.getElementById('quizNum').textContent = quizScore + '/' + QUIZ.length;
+  document.getElementById('reviewCloze').innerHTML = clozeReview.map(reviewRow).join('');
+  document.getElementById('reviewHead').innerHTML = headReview.map(reviewRow).join('');
+  document.getElementById('reviewQuiz').innerHTML = quizReview.map(reviewRow).join('');
+
+  goTo(5);
+  clearState();
+  logToSheets(clozeScore, clozeMax, headScore, PARAS.length, quizScore, QUIZ.length, total, totalMax, pct, clozeReview.concat(headReview, quizReview));
+}
+
+function logToSheets(clozeScore, clozeMax, headScore, headMax, quizScore, quizMax, total, totalMax, pct, review) {
+  const status = document.getElementById('sheetStatus');
+  if (!SHEET_URL || SHEET_URL === 'PASTE_URL_HERE') {
+    status.textContent = 'No gradebook link is set yet, so this score was not saved.';
+    return;
+  }
+  status.textContent = 'Saving to the gradebook...';
+  const name = document.getElementById('studentName').value.trim();
+  const num  = document.getElementById('studentNumber').value.trim();
+  const detail = review.map(r => `${r.label}: ${r.chosen || '-'} (${r.ok ? 'correct' : 'wrong'})`).join(' | ');
+
+  const payload = JSON.stringify({
+    studentNumber: num, studentName: name, partner,
+    score: total + '/' + totalMax, percent: pct,
+    clozeScore: clozeScore + '/' + clozeMax,
+    headingScore: headScore + '/' + headMax,
+    quizScore: quizScore + '/' + quizMax,
+    response: detail
+  });
+
+  const form = document.createElement('form');
+  form.method = 'POST'; form.action = SHEET_URL; form.target = 'hidden_iframe'; form.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'hidden'; input.name = 'data'; input.value = payload;
+  form.appendChild(input);
+  const iframe = document.createElement('iframe');
+  iframe.name = 'hidden_iframe'; iframe.style.display = 'none';
+  iframe.onload = () => { status.textContent = 'Saved to the gradebook.'; };
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(() => {
+    if (status.textContent.indexOf('Saving') === 0) status.textContent = 'Saved to the gradebook.';
+  }, 3000);
+}
+
+window.addEventListener('load', () => {
+  const state = loadState();
+  if (state && state.currentScreen > 1) restoreState(state);
+});
+</script>
+</body>
+</html>
