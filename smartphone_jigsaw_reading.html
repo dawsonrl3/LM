@@ -202,7 +202,7 @@
   <div class="screen" id="screen3">
     <div class="instr" id="s3instr"></div>
     <div id="articleContainer"></div>
-    <p class="source">Adapted from “How Japan is tackling the rising tide of smartphone addiction” by Naoko Tochibayashi, World Economic Forum (7 October 2025). Rewritten in simpler English for class.</p>
+    <p class="source">Adapted from “How Japan is tackling the rising tide of smartphone addiction” by Naoko Tochibayashi, World Economic Forum (7 October 2025). Also uses a finding from Kumban, Cetthakrikul & Santiworakul (2025), International Journal of Environmental Research and Public Health, 22(2), 237. Rewritten in simpler English for class.</p>
     <button class="btn btn-primary" onclick="finishReading()">Go to the quiz</button>
     <button class="btn btn-ghost" onclick="goTo(2)">Back</button>
   </div>
@@ -243,7 +243,7 @@ const SHEET_URL = "https://script.google.com/macros/s/AKfycbweumURl1sLPuF-8ef5-R
 // Each gap has one correct answer and two wrong options.
 const GAPS = {
   1:  { correct:"20",           options:["20","12","200"] },
-  2:  { correct:"university",   options:["university","universe","unique"] },
+  2:  { correct:"25",           options:["25","15","52"] },
   3:  { correct:"government",   options:["government","garden","governor"] },
   4:  { correct:"lonely",       options:["lonely","lovely","lazy"] },
   5:  { correct:"fun",          options:["fun","fan","fine"] },
@@ -263,7 +263,7 @@ const GAPS = {
 // Numbers in segs are gap ids. Student A owns paragraphs 1 and 3. Student B owns 2 and 4.
 // Skim sentences have NO gap: the hook + thesis (last sentence) of paragraph 1, and the first sentence of paragraphs 2-4.
 const PARAS = [
-  { n:1, owner:'A', segs:["Do you check your phone as soon as you wake up? In Japan, people use their phones for about ",1," hours a week. That is just under three hours a day, which is not a lot. But averages can hide problems. Experts think that about 10% of high school students and 25% of ",2," students may be addicted to their phones. A ",3," survey in 2024 also found that people who use phones longer feel more ",4,". Smartphones are very useful, but too much use can cause problems."] },
+  { n:1, owner:'A', segs:["Do you check your phone as soon as you wake up? In Japan, people use their phones for about ",1," hours a week. That is just under three hours a day, which is not a lot. But averages can hide problems. Experts think that about 10% of high school students and ",2,"% of university students may be addicted to their phones. A 2025 study of 120 university students found that they spent more than eight hours a day on screens, including phones and other devices. A ",3," survey in 2024 also found that people who use phones longer feel more ",4,". Smartphones are very useful, but too much use can cause problems."] },
   { n:2, owner:'B', segs:["The city of Toyoake, in Aichi, made the first city rule about smartphone use in Japan. The rule says people should use their phones for ",5," for no more than ",6," hours a day. Elementary school children should stop by 9 p.m., and junior high school students and older people should stop by 10 p.m. There is no ",7," for breaking the rule. The city only wants people to check their habits and talk with their ",8,"."] },
   { n:3, owner:'A', segs:["In June 2025, a clinic in Tokyo opened for people with “smartphone dementia.” These patients do not really have ",9,". They have problems like ",10," things. The clinic thinks this may come from too much ",11,". It says that 10 to 20 million people in Japan may be at ",12,". In July, the clinic saw about 10 patients a day, and most of them were in their 30s."] },
   { n:4, owner:'B', segs:["Other countries are also acting. Finland limited phone use in ",13," in August 2025. France, Italy, the Netherlands, and China have similar rules, and South Korea plans to join them. Australia and Norway have age ",14," for social ",15,". The article says that phones help us stay ",16,", so the goal is not to stop using them. The goal is balance. Governments, communities, and companies can all help people use phones in a healthy way."] }
@@ -290,7 +290,7 @@ const QUIZ = [
   { type:"true or false", q:"True or False: Most patients at the Tokyo clinic in July were in their 30s.", opts:["True","False"], correct:0 },
   { type:"vocabulary", q:"In Paragraph 1, what does “addicted” mean in the phrase “addicted to their phones”?", opts:["Very interested in new technology","Afraid of something","Unable to stop using something, even when it causes problems"], correct:2 },
   { type:"vocabulary", q:"In Paragraph 4, what does “balance” mean in the sentence “The goal is balance”?", opts:["Stopping all phone use","Using something in a healthy amount, not too much and not too little","Buying the newest phone"], correct:1 },
-  { type:"inference", q:"Why does the article say that averages “can hide problems”?", opts:["Because some groups use their phones much more than the average person","Because the numbers are always wrong","Because phones hide information from their users"], correct:0 }
+  { type:"inference", q:"Why does the article say that averages “can hide problems”?", opts:["Because some groups, like university students, use screens much more than the average person","Because the numbers are always wrong","Because phones hide information from their users"], correct:0 }
 ];
 
 // State
@@ -640,7 +640,7 @@ function submitAll() {
 
 function logToSheets(clozeScore, clozeMax, headScore, headMax, quizScore, quizMax, total, totalMax, pct, review) {
   const status = document.getElementById('sheetStatus');
-  if (!SHEET_URL || SHEET_URL === 'https://script.google.com/macros/s/AKfycbweumURl1sLPuF-8ef5-Re6-rsYKR89fQg_DwubGWenwu4EJChUF2BRRb921Fawl8Nf4Q/exec') {
+  if (!SHEET_URL || SHEET_URL === 'PASTE_URL_HERE') {
     status.textContent = 'No gradebook link is set yet, so this score was not saved.';
     return;
   }
