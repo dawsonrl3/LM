@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hana Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#14102b;--panel:#201a45;--line:#6a5acd;--acc:#ffd400;--acc2:#00e5ff;--ok:#5dffb0;--ng:#ff6a6a;--fg:#ffffff;--mute:#b9b2e6}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:'Noto Sans JP',system-ui,sans-serif;font-size:19px;line-height:1.45;-webkit-text-size-adjust:100%}
+body{padding:14px max(14px,env(safe-area-inset-left)) 40px}
+.px{font-family:'DotGothic16','Noto Sans JP',monospace}
+#top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+#top h1{margin:0;font-size:24px;color:var(--acc)}
+.btn{font:inherit;font-weight:900;color:#000;background:var(--acc);border:3px solid #000;box-shadow:4px 4px 0 #000;padding:12px 16px;border-radius:6px;min-height:52px;cursor:pointer}
+.btn.alt{background:var(--acc2)} .btn.ghost{background:var(--panel);color:#fff;border-color:var(--line)}
+.btn:disabled{opacity:.45}
+.card{background:var(--panel);border:3px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px}
+.q{font-size:22px;font-weight:900} .mute{color:var(--mute);font-size:16px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;font:inherit;color:#fff;background:var(--panel);border:3px solid var(--line);border-radius:8px;padding:12px;margin:0 0 10px;min-height:60px;cursor:pointer}
+.opt b{font-family:'DotGothic16',monospace;color:var(--acc);font-size:26px;min-width:30px}
+.opt.sel{border-color:var(--acc);background:#3a2f7a} .opt.ok{border-color:var(--ok)} .opt.ng{border-color:var(--ng)}
+input[type=text]{width:100%;font:inherit;font-size:20px;padding:12px;border-radius:6px;border:3px solid var(--line);background:#0e0a22;color:#fff;margin:6px 0 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap} .row .btn{flex:1}
+.bar{height:10px;background:#0e0a22;border-radius:5px;margin-bottom:12px} .bar i{display:block;height:100%;background:var(--acc);border-radius:5px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{font:inherit;font-weight:900;min-width:52px;min-height:48px;padding:6px 10px;border-radius:6px;border:3px solid var(--line);background:#0e0a22;color:#fff;cursor:pointer}
+.chip.sel{background:var(--acc);color:#000;border-color:#000}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;font-size:16px}
+.legend div{border:2px solid var(--line);border-radius:6px;padding:6px;background:#0e0a22}
+.big{font-size:56px;font-family:'DotGothic16',monospace;color:var(--acc);text-align:center;margin:8px 0}
+.pass{border-left:8px solid var(--ng);padding:10px 12px;background:#0e0a22;margin-bottom:12px;font-weight:700}
+</style>
+</head>
+<body>
+<div id="top"><h1 class="px">Hana Quiz</h1><button class="btn ghost" id="lang" type="button">English</button></div>
+<div id="app"></div>
+<script>
+var UI={
+ ja:{id:'学籍番号',name:'名前',join:'はじめる',idhint:'英数字だけ（例：2410123）',wait:'先生が問題を出すのを、待っています。',quizOpen:'クイズが始まりました',start:'クイズを始める',
+  submit:'答える',saved:'回答を保存しました。画面は、人に見せないでください。',yours:'あなたの答え',answer:'正解',next:'次へ',back:'前へ',review:'見直し',
+  send:'提出する',sure:'もう一度タップして提出',unanswered:'未回答',score:'あなたの点数',done:'提出しました。おつかれさまでした。',already:'この学籍番号は、もう提出済みです。',
+  bad:'学籍番号は英数字だけで入れてください。',err:'通信エラー。もう一度試してください。',closed:'クイズは、まだ開いていません。',of:'/',doctor:'ゴールドクター',
+  hintGrid:'まだ持っている？ 欲しい？',pick:'選ぶ',level:'レベル',noshow:'画面は、見せ合わない。'},
+ en:{id:'Student ID',name:'Name',join:'Start',idhint:'Letters and digits only (e.g. 2410123)',wait:'Waiting for your teacher to open a question.',quizOpen:'The quiz is open',start:'Start the quiz',
+  submit:'Submit answer',saved:'Your answer is saved. Do not show your screen to anyone.',yours:'Your answer',answer:'Correct answer',next:'Next',back:'Back',review:'Review',
+  send:'Submit',sure:'Tap again to submit',unanswered:'unanswered',score:'Your score',done:'Submitted. Well done.',already:'This student ID has already submitted.',
+  bad:'Use letters and digits only for your ID.',err:'Connection error. Please try again.',closed:'The quiz is not open yet.',of:'/',doctor:'Goal Doctor',
+  hintGrid:'Do you have it? Do you want it?',pick:'Choose',level:'Level',noshow:'Do not show your screen to anyone.'}
+};
+var S={lang:'ja',id:'',name:'',view:'join',live:null,doc:null,docDone:{},reveal:null,quiz:null,ans:{},qi:0,confirm:false,result:null,st:{live:'',reveal:false,quizOpen:false},busy:false};
+try{var sv=JSON.parse(localStorage.getItem('gd')||'{}');if(sv.lang)S.lang=sv.lang;if(sv.id){S.id=sv.id;S.name=sv.name||'';S.view='wait';}if(sv.ans)S.ans=sv.ans;if(sv.docDone)S.docDone=sv.docDone;}catch(e){}
+function save(){try{localStorage.setItem('gd',JSON.stringify({lang:S.lang,id:S.id,name:S.name,ans:S.ans,docDone:S.docDone,result:S.result}));}catch(e){}}
+function T(k){return UI[S.lang][k];}
+function L(o){return o?o[S.lang]:'';}
+function h(tag,attrs,kids){var e=document.createElement(tag);for(var k in (attrs||{})){if(k==='cls')e.className=attrs[k];else if(k==='on')for(var ev in attrs.on)e.addEventListener(ev,attrs.on[ev]);else if(k==='text')e.textContent=attrs[k];else e.setAttribute(k,attrs[k]);}
+ (kids||[]).forEach(function(c){if(c==null)return;e.appendChild(typeof c==='string'?document.createTextNode(c):c);});return e;}
+var QUIZ=[{"id": "q1", "type": "matrix", "title": {"ja": "ゴールグリッド", "en": "Goal Grid"}, "prompt": {"ja": "文を読んで、4つのマスのどれかに入れよう", "en": "Read each sentence and place it in one of the four boxes."}, "items": [{"ja": "まだ家で夕食を作っていなくて、作り始めたい。", "en": "She does not cook dinner at home yet, and she wants to start."}, {"ja": "毎週金曜に友達と夕食を食べていて、続けたい。", "en": "She has dinner with her friends every Friday, and she wants to keep doing it."}, {"ja": "ほぼ毎晩コンビニの夕食を買っていて、やめたい。", "en": "She buys a convenience-store dinner almost every night, and she wants to stop."}, {"ja": "友達にお金を借りたことはなくて、借りたくない。", "en": "She has never had to borrow money from her friends, and she does not want to."}], "boxes": [{"k": "GET", "label": {"ja": "達成したい", "en": "Get"}}, {"k": "KEEP", "label": {"ja": "守りたい", "en": "Keep"}}, {"k": "AVOID", "label": {"ja": "避けたい", "en": "Avoid"}}, {"k": "STOP", "label": {"ja": "辞めたい", "en": "Stop"}}]}, {"id": "q2", "type": "mcq", "title": {"ja": "S", "en": "S"}, "prompt": {"ja": "いちばん具体的な目標は？", "en": "Which goal is the most specific?"}, "sub": null, "options": [{"k": "A", "ja": "食べ物のお金の使い方を、かしこくする", "en": "I will be smarter about how I spend money on food."}, {"k": "B", "ja": "コンビニの夕食を買わずに、家で夕食を作る", "en": "I will cook dinner at home instead of buying a convenience-store dinner."}, {"k": "C", "ja": "もっと料理するように、がんばる", "en": "I will try to cook more often."}, {"k": "D", "ja": "もっと健康的なものを食べる", "en": "I will eat healthier food."}]}, {"id": "q3", "type": "mcq", "title": {"ja": "M", "en": "M"}, "prompt": {"ja": "いちばん測定できる目標は？", "en": "Which goal is the most measurable?"}, "sub": null, "options": [{"k": "A", "ja": "ときどき、家で夕食を作る", "en": "I will cook dinner at home sometimes."}, {"k": "B", "ja": "月・水・木に、家で夕食を作る", "en": "I will cook dinner at home on Monday, Wednesday and Thursday."}, {"k": "C", "ja": "週に何回か、家で夕食を作る", "en": "I will cook dinner at home several times a week."}, {"k": "D", "ja": "できるときに、家で夕食を作る", "en": "I will cook dinner at home whenever I can."}]}, {"id": "q4", "type": "mcq", "title": {"ja": "A", "en": "A"}, "prompt": {"ja": "「月・水・木に夕食を作る」は、ハナにとって、なぜ達成できる？", "en": "Why is “cooking dinner on Monday, Wednesday and Thursday” achievable for Hana?"}, "sub": null, "options": [{"k": "A", "ja": "月・水・木は6時までに帰れて、夕食は40分で作れる。火は部活、金は友達と約束があるから", "en": "She is home by 6 p.m. on those days, dinner takes 40 minutes, and Tuesday and Friday are already taken by club and friends."}, {"k": "B", "ja": "お菓子作りが好きだから、料理も楽しめるから", "en": "She loves baking, so she will enjoy cooking dinner."}, {"k": "C", "ja": "がんばるから、できるから", "en": "She will try her best, so she can do it."}, {"k": "D", "ja": "火曜の部活のあとに、2時間料理するから", "en": "She will cook for two hours after club on Tuesday."}]}, {"id": "q5", "type": "mcq", "title": {"ja": "A", "en": "A"}, "prompt": {"ja": "週に3回、家で作ると、1週間でいくら節約できる？", "en": "How much does Hana save in one week by cooking three dinners?"}, "sub": {"ja": "家の夕食は約350円、コンビニの夕食は約700円", "en": "A home-cooked dinner costs about ¥350, and a convenience-store dinner costs about ¥700."}, "options": [{"k": "A", "ja": "350円", "en": "¥350"}, {"k": "B", "ja": "1,050円", "en": "¥1,050"}, {"k": "C", "ja": "2,100円", "en": "¥2,100"}, {"k": "D", "ja": "3,500円", "en": "¥3,500"}]}, {"id": "q6", "type": "mcq", "title": {"ja": "R", "en": "R"}, "prompt": {"ja": "ハナは、お金を使いすぎないために料理する。お金を月末までもたせたい。それは、なぜ？", "en": "Hana cooks to spend less, and she wants her money to last the month. Why does she want that?"}, "sub": null, "options": [{"k": "A", "ja": "みんなが、料理はかっこいいと言うから", "en": "Everyone says that cooking is cool."}, {"k": "B", "ja": "親に、追加のお金をお願いしたくないから", "en": "She wants to stop asking her parents for extra money."}, {"k": "C", "ja": "料理は、健康にいいから", "en": "Cooking is good for her health."}, {"k": "D", "ja": "友達も、夕食を作っているから", "en": "Her friend also cooks dinner."}]}, {"id": "q7", "type": "mcq", "title": {"ja": "T", "en": "T"}, "prompt": {"ja": "正しい期限は？", "en": "Which deadline is correct?"}, "sub": null, "options": [{"k": "A", "ja": "できるだけ早く始める", "en": "She will start as soon as possible."}, {"k": "B", "ja": "11月2日（月）から、冬休みが始まる12月22日まで続ける", "en": "She will start on Monday, November 2 and continue until winter break on December 22."}, {"k": "C", "ja": "7週間、料理する", "en": "She will cook for seven weeks."}, {"k": "D", "ja": "料理がうまくなるまで続ける", "en": "She will cook until she gets better at it."}]}, {"id": "q8", "type": "mcq", "title": {"ja": "足りない文字", "en": "Missing element"}, "prompt": {"ja": "この目標に足りない文字は？", "en": "Which element is missing from this goal?"}, "passage": {"ja": "11月2日から12月22日まで、ハナは、コンビニの夕食を買わずに、家で夕食を作る。ハナは6時までに帰れて、夕食は40分で作れる。親に追加のお金をお願いしたくない。", "en": "From Monday, November 2 until December 22, Hana will cook dinner at home instead of buying a convenience-store dinner. She gets home by 6 p.m., and dinner takes 40 minutes. She wants to stop asking her parents for extra money."}, "options": [{"k": "S", "ja": "具体的：何をするかが、はっきり書いてある", "en": "Specific: The goal says exactly what she will do."}, {"k": "M", "ja": "測定できる：数字や回数が書いてある", "en": "Measurable: The goal gives a number or a count."}, {"k": "A", "ja": "達成できる：予定とお金に合うと分かる", "en": "Achievable: The goal shows the plan fits her schedule and budget."}, {"k": "R", "ja": "大切な：自分の理由が書いてある", "en": "Relevant: The goal gives her own reason."}, {"k": "T", "ja": "期限がある：始まりと終わりが書いてある", "en": "Time-bound: The goal gives a start and an end."}]}, {"id": "q9", "type": "match", "title": {"ja": "弱い目標", "en": "Weak goals"}, "prompt": {"ja": "弱い目標は、どの文字が足りない？ 文字を選ぼう", "en": "Which letter does each weak goal fail? Match each goal to a letter."}, "items": [{"ja": "もっと良いものを食べる", "en": "I will eat better."}, {"ja": "ときどき、家で夕食を作る", "en": "I will cook dinner at home sometimes."}, {"ja": "今月は、毎晩、家で夕食を作る", "en": "I will cook dinner at home every night this month."}, {"ja": "料理が流行っているから、夕食を作る", "en": "I will cook dinner because cooking is trendy."}, {"ja": "親に追加のお金をお願いしたくないから、月・水・木に家で夕食を作る。いつか", "en": "I will cook dinner on Monday, Wednesday and Thursday to stop asking my parents for extra money, someday."}], "bank": [{"k": "S", "name": {"ja": "具体的", "en": "Specific"}, "mean": {"ja": "何をするかが、はっきり書いてある", "en": "The goal says exactly what she will do."}}, {"k": "M", "name": {"ja": "測定できる", "en": "Measurable"}, "mean": {"ja": "数字や回数が書いてある", "en": "The goal gives a number or a count."}}, {"k": "A", "name": {"ja": "達成できる", "en": "Achievable"}, "mean": {"ja": "予定とお金に合うと分かる", "en": "The goal shows the plan fits her schedule and budget."}}, {"k": "R", "name": {"ja": "大切な", "en": "Relevant"}, "mean": {"ja": "自分の理由が書いてある", "en": "The goal gives her own reason."}}, {"k": "T", "name": {"ja": "期限がある", "en": "Time-bound"}, "mean": {"ja": "始まりと終わりが書いてある", "en": "The goal gives a start and an end."}}]}, {"id": "q10", "type": "mcq", "title": {"ja": "総合", "en": "Overall"}, "prompt": {"ja": "S・M・A・R・T が全部そろっているのは？", "en": "Which goal has all of S, M, A, R and T?"}, "sub": null, "options": [{"k": "A", "ja": "11月2日から12月22日まで、月・水・木に、コンビニの夕食を買わずに、家で夕食を作る。1回40分で、約350円の節約になる。親に追加のお金をお願いしたくないから", "en": "From November 2 until December 22, I will cook dinner at home on Monday, Wednesday and Thursday instead of buying a convenience-store dinner. Each dinner takes 40 minutes and saves about ¥350, and I want to stop asking my parents for extra money."}, {"k": "B", "ja": "月・水・木に、コンビニの夕食を買わずに、家で夕食を作る。1回40分で、約350円の節約になる。親に追加のお金をお願いしたくないから", "en": "I will cook dinner at home on Monday, Wednesday and Thursday instead of buying a convenience-store dinner. Each dinner takes 40 minutes and saves about ¥350, and I want to stop asking my parents for extra money."}, {"k": "C", "ja": "親に追加のお金をお願いしたくないので、今月はもっと良いものを食べる", "en": "I will eat better this month so that I can stop asking my parents for extra money."}, {"k": "D", "ja": "11月2日から12月22日まで、料理が流行っているから、毎晩、本格的な夕食を作る", "en": "From Monday, November 2 until December 22, I will cook a full dinner every night because cooking is trendy."}]}], KEYS={"q1": ["GET", "KEEP", "STOP", "AVOID"], "q2": "B", "q3": "B", "q4": "A", "q5": "B", "q6": "B", "q7": "B", "q8": "M", "q9": ["S", "M", "A", "R", "T"], "q10": "A"};
+function score_(a){var pts=[],t=0;QUIZ.forEach(function(q){var k=KEYS[q.id],x=a?a[q.id]:null,p=0;if(Array.isArray(k)){for(var i=0;i<k.length;i++)if(x&&x[i]===k[i])p+=1/k.length;}else if(x===k)p=1;p=Math.round(p*100)/100;pts.push(p);t+=p;});return{pts:pts,total:Math.round(t*100)/100};}
+function call(fn){var a=[].slice.call(arguments,1);return new Promise(function(res){
+ if(fn==='api_state')return res({live:'',reveal:false,quizOpen:true});
+ if(fn==='api_getQuiz')return res(QUIZ);
+ if(fn==='api_submitQuiz'){var r=score_(a[3]);return res({score:r.total,pts:r.pts,ok:r.pts.map(function(p){return p>=0.999;})});}
+ res(null);});}
+
+document.getElementById('lang').addEventListener('click',function(){S.lang=S.lang==='ja'?'en':'ja';save();render();});
+
+function render(){
+ document.documentElement.lang=S.lang;
+ document.getElementById('lang').textContent=S.lang==='ja'?'English':'日本語';
+ var app=document.getElementById('app');app.textContent='';
+ var v=S.view;
+ if(v==='join')return app.appendChild(viewJoin());
+ if(v==='wait')return app.appendChild(viewWait());
+ if(v==='doctor')return app.appendChild(viewDoctor());
+ if(v==='quiz')return app.appendChild(viewQuiz());
+ if(v==='review')return app.appendChild(viewReview());
+ if(v==='result')return app.appendChild(viewResult());
+}
+function viewJoin(){
+ var id=h('input',{type:'text',id:'sid',autocomplete:'off',inputmode:'text',autocapitalize:'off',placeholder:T('idhint')});
+ var nm=h('input',{type:'text',id:'snm',autocomplete:'off',maxlength:'40'});
+ var msg=h('p',{cls:'mute'});
+ var go=h('button',{cls:'btn',type:'button',text:T('join'),on:{click:function(){
+   var i=id.value.trim();if(!/^[A-Za-z0-9_\-]{1,20}$/.test(i)){msg.textContent=T('bad');return;}
+   S.id=i;S.name=nm.value.trim().substring(0,40);S.view='wait';save();render();poll();}}});
+ return h('div',{cls:'card'},[h('div',{cls:'mute',text:T('id')}),id,h('div',{cls:'mute',text:T('name')}),nm,go,msg]);
+}
+function viewWait(){
+ var c=h('div',{cls:'card'},[h('p',{text:T('wait')}),h('p',{cls:'mute',text:S.name+'　('+S.id+')'})]);
+ if(S.st.quizOpen&&!S.result){c.appendChild(h('p',{cls:'q',text:T('quizOpen')}));c.appendChild(h('button',{cls:'btn alt',type:'button',text:T('start'),on:{click:startQuiz}}));}
+ if(S.result){c.appendChild(h('p',{text:T('done')}));}
+ return c;
+}
+function opts(list,sel,onPick,mark){
+ return list.map(function(o){var cls='opt';if(sel===o.k)cls+=' sel';if(mark){if(o.k===mark.key)cls+=' ok';else if(o.k===mark.yours)cls+=' ng';}
+  return h('button',{cls:cls,type:'button',on:{click:function(){if(onPick)onPick(o.k);}}},[h('b',{text:o.k}),h('span',{text:L(o)})]);});
+}
+function viewDoctor(){
+ var d=S.doc,done=S.docDone[d.level],box=h('div');
+ box.appendChild(h('div',{cls:'mute px',text:T('doctor')+'　'+T('level')+' '+d.title}));
+ box.appendChild(h('div',{cls:'card'},[h('div',{cls:'mute',text:L({ja:'目標',en:'Goal'})}),h('div',{cls:'q',text:L(d.goal)}),h('div',{cls:'q',style:'color:var(--acc2)',text:L(d.q)})]));
+ var mark=S.reveal&&S.reveal.reveal&&S.reveal.level===d.level?{key:S.reveal.key,yours:S.reveal.yours||done}:null;
+ var sel=done||S.pick;
+ opts(d.options,sel,done?null:function(k){S.pick=k;render();},mark).forEach(function(e){box.appendChild(e);});
+ if(!done){box.appendChild(h('button',{cls:'btn',type:'button',text:T('submit'),on:{click:sendDoctor},disabled:S.pick?null:'disabled'}));}
+ else box.appendChild(h('p',{cls:'mute',text:T('saved')}));
+ if(mark)box.appendChild(h('div',{cls:'pass',text:T('answer')+': '+mark.key+'　'+L(S.reveal.reason)}));
+ return box;
+}
+async function sendDoctor(){
+ if(!S.pick||S.busy)return;S.busy=true;
+ try{await call('api_submitDoctor',S.id,S.name,S.doc.level,S.pick);S.docDone[S.doc.level]=S.pick;save();}catch(e){alert_(T('err'));}
+ S.busy=false;render();
+}
+function alert_(m){var b=document.getElementById('app');var p=h('div',{cls:'pass',text:m});b.insertBefore(p,b.firstChild);setTimeout(function(){if(p.parentNode)p.parentNode.removeChild(p);},3500);}
+async function startQuiz(){
+ try{var q=await call('api_getQuiz');if(!q){alert_(T('closed'));return;}S.quiz=q;S.qi=0;S.view='quiz';render();}catch(e){alert_(T('err'));}
+}
+function answered(q){var a=S.ans[q.id];if(!a)return false;if(Array.isArray(a)){for(var i=0;i<(q.items||[]).length;i++)if(!a[i])return false;return true;}return true;}
+function viewQuiz(){
+ var q=S.quiz[S.qi],n=S.quiz.length,box=h('div');
+ box.appendChild(h('div',{cls:'mute px',text:(S.lang==='ja'?'テスト ':'TEST ')+(S.qi+1)+' '+T('of')+' '+n+'　'+L(q.title)}));
+ box.appendChild(h('div',{cls:'bar'},[h('i',{style:'width:'+((S.qi+1)/n*100)+'%'})]));
+ box.appendChild(h('div',{cls:'q',text:L(q.prompt),style:'margin-bottom:10px'}));
+ if(q.sub)box.appendChild(h('div',{cls:'card',text:L(q.sub)}));
+ if(q.passage)box.appendChild(h('div',{cls:'card',style:'border-color:var(--ng)',text:L(q.passage)}));
+ if(q.type==='mcq'){opts(q.options,S.ans[q.id],function(k){S.ans[q.id]=k;save();render();}).forEach(function(e){box.appendChild(e);});}
+ if(q.type==='matrix'){
+  var lg=h('div',{cls:'legend'},[['GET',{ja:'まだない・欲しい',en:'not yet · want'}],['KEEP',{ja:'ある・守りたい',en:'have · keep'}],['AVOID',{ja:'まだない・欲しくない',en:'not yet · do not want'}],['STOP',{ja:'ある・やめたい',en:'have · stop'}]].map(function(x){return h('div',{},[h('b',{cls:'px',text:x[0]+'　'}),L(x[1])]);}));
+  box.appendChild(lg);
+  q.items.forEach(function(it,i){var cur=(S.ans[q.id]||[])[i];
+   var ch=q.boxes.map(function(b){return h('button',{cls:'chip'+(cur===b.k?' sel':''),type:'button',text:b.k,on:{click:function(){var a=S.ans[q.id]||[null,null,null,null];a=a.slice();a[i]=b.k;S.ans[q.id]=a;save();render();}}});});
+   box.appendChild(h('div',{cls:'card'},[h('div',{text:(i+1)+'. '+L(it)}),h('div',{cls:'chips'},ch)]));});
+ }
+ if(q.type==='match'){
+  box.appendChild(h('div',{cls:'card'},q.bank.map(function(b){return h('div',{},[h('b',{cls:'px',style:'color:var(--acc)',text:b.k+'　'}),h('b',{text:L(b.name)+'　'}),h('span',{cls:'mute',text:L(b.mean)})]);})));
+  q.items.forEach(function(it,i){var cur=(S.ans[q.id]||[])[i];
+   var ch=q.bank.map(function(b){return h('button',{cls:'chip'+(cur===b.k?' sel':''),type:'button',text:b.k,on:{click:function(){var a=S.ans[q.id]||[null,null,null,null,null];a=a.slice();a[i]=b.k;S.ans[q.id]=a;save();render();}}});});
+   box.appendChild(h('div',{cls:'card'},[h('div',{text:(i+1)+'. '+L(it)}),h('div',{cls:'chips'},ch)]));});
+ }
+ var nav=h('div',{cls:'row'});
+ if(S.qi>0)nav.appendChild(h('button',{cls:'btn ghost',type:'button',text:T('back'),on:{click:function(){S.qi--;render();scrollTo(0,0);}}}));
+ if(S.qi<n-1)nav.appendChild(h('button',{cls:'btn',type:'button',text:T('next'),on:{click:function(){S.qi++;render();scrollTo(0,0);}}}));
+ else nav.appendChild(h('button',{cls:'btn alt',type:'button',text:T('review'),on:{click:function(){S.view='review';S.confirm=false;render();scrollTo(0,0);}}}));
+ box.appendChild(nav);
+ box.appendChild(h('p',{cls:'mute',text:T('noshow')}));
+ return box;
+}
+function viewReview(){
+ var box=h('div',{},[h('div',{cls:'q',text:T('review')})]);
+ S.quiz.forEach(function(q,i){box.appendChild(h('button',{cls:'opt'+(answered(q)?' sel':''),type:'button',on:{click:function(){S.qi=i;S.view='quiz';render();}}},[h('b',{text:i+1}),h('span',{text:L(q.title)+(answered(q)?'':'　('+T('unanswered')+')')})]));});
+ box.appendChild(h('button',{cls:'btn alt',type:'button',text:S.confirm?T('sure'):T('send'),on:{click:async function(){
+   if(!S.confirm){S.confirm=true;render();return;}
+   if(S.busy)return;S.busy=true;
+   try{var r=await call('api_submitQuiz',S.id,S.name,S.lang,S.ans);S.result=r;S.view='result';}catch(e){alert_(T('err'));}
+   S.busy=false;render();}}}));
+ return box;
+}
+function viewResult(){
+ var r=S.result||{},box=h('div',{cls:'card'});
+ if(r.already){box.appendChild(h('p',{text:T('already')}));return box;}
+ box.appendChild(h('div',{cls:'mute',text:T('score')}));
+ box.appendChild(h('div',{cls:'big',text:String(r.score)+' / 10'}));
+ var row=h('div',{cls:'chips'});(r.ok||[]).forEach(function(ok,i){row.appendChild(h('span',{cls:'chip'+(ok?' sel':''),text:(i+1)+(ok?' ✓':' ✗')}));});
+ box.appendChild(row);box.appendChild(h('p',{text:T('done')}));
+ return box;
+}
+async function poll(){
+ if(S.view==='join'||S.view==='quiz'||S.view==='review')return;
+ try{
+  var st=await call('api_state');var prev=S.st;S.st=st;
+  if(st.live){
+   if(!S.doc||S.doc.level!==st.live){S.doc=await call('api_getDoctor',st.live);S.pick=null;S.reveal=null;}
+   if(S.doc){S.view='doctor';
+     if(st.reveal){var rv=await call('api_getReveal',S.id,st.live);rv.level=st.live;S.reveal=rv;}else S.reveal=null;}
+  }else if(S.view==='doctor'){S.view='wait';S.doc=null;}
+  var sig=JSON.stringify([st,S.view,S.doc&&S.doc.level,S.reveal&&S.reveal.reveal,S.docDone[st.live]||'']);
+  if(sig!==S._sig){S._sig=sig;render();}
+ }catch(e){}
+}
+setInterval(poll,2500);
+render();poll();
+</script>
+</body>
+</html>
