@@ -31,7 +31,7 @@ input[type=text]{width:100%;font:inherit;font-size:20px;padding:12px;border-radi
 .chip.sel{background:var(--acc);color:#000;border-color:#000}
 .legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;font-size:16px}
 .legend div{border:2px solid var(--line);border-radius:6px;padding:6px;background:#0e0a22}
-.big{font-size:56px;font-family:'DotGothic16',monospace;color:var(--acc);text-align:center;margin:8px 0}
+.big{font-family:Arial,'Noto Sans JP',sans-serif;font-weight:900;font-size:64px;color:var(--acc);text-align:center;margin:8px 0;letter-spacing:0}
 .pass{border-left:8px solid var(--ng);padding:10px 12px;background:#0e0a22;margin-bottom:12px;font-weight:700}
 </style>
 </head>
@@ -66,11 +66,15 @@ function sendResult(id,name,lang,r,answers){try{
  var d={id:id,name:name,lang:lang,score:r.total,points:r.pts.join(','),answers:JSON.stringify(answers||{})};
  for(var k in d){var i=document.createElement('input');i.type='hidden';i.name=k;i.value=String(d[k]);f.appendChild(i);}
  document.body.appendChild(f);f.submit();setTimeout(function(){f.remove();},3000);}catch(e){}}
-function score_(a){var pts=[],t=0;QUIZ.forEach(function(q){var k=KEYS[q.id],x=a?a[q.id]:null,p=0;if(Array.isArray(k)){for(var i=0;i<k.length;i++)if(x&&x[i]===k[i])p+=1/k.length;}else if(x===k)p=1;p=Math.round(p*100)/100;pts.push(p);t+=p;});return{pts:pts,total:Math.round(t*100)/100};}
+function score_(a){var N=0,n=0,pts=[],oks=[];
+ QUIZ.forEach(function(q){var k=KEYS[q.id],x=a?a[q.id]:null,c=0,m=Array.isArray(k)?k.length:1;
+  if(Array.isArray(k)){for(var i=0;i<k.length;i++)if(x&&x[i]===k[i])c++;}else if(x===k)c=1;
+  N+=m;n+=c;pts.push([c,m]);});
+ var w=10/N;return{pts:pts.map(function(z){return Math.round(z[0]*w*100)/100;}),ok:pts.map(function(z){return z[0]===z[1];}),total:Math.round(n*w*100)/100,n:n,N:N};}
 function call(fn){var a=[].slice.call(arguments,1);return new Promise(function(res){
  if(fn==='api_state')return res({live:'',reveal:false,quizOpen:true});
  if(fn==='api_getQuiz')return res(QUIZ);
- if(fn==='api_submitQuiz'){var r=score_(a[3]);sendResult(a[0],a[1],a[2],r,a[3]);return res({score:r.total,pts:r.pts,ok:r.pts.map(function(p){return p>=0.999;})});}
+ if(fn==='api_submitQuiz'){var r=score_(a[3]);sendResult(a[0],a[1],a[2],r,a[3]);return res({score:r.total,pts:r.pts,ok:r.ok,n:r.n,N:r.N});}
  res(null);});}
 
 document.getElementById('lang').addEventListener('click',function(){S.lang=S.lang==='ja'?'en':'ja';save();render();});
@@ -171,9 +175,13 @@ function viewResult(){
  var r=S.result||{},box=h('div',{cls:'card'});
  if(r.already){box.appendChild(h('p',{text:T('already')}));return box;}
  box.appendChild(h('div',{cls:'mute',text:T('score')}));
- box.appendChild(h('div',{cls:'big',text:String(r.score)+' / 10'}));
+ var sc=Math.max(0,Math.min(10,Number(r.score)||0));
+ var parts=sc.toFixed(2).split('.');
+ box.appendChild(h('div',{cls:'big'},[parts[0],h('span',{style:'color:#fff;padding:0 4px',text:'.'}),parts[1],h('span',{style:'font-size:28px;color:var(--mute)',text:'  /  10'})]));
+ box.appendChild(h('p',{cls:'mute',style:'text-align:center',text:(S.lang==='ja'?'小数点あり：':'Decimal score: ')+sc.toFixed(2)+(S.lang==='ja'?' 点（10点満点）':' points out of 10')}));
+ if(r.N)box.appendChild(h('p',{cls:'mute',text:(S.lang==='ja'?'正解 ':'Correct answers: ')+r.n+' / '+r.N}));
  var row=h('div',{cls:'chips'});(r.ok||[]).forEach(function(ok,i){row.appendChild(h('span',{cls:'chip'+(ok?' sel':''),text:(i+1)+(ok?' ✓':' ✗')}));});
- box.appendChild(row);box.appendChild(h('p',{text:T('done')}));
+ box.appendChild(row);box.appendChild(h('p',{text:T('done')}));box.appendChild(h('p',{cls:'mute',text:'v4'}));
  return box;
 }
 async function poll(){
