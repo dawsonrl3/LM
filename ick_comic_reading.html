@@ -319,7 +319,7 @@ function submitAll() {
 
 function logToSheets(score, max, pct, review) {
   const status = document.getElementById('sheetStatus');
-  if (!SHEET_URL || SHEET_URL === 'https://script.google.com/macros/s/AKfycbzZ8miJiBCeauZUE5RnyBsszXJulw3HMWtcCewDi9CMXzuvheGAagKslMMACAqmktbx/exec') { status.textContent = 'No gradebook link is set yet, so this score was not saved.'; return; }
+  if (!SHEET_URL || SHEET_URL.indexOf('PASTE_') === 0) { status.textContent = 'No gradebook link is set yet, so this score was not saved.'; return; }
   status.textContent = 'Saving to the gradebook...';
   const detail = review.map(r => `${r.label}: ${r.chosen || '-'} (${r.ok ? 'correct' : 'wrong'})`).join(' | ');
   const payload = JSON.stringify({
