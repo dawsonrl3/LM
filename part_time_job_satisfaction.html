@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part-Time Job Satisfaction in Japan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,400&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --desk:#eef2f7; --grid:#dce4ee; --sheet:#ffffff;
+    --ink:#16233b; --muted:#59687f; --rule:#cdd7e3;
+    --hl:#ffe46b; --hl-edge:#e6b800;
+    --teal:#1f8a9e; --amber:#d9822b;
+    --ok:#2b9468; --ok-soft:#e3f4ec; --bad:#d04545; --bad-soft:#fae8e8;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    font-family:'Sora',sans-serif; color:var(--ink);
+    background-color:var(--desk);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:22px 22px;
+    min-height:100vh; padding:18px 12px 56px;
+  }
+  button:focus-visible, select:focus-visible, input:focus-visible, .q-option:focus-visible {
+    outline:3px solid var(--teal); outline-offset:2px;
+  }
+
+  .sheet { max-width:640px; margin:0 auto; background:var(--sheet); border:1px solid var(--rule); border-radius:6px; padding:24px 20px 28px; }
+  .masthead h1 { font-family:'Newsreader',serif; font-size:1.6rem; font-weight:600; line-height:1.25; }
+  .masthead p { font-size:.8rem; color:var(--muted); margin-top:6px; line-height:1.5; }
+
+  .steps { display:flex; align-items:center; margin:18px 0 22px; }
+  .step { display:flex; align-items:center; gap:5px; font-size:.64rem; font-weight:600; color:var(--muted); }
+  .step-dot { width:22px; height:22px; border-radius:50%; border:2px solid var(--rule); display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:700; background:#fff; flex-shrink:0; }
+  .step.active { color:var(--ink); }
+  .step.active .step-dot { border-color:var(--ink); background:var(--hl); color:var(--ink); }
+  .step.done { color:var(--ok); }
+  .step.done .step-dot { border-color:var(--ok); background:var(--ok); color:#fff; }
+  @media (max-width:440px) { .step span { display:none; } .step.active span { display:inline; } }
+  .step-line { flex:1; height:2px; background:var(--rule); margin:0 6px; min-width:8px; }
+
+  .screen { display:none; }
+  .screen.active { display:block; }
+
+  .h2 { font-family:'Newsreader',serif; font-size:1.15rem; font-weight:600; margin:22px 0 10px; }
+  .h2:first-child { margin-top:0; }
+  .instr { border-left:4px solid var(--hl-edge); background:#fffbe6; padding:12px 14px; font-size:.8rem; line-height:1.7; margin-bottom:18px; }
+
+  .field { margin-bottom:12px; }
+  .field label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); margin-bottom:5px; }
+  .field input { width:100%; background:#fff; border:1.5px solid var(--rule); border-radius:6px; padding:11px 13px; color:var(--ink); font-family:'Sora',sans-serif; font-size:.9rem; -webkit-appearance:none; }
+  .field input:focus { border-color:var(--teal); }
+
+  .partner-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .partner-btn { background:#fff; border:2px solid var(--rule); border-radius:6px; padding:14px 12px; text-align:left; cursor:pointer; color:var(--ink); font-family:'Sora',sans-serif; display:block; }
+  .partner-btn.sel-A { border-color:var(--teal); background:#e9f6f8; }
+  .partner-btn.sel-B { border-color:var(--amber); background:#fdf1e3; }
+  .partner-letter { display:block; font-family:'Newsreader',serif; font-size:2rem; font-weight:600; line-height:1; margin-bottom:6px; }
+  .partner-btn .pa { color:var(--teal); } .partner-btn .pb { color:var(--amber); }
+  .partner-desc { display:block; font-size:.74rem; color:var(--muted); line-height:1.55; }
+
+  .btn { width:100%; padding:14px; border:none; border-radius:8px; font-family:'Sora',sans-serif; font-size:.88rem; font-weight:600; cursor:pointer; }
+  .btn-primary { background:var(--ink); color:#fff; }
+  .btn-primary:hover { background:#0e1828; }
+  .btn-primary:disabled { opacity:.35; cursor:not-allowed; }
+  .btn-ghost { background:transparent; border:1.5px solid var(--rule); color:var(--muted); margin-top:10px; }
+  .btn-ghost:hover { border-color:var(--muted); color:var(--ink); }
+
+  /* Reading */
+  .para { display:grid; grid-template-columns:54px 1fr; gap:8px; padding:16px 0; border-top:1px solid var(--rule); }
+  #articleContainer > :first-child { border-top:none; padding-top:4px; }
+  .para-side { text-align:center; }
+  .para-num { font-family:'Newsreader',serif; font-size:1.8rem; font-weight:600; line-height:1; }
+  .para.own-A .para-num { color:var(--teal); }
+  .para.own-B .para-num { color:var(--amber); }
+  .para-role { font-size:.62rem; color:var(--muted); margin-top:5px; line-height:1.35; }
+  .para-text { font-family:'Newsreader',serif; font-size:1.05rem; line-height:2.1; }
+  .source { font-size:.68rem; color:var(--muted); line-height:1.6; margin:6px 0 20px; }
+
+  select.gap-sel {
+    display:inline-block; background:var(--hl); border:1px solid var(--hl-edge); border-radius:4px;
+    color:var(--ink); font-family:'Sora',sans-serif; font-size:.78rem; font-weight:700;
+    padding:3px 24px 3px 8px; margin:0 2px; cursor:pointer;
+    -webkit-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2316233b'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 7px center;
+  }
+  select.gap-sel:disabled { cursor:default; opacity:1; color:var(--ink); }
+  select.gap-sel option { background:#fff; color:#16233b; }
+
+  .blank { display:inline-block; height:1.15em; vertical-align:-0.2em; background:var(--hl); border:1px solid var(--hl-edge); border-radius:4px; margin:0 3px; }
+  .nav-end { margin-top:18px; }
+
+  /* Headings */
+  .headlist { border:1px solid var(--rule); border-radius:4px; padding:10px 14px; margin-bottom:14px; }
+  .headlist-title { font-family:'Newsreader',serif; font-size:1rem; font-weight:600; margin-bottom:4px; }
+  .headlist-item { font-size:.84rem; line-height:1.9; }
+  .hpara { padding:16px 0; border-top:1px solid var(--rule); }
+  #skimContainer > :first-child { border-top:none; padding-top:4px; }
+  .hhead { display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+  .hhead { align-items:center; }
+  .hicon { display:inline-flex; width:38px; height:38px; align-items:center; justify-content:center; background:#e9f6f8; border:1.5px solid var(--teal); border-radius:8px; flex-shrink:0; }
+  .hicon svg { width:26px; height:26px; fill:none; stroke:var(--teal); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .hnum { font-family:'Newsreader',serif; font-size:1.6rem; font-weight:600; line-height:1; }
+  .hpara .para-text { line-height:1.85; margin-bottom:12px; }
+  select.head-sel {
+    width:100%; background:var(--hl); border:1px solid var(--hl-edge); border-radius:4px;
+    color:var(--ink); font-family:'Sora',sans-serif; font-size:.82rem; font-weight:700;
+    padding:10px 32px 10px 12px; cursor:pointer;
+    -webkit-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2316233b'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center;
+  }
+  select.head-sel option { background:#fff; color:#16233b; }
+  .head-end { margin-top:18px; }
+
+  /* Quiz */
+  .toggle-btn { width:100%; padding:12px 14px; border:1.5px solid var(--rule); background:#fff; color:var(--ink); border-radius:8px; font-family:'Sora',sans-serif; font-size:.82rem; font-weight:600; cursor:pointer; text-align:left; margin-bottom:12px; }
+  .full-article { display:none; border:1px solid var(--rule); border-radius:6px; padding:2px 14px 6px; margin-bottom:18px; background:#fbfcfe; }
+  .full-article.open { display:block; }
+  .fa-title { font-family:'Newsreader',serif; font-size:1.05rem; font-weight:600; padding:10px 0 4px; }
+  .fa-para { font-family:'Newsreader',serif; font-size:1rem; line-height:1.85; padding:10px 0; border-top:1px solid var(--rule); }
+  .fa-para mark { background:var(--hl); padding:0 2px; color:var(--ink); }
+
+  .q { padding:16px 0; border-top:1px solid var(--rule); }
+  #quizContainer > :first-child { border-top:none; padding-top:4px; }
+  .q-text { font-family:'Newsreader',serif; font-size:1.06rem; font-weight:600; line-height:1.5; margin-bottom:10px; }
+  .q-option { display:flex; gap:10px; align-items:flex-start; padding:11px 12px; border:1.5px solid var(--rule); border-radius:6px; margin-bottom:7px; cursor:pointer; background:#fff; }
+  .q-option:hover { border-color:var(--muted); }
+  .q-option.selected { background:var(--hl); border-color:var(--hl-edge); }
+  .opt-letter { min-width:22px; height:22px; border-radius:50%; border:1.5px solid var(--rule); font-size:.68rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; background:#fff; }
+  .q-option.selected .opt-letter { border-color:var(--ink); background:var(--ink); color:#fff; }
+  .opt-text { font-size:.85rem; line-height:1.5; padding-top:2px; }
+  .quiz-end { margin-top:18px; }
+
+  /* Score */
+  .score-big { font-family:'Newsreader',serif; font-size:3.4rem; font-weight:600; line-height:1; }
+  .score-sub { font-size:.82rem; color:var(--muted); margin:6px 0 18px; }
+  .score-row { display:flex; justify-content:space-between; padding:10px 0; border-top:1px solid var(--rule); font-size:.9rem; }
+  .score-row:last-of-type { border-bottom:1px solid var(--rule); }
+  .review-h { font-family:'Newsreader',serif; font-size:1.12rem; font-weight:600; margin:22px 0 4px; }
+  .review-row { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--rule); }
+  .review-mark { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.66rem; font-weight:700; flex-shrink:0; margin-top:1px; }
+  .review-mark.ok { background:var(--ok-soft); color:var(--ok); }
+  .review-mark.no { background:var(--bad-soft); color:var(--bad); }
+  .review-label { font-size:.7rem; color:var(--muted); }
+  .review-answer { font-size:.85rem; font-weight:600; }
+  .review-correct { font-size:.75rem; color:var(--muted); margin-top:2px; }
+  .review-correct b { color:var(--ok); font-weight:700; }
+  .fig { margin:2px 0 14px; border:1px solid var(--rule); border-radius:6px; padding:10px 10px 8px; background:#fbfcfe; }
+  .fig svg { display:block; width:100%; height:auto; max-width:460px; margin:0 auto; flex:none; align-self:center; }
+  .fig figcaption { font-family:'Newsreader',serif; font-style:italic; font-size:.86rem; color:var(--muted); margin-top:6px; line-height:1.45; }
+  .hpara .fig { margin-bottom:12px; }
+  /* Job quiz + situations */
+  #jqBox .q-card, #scBox .q-card { margin-bottom:14px; padding:14px; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  .jq-opts { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .jq-opt { flex:1 1 120px; background:#fff; border:2px solid var(--rule); border-radius:8px; padding:11px 10px; font-family:'Sora',sans-serif; font-size:.82rem; color:var(--ink); cursor:pointer; }
+  .jq-opt.on { border-color:var(--teal); background:#e9f6f8; font-weight:700; }
+  .jq-result { margin-top:16px; text-align:center; border:2px solid var(--amber); background:#fdf1e3; border-radius:10px; padding:18px 16px; }
+  .jq-result p { font-size:.9rem; line-height:1.6; margin-top:8px; text-align:left; }
+  .jq-emoji { font-size:3.2rem; line-height:1.1; }
+  .jq-label { font-size:.75rem; color:var(--muted); margin-top:4px; }
+  .jq-name { font-family:'Newsreader',serif; font-size:1.6rem; font-weight:700; }
+  .jq-watch { color:var(--ink); }
+  .sc-opt { width:100%; text-align:left; font-family:'Sora',sans-serif; font-size:.86rem; line-height:1.45; color:var(--ink); }
+  .sc-opt.sc-good { border-color:#2e8b57; background:#e8f5ee; }
+  .sc-opt.sc-bad { border-color:#d04545; background:#fbeaea; }
+  .sc-opt.sc-good .opt-letter { border-color:#2e8b57; background:#2e8b57; color:#fff; }
+  .sc-opt.sc-bad .opt-letter { border-color:#d04545; background:#d04545; color:#fff; }
+  .sc-fb { margin-top:8px; font-size:.84rem; font-weight:600; line-height:1.5; }
+  .sc-fb.good { color:#2e7d4f; } .sc-fb.bad { color:#b03a3a; }
+  /* Tap-a-word */
+  button.tw { font:inherit; color:inherit; background:none; border:none; padding:0; margin:0; cursor:pointer;
+    text-decoration:underline dotted var(--teal); text-decoration-thickness:2px; text-underline-offset:3px; }
+  button.tw:hover { background:#e9f6f8; }
+  .gloss { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(14px + env(safe-area-inset-bottom,0px)); width:min(92vw,460px);
+    background:#fff; border:2px solid var(--teal); border-radius:10px; box-shadow:0 8px 28px rgba(22,35,59,.25); padding:14px 40px 14px 16px; z-index:50; }
+  .gloss-x { position:absolute; top:6px; right:8px; background:none; border:none; font-size:1rem; color:var(--muted); cursor:pointer; padding:6px; }
+  .gloss-word { font-family:'Newsreader',serif; font-size:1.2rem; font-weight:600; }
+  .gloss-jp { font-size:.88rem; color:var(--teal); font-weight:600; margin:2px 0 6px; }
+  .gloss-def { font-size:.86rem; line-height:1.55; }
+  /* My phone */
+  .st-sel { background:#fff; border:1.5px solid var(--rule); border-radius:6px; padding:9px 10px; font-family:'Sora',sans-serif; font-size:.9rem; color:var(--ink); }
+  .field .st-sel { width:100%; }
+  .st-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:.85rem; }
+  .st-row .st-sel { width:auto; min-width:72px; }
+  .howto { font-size:.8rem; line-height:1.7; background:#f4f7fb; border:1px solid var(--rule); border-radius:6px; padding:10px 12px; margin-bottom:12px; }
+  .st-check { display:flex; gap:8px; align-items:center; font-size:.8rem; color:var(--muted); }
+  .st-box { margin-top:14px; border:1.5px solid var(--amber); background:#fdf1e3; border-radius:8px; padding:14px; font-size:.88rem; line-height:1.6; }
+  .st-box p { margin-bottom:8px; }
+  .st-bar { position:relative; height:26px; background:#fff; border:1.5px solid var(--teal); border-radius:5px; overflow:hidden; margin-top:6px; }
+  .st-fill { height:100%; background:var(--amber); }
+  .st-half { position:absolute; left:50%; top:-2px; bottom:-2px; border-left:2px dashed var(--ink); }
+  .st-scale { display:flex; justify-content:space-between; font-size:.7rem; color:var(--muted); margin:3px 0 10px; }
+  .muted-note { font-size:.78rem; color:var(--muted); line-height:1.55; }
+  /* Plan */
+  .plan-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .plan-opt { display:flex; gap:8px; align-items:center; text-align:left; background:#fff; border:2px solid var(--rule); border-radius:8px; padding:10px; font-family:'Sora',sans-serif; font-size:.78rem; line-height:1.4; color:var(--ink); cursor:pointer; }
+  .plan-opt.on { border-color:var(--teal); background:#e9f6f8; font-weight:600; }
+  .plan-ic { font-size:1.3rem; flex-shrink:0; }
+  .plan-row { padding:12px 0; border-top:1px solid var(--rule); }
+  .plan-n { font-size:.74rem; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  .plan-line { font-family:'Newsreader',serif; font-size:1.05rem; line-height:2.2; }
+  .plan-card { margin-top:14px; border:2px solid var(--ink); border-radius:8px; padding:12px 14px; background:#fffbe6; }
+  .plan-card-title { font-family:'Newsreader',serif; font-size:1.05rem; font-weight:700; margin-bottom:4px; }
+  .plan-card p { font-family:'Newsreader',serif; font-size:1.02rem; line-height:1.6; }
+  @media (max-width:420px) { .plan-grid { grid-template-columns:1fr; } }
+  #sheetStatus { font-size:.74rem; color:var(--muted); padding:14px 0 0; }
+</style>
+</head>
+<body>
+<div class="gloss" id="gloss" hidden role="dialog" aria-live="polite">
+  <button type="button" class="gloss-x" onclick="closeGloss()" aria-label="Close">✕</button>
+  <div class="gloss-word" id="glossWord"></div>
+  <div class="gloss-jp" id="glossJp"></div>
+  <div class="gloss-def" id="glossDef"></div>
+</div>
+<div class="sheet">
+
+  <header class="masthead">
+    <h1>Happy at Your Part-Time Job?</h1>
+    <p>Read with a partner, find the main ideas, then answer the quiz.</p>
+  </header>
+
+  <div class="steps" id="stepBar">
+    <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div><div class="step-line"></div>
+    <div class="step" id="s2"><div class="step-dot">2</div><span>Job quiz</span></div><div class="step-line"></div>
+    <div class="step" id="s3"><div class="step-dot">3</div><span>Skim</span></div><div class="step-line"></div>
+    <div class="step" id="s4"><div class="step-dot">4</div><span>Reading</span></div><div class="step-line"></div>
+    <div class="step" id="s5"><div class="step-dot">5</div><span>Quiz</span></div><div class="step-line"></div>
+    <div class="step" id="s6"><div class="step-dot">6</div><span>What would you do?</span></div><div class="step-line"></div>
+    <div class="step" id="s7"><div class="step-dot">7</div><span>Score</span></div>
+  </div>
+
+  <!-- Screen 1: Setup -->
+  <div class="screen active" id="screen1">
+    <h2 class="h2">Your details</h2>
+    <div class="field"><label for="studentNumber">Student number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+    <div class="field"><label for="studentName">Name (romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+    <h2 class="h2">Which student are you?</h2>
+    <div class="partner-grid">
+      <button type="button" class="partner-btn" id="btnA" onclick="selectPartner('A')">
+        <span class="partner-letter pa">A</span>
+        <span class="partner-desc">You read paragraphs 1 and 3 aloud. You fill the gaps in paragraphs 2 and 4.</span>
+      </button>
+      <button type="button" class="partner-btn" id="btnB" onclick="selectPartner('B')">
+        <span class="partner-letter pb">B</span>
+        <span class="partner-desc">You read paragraphs 2 and 4 aloud. You fill the gaps in paragraphs 1 and 3.</span>
+      </button>
+    </div>
+    <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled style="margin-top:22px;">Start</button>
+  </div>
+
+  <!-- Screen 2: Job quiz (warm-up) -->
+  <div class="screen" id="screen2">
+    <div class="instr">Before you read: which part-time job fits you? Answer 6 quick questions. Then show your result to your partner.</div>
+    <div id="jqBox"></div>
+    <div id="jqResult"></div>
+    <div class="nav-end">
+      <button class="btn btn-primary" id="jqNext" onclick="goTo(3)" disabled>Start skimming</button>
+      <button class="btn btn-ghost" onclick="goTo(1)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Skim (match headings) -->
+  <div class="screen" id="screen3">
+    <div class="instr">Skim the article. <strong>Skim</strong> means read quickly to find the main idea. Some words are missing. You will fill them in on the next page. Read the first sentence of each paragraph and the last sentence of paragraph 1. Look at the charts and pictures. Tap the <u>underlined words</u> to see what they mean. Then choose a heading for each paragraph. Use each heading only once. Two headings do not match.</div>
+    <div class="headlist" id="headList"></div>
+    <div id="skimContainer"></div>
+    <div class="nav-end">
+      <button class="btn btn-primary" onclick="finishSkim()">Go to the reading page</button>
+      <button class="btn btn-ghost" onclick="goTo(2)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Reading (cloze) -->
+  <div class="screen" id="screen4">
+    <div class="instr" id="s3instr"></div>
+    <div id="articleContainer"></div>
+    <p class="source">Written for class using: Mynavi Career Research Lab, “University Student Part-Time Job Survey 2025” and “Customer Harassment of Part-Time Staff” (2025); Ministry of Health, Labour and Welfare (part-time working conditions campaign, and new customer harassment rules from October 1, 2026); Nagasaki Labour Bureau (minimum wage). Rewritten in simpler English for class.</p>
+    <button class="btn btn-primary" onclick="finishReading()">Go to the quiz</button>
+    <button class="btn btn-ghost" onclick="goTo(3)">Back</button>
+  </div>
+
+  <!-- Screen 4: Quiz -->
+  <div class="screen" id="screen5">
+    <div class="instr">Answer all 10 questions on your own. You can open the article to check. It shows the words you chose.</div>
+    <button class="toggle-btn" id="toggleArticleBtn" onclick="toggleArticle()">Show the article</button>
+    <div class="full-article" id="fullArticle"></div>
+    <div id="quizContainer"></div>
+    <div class="quiz-end">
+      <button class="btn btn-primary" onclick="finishQuiz()">Next: what would you do?</button>
+      <button class="btn btn-ghost" onclick="goTo(4)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 6: What would you do? -->
+  <div class="screen" id="screen6">
+    <div class="instr"><strong>Part 1:</strong> Read each situation. What is the best thing to do? <strong>Part 2:</strong> Make your own “If a customer…, I will…” sentence. Then talk about it with your partner.</div>
+    <h2 class="h2">Part 1. What would you do?</h2>
+    <div id="scBox"></div>
+    <h2 class="h2">Part 2. My sentence</h2>
+    <div class="plan-line" id="ifLine"></div>
+    <div class="plan-card" id="ifCard" hidden>
+      <div class="plan-card-title">My sentence</div>
+      <div id="ifSummary"></div>
+    </div>
+    <div class="nav-end">
+      <button class="btn btn-primary" onclick="submitAll()">Submit and see my score</button>
+      <button class="btn btn-ghost" onclick="goTo(5)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 7: Score (no Back button: the score is already saved) -->
+  <div class="screen" id="screen7">
+    <div class="score-big" id="totalNum">0</div>
+    <div class="score-sub" id="totalDenom">out of 22</div>
+    <div class="score-row"><span>Reading gaps</span><strong id="clozeNum">0/8</strong></div>
+    <div class="score-row"><span>Headings</span><strong id="headNum">0/4</strong></div>
+    <div class="score-row"><span>Quiz</span><strong id="quizNum">0/10</strong></div>
+    <h2 class="review-h">Reading gaps</h2>
+    <div id="reviewCloze"></div>
+    <h2 class="review-h">Headings</h2>
+    <div id="reviewHead"></div>
+    <h2 class="review-h">Quiz</h2>
+    <div id="reviewQuiz"></div>
+    <h2 class="review-h">My job quiz result</h2>
+    <div class="plan-card" id="jobFinal"></div>
+    <h2 class="review-h">My sentence</h2>
+    <div class="plan-card" id="ifFinal"></div>
+    <div id="sheetStatus"></div>
+  </div>
+
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyo7YDx9lKQAqu99IhM5NoOJC7xYmZCW3z8RtwDMnlf0bRWpAkAFy201VyZ-DxKXhg3/exec";
+
+// Each gap has one correct answer and two wrong options.
+const GAPS = {
+  1: { correct:"days", options:["days", "ways", "dates"] },
+  2: { correct:"jobs", options:["jobs", "jokes", "jogs"] },
+  3: { correct:"quit", options:["quit", "quiet", "quick"] },
+  4: { correct:"month", options:["month", "mouth", "moth"] },
+  5: { correct:"coworker", options:["coworker", "cooker", "co-owner"] },
+  6: { correct:"writing", options:["writing", "riding", "waiting"] },
+  7: { correct:"exams", options:["exams", "eggs", "X-rays"] },
+  8: { correct:"products", options:["products", "projects", "protects"] },
+  9: { correct:"harassment", options:["harassment", "embarrassment", "arrangement"] },
+  10: { correct:"70.3%", options:["70.3%", "73.0%", "17.3%"] },
+  11: { correct:"shouting", options:["shouting", "shooting", "shopping"] },
+  12: { correct:"protect", options:["protect", "project", "product"] },
+  13: { correct:"manager", options:["manager", "manner", "manga"] },
+  14: { correct:"wage", options:["wage", "age", "page"] },
+  15: { correct:"calm", options:["calm", "come", "cold"] },
+  16: { correct:"advice", options:["advice", "device", "office"] }
+};
+
+// Numbers in segs are gap ids. Student A owns paragraphs 1 and 3. Student B owns 2 and 4.
+// Skim sentences have NO gap: the hook + thesis (last sentence) of paragraph 1, and the first sentence of paragraphs 2-4.
+const PARAS = [
+  {"n": 1, "owner": "A", "fig": 1, "segs": ["Most university students in Japan have a part-time job. In a 2025 survey, 73.5% of students worked part-time, about three ", 1, " a week. Most of them like their ", 2, ": 73.8% said they were satisfied. But this number is going down. In 2023, it was 80%. Also, some students ", 3, " very quickly. About 8.5% left a new job within one ", 4, ". Why are some students happy at work while others want to quit? To be happy at work, you need to choose the right job, know your rights, and know what to do when a customer is rude."]},
+  {"n": 2, "owner": "B", "fig": 2, "segs": ["Part-time workers in Japan face some common problems. Students who quit a job early gave three main reasons. The workplace atmosphere was bad (30.8%), the work was harder than they expected (30.6%), or a boss or older ", 5, " criticized them unfairly (29.2%). The Ministry of Health, Labour and Welfare warns about other problems, too. Some workers never get their working conditions in ", 6, ". Some get shifts during ", 7, ", some are not paid for time before or after work, and some are told to buy the store’s ", 8, "."]},
+  {"n": 3, "owner": "A", "fig": 3, "segs": ["Rude customers are another big problem. In a 2024 survey, 45.7% of companies said their part-time workers faced customer ", 9, ", or “kasuhara,” in the past year. At convenience stores and supermarkets, it was ", 10, ". The most common problem was customers ", 11, " loudly. Kasuhara also makes people quit: at 34.2% of these companies, a part-timer left within one month. Now the law has changed. Since October 1, 2026, all companies in Japan must ", 12, " workers from customer harassment. They must have a clear rule and a place where workers can ask for help."]},
+  {"n": 4, "owner": "B", "fig": 4, "segs": ["There are some ways to find a good job and stay happy. First, choose carefully. Students say the most important things are flexible shifts (42.8%), a workplace close to home, and a ", 13, " who understands school. Second, before you start, ask for your working conditions in writing and check your pay. In Nagasaki, the minimum ", 14, " is now 1,087 yen an hour. Third, if a customer is rude, stay ", 15, ", don’t argue, and tell your manager right away. You don’t have to handle it alone. If you still have a problem, you can get free ", 16, " at the Labour Bureau’s youth consultation desk."]}
+];
+
+const HEADINGS = {"a": "Are Students Happy at Work?", "b": "Common Problems at Part-Time Jobs", "c": "When Customers Are Rude", "d": "How to Find a Good Job", "e": "The Best-Paying Jobs in Japan", "f": "Why Students Should Not Work"};
+const HEAD_ORDER = ["c", "f", "a", "e", "d", "b"];
+const HEAD_ANSWER = {"1": "a", "2": "b", "3": "c", "4": "d"};
+
+const QUIZ = [
+  {"type": "gist", "q": "What is the main topic of the whole article?", "opts": ["How students can be happy at their part-time jobs", "How to start your own company", "Why students should stop working"], "correct": 0},
+  {"type": "main idea", "q": "What is the main idea of Paragraph 2?", "opts": ["Most bosses are very kind", "Part-time workers face some common problems", "Students earn a lot of money"], "correct": 1},
+  {"type": "main idea", "q": "What is the main idea of Paragraph 3?", "opts": ["Customers in Japan are always polite", "Supermarkets pay more than convenience stores", "Rude customers are a big problem, and the law has changed"], "correct": 2},
+  {"type": "detail", "q": "In 2025, how many students were satisfied with their part-time job?", "opts": ["8.5%", "73.8%", "80%"], "correct": 1},
+  {"type": "detail", "q": "What was the top reason students quit a new job early?", "opts": ["The workplace atmosphere was bad", "The pay was too low", "The train was too crowded"], "correct": 0},
+  {"type": "true or false", "q": "True or False: Since October 1, 2026, companies in Japan must protect workers from customer harassment.", "opts": ["True", "False"], "correct": 0},
+  {"type": "true or false", "q": "True or False: Less than half of convenience stores and supermarkets said their workers faced kasuhara.", "opts": ["True", "False"], "correct": 1},
+  {"type": "vocabulary", "q": "What is “kasuhara”?", "opts": ["A kind of part-time job", "Customer harassment", "A shift during exams"], "correct": 1},
+  {"type": "chart", "q": "Look at Chart 1. In which year were the most students satisfied?", "opts": ["2023", "2024", "2025"], "correct": 0},
+  {"type": "inference", "q": "Why should you get your working conditions in writing?", "opts": ["So you can get a free uniform", "So you can check your pay and shifts later", "So you don’t have to talk to customers"], "correct": 1}
+];
+
+// State
+let currentScreen = 1;
+let partner = null;
+let sel = {};
+let headSel = {};
+let quizSel = {};
+let quizBuilt = false;
+let jq = {};        // job quiz answers: question index -> option index
+let sc = {};        // situations: index -> chosen option index
+let ifs = {};       // if-sentence: {c: condition index, a: action index}
+let tapped = [];    // tap-a-word keys, in order of first tap
+
+const LS_KEY = 'parttime_job_satisfaction_state_v1';
+
+function saveState() {
+  const state = { currentScreen, partner, sel, headSel, quizSel, jq, sc, ifs, tapped,
+    studentName: document.getElementById('studentName').value,
+    studentNumber: document.getElementById('studentNumber').value };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch(e) { return null; }
+}
+function clearState() { try { localStorage.removeItem(LS_KEY); } catch(e) {} }
+
+function restoreState(state) {
+  partner = state.partner;
+  sel = state.sel || {};
+  headSel = state.headSel || {};
+  quizSel = state.quizSel || {};
+  jq = state.jq || {};
+  sc = state.sc || {};
+  ifs = state.ifs || {};
+  tapped = state.tapped || [];
+  if (state.studentName) document.getElementById('studentName').value = state.studentName;
+  if (state.studentNumber) document.getElementById('studentNumber').value = state.studentNumber;
+  if (partner) paintPartner();
+  checkReady();
+  goTo(state.currentScreen || 1);
+}
+
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+// Navigation
+function updateSteps(n) {
+  for (let i = 1; i <= 7; i++) {
+    const el = document.getElementById('s' + i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '\u2713' : i;
+  }
+}
+function goTo(n) {
+  currentScreen = n;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen' + n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0, 0);
+  if (n === 2) buildJobQuiz();
+  if (n === 3) buildSkim();
+  if (n === 4) buildReading();
+  if (n === 5) { buildQuiz(); buildArticlePanel(); }
+  if (n === 6) buildSituations();
+  saveState();
+}
+
+// Setup
+function paintPartner() {
+  document.getElementById('btnA').className = 'partner-btn' + (partner === 'A' ? ' sel-A' : '');
+  document.getElementById('btnB').className = 'partner-btn' + (partner === 'B' ? ' sel-B' : '');
+}
+function resetBuiltPages() {
+  document.getElementById('skimContainer').innerHTML = '';
+  document.getElementById('headList').innerHTML = '';
+  document.getElementById('articleContainer').innerHTML = '';
+}
+function selectPartner(p) {
+  if (partner && partner !== p) { sel = {}; resetBuiltPages(); }
+  partner = p;
+  paintPartner(); checkReady(); saveState();
+}
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    partner &&
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', () => { checkReady(); saveState(); });
+document.getElementById('studentNumber').addEventListener('input', () => { checkReady(); saveState(); });
+
+// A blank spot (not fillable): used on the Skim page and in the quiz article
+function blankSpan(n) {
+  const b = document.createElement('span');
+  b.className = 'blank';
+  b.setAttribute('aria-label', 'missing word');
+  b.style.width = Math.max(56, GAPS[n].correct.length * 9 + 28) + 'px';
+  return b;
+}
+
+
+const ICONS = {"1": "<svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><circle cx=\"16\" cy=\"16\" r=\"12\"/><circle cx=\"11.5\" cy=\"13\" r=\"1.2\"/><circle cx=\"20.5\" cy=\"13\" r=\"1.2\"/><path d=\"M10.5 19 Q16 24 21.5 19\"/></svg>", "2": "<svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><path d=\"M16 4 L29 27 L3 27 Z\"/><line x1=\"16\" y1=\"12\" x2=\"16\" y2=\"19\"/><line x1=\"16\" y1=\"22.5\" x2=\"16\" y2=\"23\"/></svg>", "3": "<svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><path d=\"M5 7 H27 V21 H14 L8 26 V21 H5 Z\"/><line x1=\"16\" y1=\"10.5\" x2=\"16\" y2=\"15\"/><line x1=\"16\" y1=\"18\" x2=\"16\" y2=\"18.4\"/></svg>", "4": "<svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><rect x=\"7\" y=\"5\" width=\"18\" height=\"23\" rx=\"2\"/><path d=\"M11 12 L13 14 L17 10\"/><line x1=\"19\" y1=\"12\" x2=\"22\" y2=\"12\"/><path d=\"M11 20 L13 22 L17 18\"/><line x1=\"19\" y1=\"20\" x2=\"22\" y2=\"20\"/></svg>"};
+const FIGS = {"1": {"svg": "<svg role=\"img\" aria-label=\"Bar chart. Satisfied students: 80.0% in 2023, 78.9% in 2024, 73.8% in 2025.\" viewBox=\"0 0 320 176\" style=\"font-family:Sora,sans-serif\"><text x=\"8\" y=\"17\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">Happy at work? (% satisfied)</text><line x1=\"40\" y1=\"150\" x2=\"300\" y2=\"150\" stroke=\"#cdd7e3\" stroke-width=\"1.5\"/><rect x=\"62\" y=\"62.0\" width=\"56\" height=\"88.0\" rx=\"3\" fill=\"#1f8a9e\"/><text x=\"90\" y=\"56.0\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\" text-anchor=\"middle\">80.0%</text><text x=\"90\" y=\"166\" font-size=\"11\" font-weight=\"600\" fill=\"#16233b\" text-anchor=\"middle\">2023</text><rect x=\"142\" y=\"63.2\" width=\"56\" height=\"86.8\" rx=\"3\" fill=\"#1f8a9e\"/><text x=\"170\" y=\"57.2\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\" text-anchor=\"middle\">78.9%</text><text x=\"170\" y=\"166\" font-size=\"11\" font-weight=\"600\" fill=\"#16233b\" text-anchor=\"middle\">2024</text><rect x=\"222\" y=\"68.8\" width=\"56\" height=\"81.2\" rx=\"3\" fill=\"#d9822b\"/><text x=\"250\" y=\"62.8\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\" text-anchor=\"middle\">73.8%</text><text x=\"250\" y=\"166\" font-size=\"11\" font-weight=\"600\" fill=\"#16233b\" text-anchor=\"middle\">2025</text></svg>", "cap": "Chart 1. University students who are satisfied with their part-time job (Mynavi survey)."}, "2": {"svg": "<svg role=\"img\" aria-label=\"Bar chart. Bad workplace mood 30.8%, work harder than expected 30.6%, unfair words from a boss or older worker 29.2%.\" viewBox=\"0 0 320 150\" style=\"font-family:Sora,sans-serif\"><text x=\"8\" y=\"17\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">Why did they quit so fast?</text><text x=\"8\" y=\"44\" font-size=\"11\" font-weight=\"600\" fill=\"#16233b\">Bad workplace mood</text><rect x=\"8\" y=\"50\" width=\"246\" height=\"16\" rx=\"3\" fill=\"#d9822b\"/><text x=\"260\" y=\"62\" font-size=\"11\" font-weight=\"700\" fill=\"#16233b\">30.8%</text><text x=\"8\" y=\"86\" font-size=\"11\" font-weight=\"600\" fill=\"#16233b\">Work harder than expected</text><rect x=\"8\" y=\"92\" width=\"245\" height=\"16\" rx=\"3\" fill=\"#1f8a9e\"/><text x=\"259\" y=\"104\" font-size=\"11\" font-weight=\"700\" fill=\"#16233b\">30.6%</text><text x=\"8\" y=\"128\" font-size=\"11\" font-weight=\"600\" fill=\"#16233b\">Unfair words from a boss or senior</text><rect x=\"8\" y=\"134\" width=\"234\" height=\"16\" rx=\"3\" fill=\"#1f8a9e\"/><text x=\"248\" y=\"146\" font-size=\"11\" font-weight=\"700\" fill=\"#16233b\">29.2%</text></svg>", "cap": "Chart 2. Why students quit a new part-time job within one month."}, "3": {"svg": "<svg role=\"img\" aria-label=\"An angry customer shouts at a calm young worker behind a convenience store counter.\" viewBox=\"0 0 320 180\" style=\"font-family:Sora,sans-serif\"><rect x=\"0\" y=\"0\" width=\"320\" height=\"180\" fill=\"#f4f7fb\"/><rect x=\"196\" y=\"20\" width=\"110\" height=\"70\" fill=\"#fff\" stroke=\"#cdd7e3\" stroke-width=\"1.5\"/><line x1=\"196\" y1=\"43\" x2=\"306\" y2=\"43\" stroke=\"#cdd7e3\"/><line x1=\"196\" y1=\"66\" x2=\"306\" y2=\"66\" stroke=\"#cdd7e3\"/><rect x=\"204\" y=\"28\" width=\"10\" height=\"12\" fill=\"#1f8a9e\"/><rect x=\"218\" y=\"30\" width=\"10\" height=\"10\" fill=\"#d9822b\"/><rect x=\"236\" y=\"27\" width=\"12\" height=\"13\" fill=\"#d04545\"/><rect x=\"254\" y=\"51\" width=\"10\" height=\"12\" fill=\"#1f8a9e\"/><rect x=\"270\" y=\"50\" width=\"14\" height=\"13\" fill=\"#d9822b\"/><circle cx=\"250\" cy=\"98\" r=\"17\" fill=\"#fdf1e3\" stroke=\"#16233b\" stroke-width=\"2\"/><circle cx=\"244\" cy=\"96\" r=\"2\" fill=\"#16233b\"/><circle cx=\"256\" cy=\"96\" r=\"2\" fill=\"#16233b\"/><path d=\"M245 105 Q250 107 255 105\" fill=\"none\" stroke=\"#16233b\" stroke-width=\"1.8\" stroke-linecap=\"round\"/><path d=\"M226 150 Q228 118 250 116 Q272 118 274 150 Z\" fill=\"#1f8a9e\"/><rect x=\"243\" y=\"122\" width=\"14\" height=\"8\" rx=\"2\" fill=\"#fff\"/><rect x=\"150\" y=\"128\" width=\"170\" height=\"52\" fill=\"#c9b18f\" stroke=\"#16233b\" stroke-width=\"1.5\"/><rect x=\"168\" y=\"114\" width=\"30\" height=\"16\" rx=\"2\" fill=\"#16233b\"/><circle cx=\"78\" cy=\"76\" r=\"22\" fill=\"#f6d3b5\" stroke=\"#16233b\" stroke-width=\"2\"/><path d=\"M66 68 L75 72\" stroke=\"#16233b\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M92 68 L83 72\" stroke=\"#16233b\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><circle cx=\"71\" cy=\"76\" r=\"2.2\" fill=\"#16233b\"/><circle cx=\"86\" cy=\"76\" r=\"2.2\" fill=\"#16233b\"/><ellipse cx=\"80\" cy=\"88\" rx=\"7\" ry=\"5\" fill=\"#16233b\"/><path d=\"M42 180 Q44 108 80 104 Q116 108 118 180 Z\" fill=\"#d04545\"/><path d=\"M112 128 L150 118\" stroke=\"#f6d3b5\" stroke-width=\"9\" stroke-linecap=\"round\"/><path d=\"M108 56 L122 44 M112 66 L130 62 M110 76 L126 80\" stroke=\"#d04545\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><rect x=\"122\" y=\"10\" width=\"62\" height=\"30\" rx=\"8\" fill=\"#fff\" stroke=\"#d04545\" stroke-width=\"2\"/><path d=\"M130 40 L124 50 L140 40\" fill=\"#fff\" stroke=\"#d04545\" stroke-width=\"2\" stroke-linejoin=\"round\"/><text x=\"153\" y=\"31\" font-size=\"17\" font-weight=\"800\" fill=\"#d04545\" text-anchor=\"middle\">!!!</text></svg>", "cap": "Picture 3. An angry customer shouts at a convenience store worker."}, "4": {"svg": "<svg role=\"img\" aria-label=\"Checklist: shifts fit my school schedule, close to home, working conditions on paper, pay of 1,087 yen or more in Nagasaki.\" viewBox=\"0 0 320 172\" style=\"font-family:Sora,sans-serif\"><text x=\"8\" y=\"17\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">Before you start: check!</text><rect x=\"12\" y=\"30\" width=\"22\" height=\"22\" rx=\"4\" fill=\"#fff\" stroke=\"#1f8a9e\" stroke-width=\"2\"/><path d=\"M16 41 L21.5 46.5 L30 36\" fill=\"none\" stroke=\"#1f8a9e\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><text x=\"44\" y=\"46\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">Shifts fit my school schedule</text><rect x=\"12\" y=\"66\" width=\"22\" height=\"22\" rx=\"4\" fill=\"#fff\" stroke=\"#1f8a9e\" stroke-width=\"2\"/><path d=\"M16 77 L21.5 82.5 L30 72\" fill=\"none\" stroke=\"#1f8a9e\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><text x=\"44\" y=\"82\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">Close to home</text><rect x=\"12\" y=\"102\" width=\"22\" height=\"22\" rx=\"4\" fill=\"#fff\" stroke=\"#1f8a9e\" stroke-width=\"2\"/><path d=\"M16 113 L21.5 118.5 L30 108\" fill=\"none\" stroke=\"#1f8a9e\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><text x=\"44\" y=\"118\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">Working conditions on paper</text><text x=\"44\" y=\"132\" font-size=\"9.5\" fill=\"#59687f\">Ask for them before your first day</text><rect x=\"12\" y=\"138\" width=\"22\" height=\"22\" rx=\"4\" fill=\"#fff\" stroke=\"#1f8a9e\" stroke-width=\"2\"/><path d=\"M16 149 L21.5 154.5 L30 144\" fill=\"none\" stroke=\"#1f8a9e\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><text x=\"44\" y=\"154\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">Pay: 1,087 yen or more</text><text x=\"44\" y=\"168\" font-size=\"9.5\" fill=\"#59687f\">Nagasaki, from November 2, 2026</text></svg>", "cap": "Picture 4. A checklist for choosing a good part-time job."}};
+function figEl(n) {
+  const f = FIGS[n]; if (!f) return document.createTextNode('');
+  const fig = document.createElement('figure'); fig.className = 'fig';
+  fig.innerHTML = f.svg + '<figcaption>' + f.cap + '</figcaption>';
+  const svg = fig.querySelector('svg');
+  if (svg) {
+    const vb = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
+    if (vb.length === 4 && vb[2] && vb[3]) {
+      svg.setAttribute('width', vb[2]); svg.setAttribute('height', vb[3]);
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      svg.style.aspectRatio = vb[2] + ' / ' + vb[3];
+    }
+  }
+  return fig;
+}
+function iconEl(n) { const s = document.createElement('span'); s.className = 'hicon'; s.innerHTML = ICONS[n] || ''; return s; }
+
+
+// ── Tap-a-word ───────────────────────────────────────────────
+const GLOSS = {"parttime": ["part-time job", "アルバイト", "A job you do for only some hours a week."], "survey": ["survey", "調査", "A study that asks many people the same questions."], "satisfied": ["satisfied", "満足している", "Happy with something because it is good enough."], "quit": ["quit", "辞める", "To stop doing a job."], "within": ["within", "〜以内に", "Before a time ends. “Within one month” = in less than one month."], "rights": ["rights", "権利", "Things the law says you can have or do."], "rude": ["rude", "失礼な", "Not polite."], "atmosphere": ["atmosphere", "雰囲気", "The feeling of a place. A good atmosphere is friendly and relaxed."], "expected": ["expect (expected)", "予想する", "To think something will happen."], "criticize": ["criticize", "批判する、文句を言う", "To say what is bad about someone or their work."], "unfairly": ["unfairly", "不公平に", "In a way that is not right or not equal."], "ministry": ["Ministry of Health, Labour and Welfare", "厚生労働省", "The part of Japan’s government that makes rules about work and health."], "warns": ["warn", "注意を呼びかける", "To tell people about a possible problem or danger."], "conditions": ["working conditions", "労働条件", "Your pay, hours, shifts, breaks, and other rules of your job."], "shifts": ["shift", "シフト", "The hours you work on one day, for example 5 p.m. to 10 p.m."], "harassment": ["harassment", "ハラスメント、嫌がらせ", "Words or actions that hurt or scare someone again and again."], "kasuhara": ["kasuhara", "カスハラ", "Customer harassment: a customer is very rude, shouts, or asks for things they should not get."], "law": ["law", "法律", "A rule made by the government that everyone must follow."], "flexible": ["flexible", "融通がきく", "Easy to change. Flexible shifts can change when you have tests."], "minimum": ["minimum wage", "最低賃金", "The lowest pay per hour that a company can legally pay."], "argue": ["argue", "言い争う", "To speak angrily with someone because you do not agree."], "handle": ["handle", "対処する", "To deal with a problem."], "bureau": ["Labour Bureau", "労働局", "A government office that helps workers with problems at work."], "consult": ["youth consultation desk", "若者相談コーナー", "A free place where young people can ask for advice about work problems."], "immediately": ["right away", "すぐに", "Now, without waiting."]};
+const GLOSS_PATTERNS = [["part-time job", "parttime"], ["survey", "survey"], ["satisfied", "satisfied"], ["within", "within"], ["rights", "rights"], ["rude", "rude"], ["atmosphere", "atmosphere"], ["expected", "expected"], ["criticized", "criticize"], ["unfairly", "unfairly"], ["Ministry of Health, Labour and Welfare", "ministry"], ["warns", "warns"], ["working conditions", "conditions"], ["flexible shifts", "flexible"], ["shifts", "shifts"], ["kasuhara", "kasuhara"], ["law", "law"], ["argue", "argue"], ["handle", "handle"], ["Labour Bureau", "bureau"], ["youth consultation desk", "consult"], ["right away", "immediately"], ["harassment", "harassment"], ["minimum", "minimum"]];
+const GLOSS_RE = new RegExp('\\b(' + GLOSS_PATTERNS.map(p => p[0]).join('|') + ')\\b', 'gi');
+function glossKey(match) {
+  for (const [pat, key] of GLOSS_PATTERNS) {
+    if (new RegExp('^' + pat.replace(/^\(\?<=[^)]*\)/, '') + '$', 'i').test(match)) return key;
+  }
+  return null;
+}
+function appendGlossed(parent, str) {
+  let last = 0; GLOSS_RE.lastIndex = 0; let m;
+  while ((m = GLOSS_RE.exec(str)) !== null) {
+    const key = glossKey(m[0]);
+    if (!key) continue;
+    if (m.index > last) parent.appendChild(document.createTextNode(str.slice(last, m.index)));
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'tw'; b.textContent = m[0]; b.dataset.k = key;
+    b.addEventListener('click', ev => { ev.stopPropagation(); openGloss(key); });
+    parent.appendChild(b);
+    last = m.index + m[0].length;
+  }
+  if (last < str.length) parent.appendChild(document.createTextNode(str.slice(last)));
+}
+function openGloss(key) {
+  const g = GLOSS[key]; if (!g) return;
+  document.getElementById('glossWord').textContent = g[0];
+  document.getElementById('glossJp').textContent = g[1];
+  document.getElementById('glossDef').textContent = g[2];
+  document.getElementById('gloss').hidden = false;
+  if (!tapped.includes(key)) { tapped.push(key); saveState(); }
+}
+function closeGloss() { document.getElementById('gloss').hidden = true; }
+document.addEventListener('click', e => { if (!e.target.closest('#gloss')) closeGloss(); });
+
+// ── Job quiz (warm-up) ──────────────────────────────────────
+const JOBS = {
+  cafe:    { emoji:'☕', name:'Café staff', desc:'You like people, nice smells, and making things with your hands. You will make drinks and talk with friendly customers.', watch:'Busy mornings! Ask how many shifts you need each week.' },
+  konbini: { emoji:'🏪', name:'Convenience store clerk', desc:'You are flexible and calm. You can work at many different times, and there is a store near everyone’s home.', watch:'Some customers are rude. Read Paragraph 3!' },
+  tutor:   { emoji:'📚', name:'Juku teacher or tutor', desc:'You like explaining things and helping students. The pay is often good, and the work is quiet.', watch:'You need to prepare lessons. Is that time paid?' },
+  izakaya: { emoji:'🏮', name:'Izakaya staff', desc:'You love a busy, noisy place and a fun team. Every night is different!', watch:'Late nights. Check your shifts during exams.' },
+  delivery:{ emoji:'🚲', name:'Delivery rider', desc:'You like working alone and moving around. You can choose when you work.', watch:'Rain, hills, and traffic in Nagasaki! Be careful.' },
+  event:   { emoji:'🎤', name:'Event staff', desc:'You love energy, music, and new places. You can work at concerts, festivals, and sports games.', watch:'The work is not every week, so the pay can change a lot.' },
+};
+const JQ = [
+  { q:'Do you like talking to people you don’t know?', o:[['Yes, I love it!',{cafe:2,izakaya:2,event:1}],['A little',{konbini:2,tutor:1}],['Not really',{delivery:3}]] },
+  { q:'When do you want to work?', o:[['In the morning',{cafe:2,konbini:1}],['At night',{izakaya:2,konbini:1}],['Any time is OK',{delivery:2,event:1}]] },
+  { q:'What do you like more?', o:[['Making things',{cafe:2,izakaya:1}],['Teaching and explaining',{tutor:3}],['Moving around',{delivery:2,event:2}]] },
+  { q:'A busy, noisy place is…', o:[['Fun!',{izakaya:2,event:2}],['OK',{konbini:1,cafe:1}],['Too much for me',{tutor:2,delivery:1}]] },
+  { q:'Do you like working…', o:[['alone?',{delivery:2,tutor:1}],['with a team?',{izakaya:1,event:2,cafe:1}],['Both are OK',{konbini:2}]] },
+  { q:'What is most important to you?', o:[['Flexible shifts',{delivery:2,konbini:1}],['Good pay',{tutor:2,izakaya:1}],['Fun coworkers',{event:2,izakaya:1,cafe:1}]] },
+];
+function jobResult() {
+  if (JQ.some((_, i) => jq[i] === undefined)) return null;
+  const pts = {}; Object.keys(JOBS).forEach(k => pts[k] = 0);
+  JQ.forEach((item, i) => { const add = item.o[jq[i]][1]; Object.keys(add).forEach(k => pts[k] += add[k]); });
+  let best = null;
+  Object.keys(JOBS).forEach(k => { if (best === null || pts[k] > pts[best]) best = k; });
+  return Object.assign({ key: best }, JOBS[best]);
+}
+function buildJobQuiz() {
+  const box = document.getElementById('jqBox');
+  box.innerHTML = '';
+  JQ.forEach((item, i) => {
+    const card = document.createElement('div'); card.className = 'q-card';
+    card.innerHTML = `<div class="q-num">Question ${i + 1} of ${JQ.length}</div><div class="q-text">${item.q}</div>`;
+    const opts = document.createElement('div'); opts.className = 'jq-opts';
+    item.o.forEach((o, k) => {
+      const b = document.createElement('button'); b.type = 'button';
+      b.className = 'jq-opt' + (jq[i] === k ? ' on' : ''); b.textContent = o[0];
+      b.onclick = () => { jq[i] = k; saveState(); buildJobQuiz(); };
+      opts.appendChild(b);
+    });
+    card.appendChild(opts); box.appendChild(card);
+  });
+  renderJobResult();
+}
+function renderJobResult() {
+  const r = jobResult(), box = document.getElementById('jqResult');
+  document.getElementById('jqNext').disabled = !r;
+  if (!r) { box.innerHTML = ''; return; }
+  box.innerHTML = `<div class="jq-result"><div class="jq-emoji">${r.emoji}</div>
+    <div class="jq-label">Your part-time job match:</div><div class="jq-name">${r.name}</div>
+    <p>${r.desc}</p><p class="jq-watch"><b>Be careful:</b> ${r.watch}</p>
+    <p class="muted-note">Show your partner. Do you agree with your result? What job do you really do, or want to do?</p></div>`;
+}
+
+// ── What would you do? ───────────────────────────────────────
+const SITUATIONS = [
+  { where:'🏪 Convenience store', s:'The line is long. A man shouts at you: “Why are you so slow?!”',
+    o:['Shout back: “Wait!”','Stay calm and say, “I’m sorry for the wait.” If he keeps shouting, call your manager.','Leave the register and go home.'], best:1,
+    fb:['Shouting back makes the problem bigger.','Good! Stay calm, and you don’t have to handle it alone.','You can’t just leave. Ask your manager for help.'] },
+  { where:'☕ Café', s:'A customer says politely, “Excuse me, this coffee is cold.”',
+    o:['Say, “I’m sorry. I’ll make a new one.”','Ignore the customer.','Call the police.'], best:0,
+    fb:['Good! This is a normal complaint, not kasuhara.','Ignoring a polite customer is rude.','This is a normal complaint, not kasuhara. No police!'] },
+  { where:'🍜 Restaurant', s:'A customer says, “Give me free food, or I will write a bad review online!”',
+    o:['Give the food for free.','Argue with the customer.','Stay calm and tell your manager right away.'], best:2,
+    fb:['You should not decide this alone. This is kasuhara.','Arguing makes it worse.','Good! This is kasuhara. Your manager must help you.'] },
+];
+const IF_COND = ['shouts at me','is very rude','asks for free things','complains politely'];
+const IF_ACT  = ['stay calm','say “I’m sorry”','tell my manager right away','ask a coworker for help'];
+function buildSituations() {
+  const box = document.getElementById('scBox');
+  box.innerHTML = '';
+  SITUATIONS.forEach((it, i) => {
+    const card = document.createElement('div'); card.className = 'q-card';
+    card.innerHTML = `<div class="q-num">${it.where}</div><div class="q-text">${it.s}</div>`;
+    const opts = document.createElement('div'); opts.className = 'opts';
+    it.o.forEach((o, k) => {
+      const b = document.createElement('button'); b.type = 'button';
+      const chosen = sc[i] === k;
+      b.className = 'q-option sc-opt' + (chosen ? (k === it.best ? ' sc-good' : ' sc-bad') : '');
+      b.innerHTML = `<span class="opt-letter">${'abc'[k]}</span><span>${o}</span>`;
+      b.onclick = () => { sc[i] = k; saveState(); buildSituations(); };
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);
+    if (sc[i] !== undefined) {
+      const f = document.createElement('div'); f.className = 'sc-fb ' + (sc[i] === it.best ? 'good' : 'bad');
+      f.textContent = it.fb[sc[i]]; card.appendChild(f);
+    }
+    box.appendChild(card);
+  });
+  const line = document.getElementById('ifLine');
+  line.innerHTML = '';
+  const c = document.createElement('select'); c.className = 'gap-sel'; c.setAttribute('aria-label', 'What the customer does');
+  c.innerHTML = '<option value="">choose…</option>' + IF_COND.map((x, k) => `<option value="${k}">${x}</option>`).join('');
+  const a = document.createElement('select'); a.className = 'gap-sel'; a.setAttribute('aria-label', 'What I will do');
+  a.innerHTML = '<option value="">choose…</option>' + IF_ACT.map((x, k) => `<option value="${k}">${x}</option>`).join('');
+  if (ifs.c !== undefined) c.value = String(ifs.c);
+  if (ifs.a !== undefined) a.value = String(ifs.a);
+  c.onchange = () => { ifs.c = c.value === '' ? undefined : Number(c.value); saveState(); renderIf(); };
+  a.onchange = () => { ifs.a = a.value === '' ? undefined : Number(a.value); saveState(); renderIf(); };
+  line.appendChild(document.createTextNode('If a customer ')); line.appendChild(c);
+  line.appendChild(document.createTextNode(', I will ')); line.appendChild(a); line.appendChild(document.createTextNode('.'));
+  renderIf();
+}
+function ifSentence() {
+  if (ifs.c === undefined || ifs.a === undefined) return '';
+  return `If a customer ${IF_COND[ifs.c]}, I will ${IF_ACT[ifs.a]}.`;
+}
+function renderIf() {
+  const t = ifSentence();
+  document.getElementById('ifCard').hidden = !t;
+  document.getElementById('ifSummary').innerHTML = t ? `<p>${t}</p>` : '';
+}
+function sitScore() { return SITUATIONS.filter((it, i) => sc[i] === it.best).length; }
+function sitComplete() { return SITUATIONS.every((_, i) => sc[i] !== undefined) && !!ifSentence(); }
+function sitText() { return SITUATIONS.map((it, i) => `S${i + 1}: ${sc[i] === undefined ? '-' : 'abc'[sc[i]]} (${sc[i] === it.best ? 'best' : 'not best'})`).join('; '); }
+
+// Skim page (match headings)
+function buildSkim() {
+  const cont = document.getElementById('skimContainer');
+  if (cont.innerHTML) return;
+  document.getElementById('headList').innerHTML =
+    '<div class="headlist-title">Headings</div>' +
+    HEAD_ORDER.map(id => `<div class="headlist-item">${HEADINGS[id]}</div>`).join('');
+
+  PARAS.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'hpara';
+
+    const head = document.createElement('div');
+    head.className = 'hhead';
+    const num = document.createElement('div');
+    num.className = 'hnum'; num.textContent = 'Paragraph ' + p.n;
+    head.appendChild(iconEl(p.n)); head.appendChild(num);
+
+    const text = document.createElement('div');
+    text.className = 'para-text';
+    p.segs.forEach(seg => {
+      if (typeof seg === 'number') {
+        if (p.owner === partner) appendGlossed(text, GAPS[seg].correct);
+        else text.appendChild(blankSpan(seg));
+      } else {
+        appendGlossed(text, seg);
+      }
+    });
+
+    const s = document.createElement('select');
+    s.className = 'head-sel'; s.id = 'head_' + p.n;
+    s.setAttribute('aria-label', 'Heading for paragraph ' + p.n);
+    const blank = document.createElement('option');
+    blank.value = ''; blank.textContent = 'Choose a heading';
+    s.appendChild(blank);
+    HEAD_ORDER.forEach(id => {
+      const op = document.createElement('option');
+      op.value = id; op.textContent = HEADINGS[id];
+      s.appendChild(op);
+    });
+    if (headSel[p.n]) s.value = headSel[p.n];
+    s.addEventListener('change', () => { headSel[p.n] = s.value; saveState(); });
+
+    div.appendChild(head); div.appendChild(text); div.appendChild(figEl(p.fig)); div.appendChild(s);
+    cont.appendChild(div);
+  });
+}
+
+function finishSkim() {
+  const vals = PARAS.map(p => headSel[p.n]);
+  if (vals.some(v => !v)) { alert('Please choose a heading for every paragraph.'); return; }
+  if (new Set(vals).size !== vals.length) { alert('You used the same heading twice. Use each heading only once.'); return; }
+  goTo(4);
+}
+
+// Reading page (cloze)
+function makeSelect(n) {
+  const g = GAPS[n];
+  const s = document.createElement('select');
+  s.className = 'gap-sel';
+  s.id = 'gap_' + n;
+  s.setAttribute('aria-label', 'Missing word ' + n);
+  const longest = Math.max.apply(null, g.options.map(o => o.length));
+  s.style.width = Math.max(80, longest * 9 + 34) + 'px';
+  const blank = document.createElement('option');
+  blank.value = ''; blank.textContent = '\u2014';
+  s.appendChild(blank);
+  shuffle(g.options).forEach(o => {
+    const op = document.createElement('option');
+    op.value = o; op.textContent = o;
+    s.appendChild(op);
+  });
+  if (sel[n]) s.value = sel[n];
+  s.addEventListener('change', () => { sel[n] = s.value; saveState(); });
+  return s;
+}
+
+function renderPara(p) {
+  const mine = (p.owner === partner);
+  const div = document.createElement('div');
+  div.className = 'para own-' + p.owner;
+
+  const side = document.createElement('div');
+  side.className = 'para-side';
+  const num = document.createElement('div');
+  num.className = 'para-num'; num.textContent = p.n;
+  const role = document.createElement('div');
+  role.className = 'para-role';
+  role.textContent = mine ? 'Read aloud' : 'Listen and choose';
+  side.appendChild(num); side.appendChild(role);
+
+  const text = document.createElement('div');
+  text.className = 'para-text';
+  p.segs.forEach(seg => {
+    if (typeof seg === 'number') {
+      if (mine) appendGlossed(text, GAPS[seg].correct);
+      else text.appendChild(makeSelect(seg));
+    } else {
+      appendGlossed(text, seg);
+    }
+  });
+
+  div.appendChild(side); div.appendChild(text);
+  return div;
+}
+
+function buildReading() {
+  document.getElementById('s3instr').innerHTML = partner === 'A'
+    ? 'You are <strong>Student A</strong>. <strong>Round 1:</strong> Read paragraphs 1 and 3 aloud. Your partner chooses the missing words. <strong>Round 2:</strong> Listen to your partner read paragraphs 2 and 4, and choose the missing words. The charts and pictures can help you. Do not show your screen.'
+    : 'You are <strong>Student B</strong>. <strong>Round 1:</strong> Listen to your partner read paragraphs 1 and 3, and choose the missing words. <strong>Round 2:</strong> Read paragraphs 2 and 4 aloud. Your partner chooses the missing words. The charts and pictures can help you. Do not show your screen.';
+  const cont = document.getElementById('articleContainer');
+  if (cont.innerHTML) return;
+  PARAS.forEach(p => { cont.appendChild(renderPara(p)); cont.appendChild(figEl(p.fig)); });
+}
+
+function finishReading() {
+  const missing = PARAS.some(p => p.owner !== partner && p.segs.some(seg => typeof seg === 'number' && !sel[seg]));
+  if (missing) { alert('Please choose a word for every gap.'); return; }
+  goTo(5);
+}
+
+// Quiz
+function buildArticlePanel() {
+  // Shows the student's own version: their own paragraphs, plus the words they chose.
+  const cont = document.getElementById('fullArticle');
+  cont.innerHTML = '';
+  const t = document.createElement('div');
+  t.className = 'fa-title';
+  t.textContent = 'Happy at Your Part-Time Job?';
+  cont.appendChild(t);
+  PARAS.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'fa-para';
+    p.segs.forEach(seg => {
+      if (typeof seg === 'number') {
+        if (p.owner === partner) {
+          appendGlossed(d, GAPS[seg].correct);
+        } else if (sel[seg]) {
+          const m = document.createElement('mark');
+          m.textContent = sel[seg];
+          d.appendChild(m);
+        } else {
+          d.appendChild(blankSpan(seg));
+        }
+      } else {
+        appendGlossed(d, seg);
+      }
+    });
+    cont.appendChild(d);
+    cont.appendChild(figEl(p.fig));
+  });
+}
+
+function buildQuiz() {
+  if (quizBuilt) return;
+  const L = ['a', 'b', 'c'];
+  document.getElementById('quizContainer').innerHTML = QUIZ.map((q, qi) => `
+    <div class="q">
+      <div class="q-text">${qi + 1}. ${q.q}</div>
+      ${q.opts.map((o, oi) => `
+        <div class="q-option${quizSel[qi] === oi ? ' selected' : ''}" id="qo${qi}_${oi}" role="button" tabindex="0"
+             onclick="selectQuiz(${qi},${oi})"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectQuiz(${qi},${oi});}">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${o}</div>
+        </div>`).join('')}
+    </div>`).join('');
+  quizBuilt = true;
+}
+function selectQuiz(qi, oi) {
+  QUIZ[qi].opts.forEach((_, o) => { document.getElementById(`qo${qi}_${o}`).className = 'q-option'; });
+  quizSel[qi] = oi;
+  document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+  saveState();
+}
+function toggleArticle() {
+  const box = document.getElementById('fullArticle');
+  const open = box.classList.toggle('open');
+  document.getElementById('toggleArticleBtn').textContent = open ? 'Hide the article' : 'Show the article';
+}
+
+// Score
+function reviewRow(r) {
+  return `
+    <div class="review-row">
+      <div class="review-mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '\u2713' : '\u2717'}</div>
+      <div>
+        <div class="review-label">${r.label}</div>
+        <div class="review-answer">Your answer: ${r.chosen || '\u2014'}</div>
+        ${r.ok ? '' : `<div class="review-correct">Correct answer: <b>${r.correct}</b></div>`}
+      </div>
+    </div>`;
+}
+
+function finishQuiz() {
+  if (QUIZ.some((_, i) => quizSel[i] === undefined)) { alert('Please answer all 10 questions.'); return; }
+  goTo(6);
+}
+
+function submitAll() {
+  if (QUIZ.some((_, i) => quizSel[i] === undefined)) { alert('Please answer all 10 questions.'); goTo(5); return; }
+  if (!sitComplete()) { alert('Please answer all three situations and finish your sentence.'); return; }
+
+  const clozeReview = [];
+  let clozeScore = 0, clozeMax = 0;
+  PARAS.forEach(p => {
+    if (p.owner === partner) return;
+    let gi = 0;
+    p.segs.forEach(seg => {
+      if (typeof seg !== 'number') return;
+      clozeMax++; gi++;
+      const chosen = sel[seg];
+      const ok = chosen === GAPS[seg].correct;
+      if (ok) clozeScore++;
+      clozeReview.push({ label: `Paragraph ${p.n}, gap ${gi}`, chosen, ok, correct: GAPS[seg].correct });
+    });
+  });
+
+  const headReview = [];
+  let headScore = 0;
+  PARAS.forEach(p => {
+    const c = headSel[p.n];
+    const ok = c === HEAD_ANSWER[p.n];
+    if (ok) headScore++;
+    headReview.push({ label: `Paragraph ${p.n}`, chosen: HEADINGS[c], ok, correct: HEADINGS[HEAD_ANSWER[p.n]] });
+  });
+
+  const L = ['a', 'b', 'c'];
+  const quizReview = [];
+  let quizScore = 0;
+  QUIZ.forEach((q, i) => {
+    const c = quizSel[i];
+    const ok = c === q.correct;
+    if (ok) quizScore++;
+    quizReview.push({
+      label: `Question ${i + 1} (${q.type})`,
+      chosen: `${L[c]}. ${q.opts[c]}`, ok,
+      correct: `${L[q.correct]}. ${q.opts[q.correct]}`
+    });
+  });
+
+  const total = clozeScore + headScore + quizScore;
+  const totalMax = clozeMax + PARAS.length + QUIZ.length;
+  const pct = Math.round(total / totalMax * 100);
+
+  document.getElementById('totalNum').textContent = total;
+  document.getElementById('totalDenom').textContent = 'out of ' + totalMax;
+  document.getElementById('clozeNum').textContent = clozeScore + '/' + clozeMax;
+  document.getElementById('headNum').textContent = headScore + '/' + PARAS.length;
+  document.getElementById('quizNum').textContent = quizScore + '/' + QUIZ.length;
+  document.getElementById('reviewCloze').innerHTML = clozeReview.map(reviewRow).join('');
+  document.getElementById('reviewHead').innerHTML = headReview.map(reviewRow).join('');
+  document.getElementById('reviewQuiz').innerHTML = quizReview.map(reviewRow).join('');
+
+  const jr = jobResult();
+  document.getElementById('jobFinal').innerHTML = jr ? `<p>${jr.emoji} ${jr.name}</p>` : '';
+  document.getElementById('ifFinal').innerHTML = `<p>${ifSentence()}</p>`;
+  goTo(7);
+  clearState();
+  logToSheets(clozeScore, clozeMax, headScore, PARAS.length, quizScore, QUIZ.length, total, totalMax, pct, clozeReview.concat(headReview, quizReview));
+}
+
+function logToSheets(clozeScore, clozeMax, headScore, headMax, quizScore, quizMax, total, totalMax, pct, review) {
+  const status = document.getElementById('sheetStatus');
+  if (!SHEET_URL || SHEET_URL === 'PASTE_URL_HERE') {
+    status.textContent = 'No gradebook link is set yet, so this score was not saved.';
+    return;
+  }
+  status.textContent = 'Saving to the gradebook...';
+  const name = document.getElementById('studentName').value.trim();
+  const num  = document.getElementById('studentNumber').value.trim();
+  const detail = review.map(r => `${r.label}: ${r.chosen || '-'} (${r.ok ? 'correct' : 'wrong'})`).join(' | ')
+    + ` || Job quiz: ${jobResult() ? jobResult().name : '-'} || Situations: ${sitText()}`
+    + ` || Sentence: ${ifSentence()} || Words tapped: ${tapped.map(k => GLOSS[k][0]).join(', ') || 'none'}`;
+
+  const payload = JSON.stringify({
+    studentNumber: num, studentName: name, partner,
+    score: total + '/' + totalMax, percent: pct,
+    clozeScore: clozeScore + '/' + clozeMax,
+    headingScore: headScore + '/' + headMax,
+    quizScore: quizScore + '/' + quizMax,
+    jobMatch: jobResult() ? jobResult().name : '',
+    situations: sitText(),
+    situationScore: sitScore() + '/' + SITUATIONS.length,
+    sentence: ifSentence(),
+    tapped: tapped.map(k => GLOSS[k][0]).join(', '),
+    response: detail
+  });
+
+  const form = document.createElement('form');
+  form.method = 'POST'; form.action = SHEET_URL; form.target = 'hidden_iframe'; form.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'hidden'; input.name = 'data'; input.value = payload;
+  form.appendChild(input);
+  const iframe = document.createElement('iframe');
+  iframe.name = 'hidden_iframe'; iframe.style.display = 'none';
+  iframe.onload = () => { status.textContent = 'Saved to the gradebook.'; };
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(() => {
+    if (status.textContent.indexOf('Saving') === 0) status.textContent = 'Saved to the gradebook.';
+  }, 3000);
+}
+
+window.addEventListener('load', () => {
+  const state = loadState();
+  if (state && state.currentScreen > 1) restoreState(state);
+});
+</script>
+</body>
+</html>
