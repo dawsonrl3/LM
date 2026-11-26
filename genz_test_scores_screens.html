@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gen Z Test Scores Falling: Screens and Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,400&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --desk:#eef2f7; --grid:#dce4ee; --sheet:#ffffff;
+    --ink:#16233b; --muted:#59687f; --rule:#cdd7e3;
+    --hl:#ffe46b; --hl-edge:#e6b800;
+    --teal:#1f8a9e; --amber:#d9822b;
+    --ok:#2b9468; --ok-soft:#e3f4ec; --bad:#d04545; --bad-soft:#fae8e8;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    font-family:'Sora',sans-serif; color:var(--ink);
+    background-color:var(--desk);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:22px 22px;
+    min-height:100vh; padding:18px 12px 56px;
+  }
+  button:focus-visible, select:focus-visible, input:focus-visible, .q-option:focus-visible {
+    outline:3px solid var(--teal); outline-offset:2px;
+  }
+
+  .sheet { max-width:640px; margin:0 auto; background:var(--sheet); border:1px solid var(--rule); border-radius:6px; padding:24px 20px 28px; }
+  .masthead h1 { font-family:'Newsreader',serif; font-size:1.6rem; font-weight:600; line-height:1.25; }
+  .masthead p { font-size:.8rem; color:var(--muted); margin-top:6px; line-height:1.5; }
+
+  .steps { display:flex; align-items:center; margin:18px 0 22px; }
+  .step { display:flex; align-items:center; gap:5px; font-size:.64rem; font-weight:600; color:var(--muted); }
+  .step-dot { width:22px; height:22px; border-radius:50%; border:2px solid var(--rule); display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:700; background:#fff; flex-shrink:0; }
+  .step.active { color:var(--ink); }
+  .step.active .step-dot { border-color:var(--ink); background:var(--hl); color:var(--ink); }
+  .step.done { color:var(--ok); }
+  .step.done .step-dot { border-color:var(--ok); background:var(--ok); color:#fff; }
+  @media (max-width:440px) { .step span { display:none; } .step.active span { display:inline; } }
+  .step-line { flex:1; height:2px; background:var(--rule); margin:0 6px; min-width:8px; }
+
+  .screen { display:none; }
+  .screen.active { display:block; }
+
+  .h2 { font-family:'Newsreader',serif; font-size:1.15rem; font-weight:600; margin:22px 0 10px; }
+  .h2:first-child { margin-top:0; }
+  .instr { border-left:4px solid var(--hl-edge); background:#fffbe6; padding:12px 14px; font-size:.8rem; line-height:1.7; margin-bottom:18px; }
+
+  .field { margin-bottom:12px; }
+  .field label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); margin-bottom:5px; }
+  .field input { width:100%; background:#fff; border:1.5px solid var(--rule); border-radius:6px; padding:11px 13px; color:var(--ink); font-family:'Sora',sans-serif; font-size:.9rem; -webkit-appearance:none; }
+  .field input:focus { border-color:var(--teal); }
+
+  .partner-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .partner-btn { background:#fff; border:2px solid var(--rule); border-radius:6px; padding:14px 12px; text-align:left; cursor:pointer; color:var(--ink); font-family:'Sora',sans-serif; display:block; }
+  .partner-btn.sel-A { border-color:var(--teal); background:#e9f6f8; }
+  .partner-btn.sel-B { border-color:var(--amber); background:#fdf1e3; }
+  .partner-letter { display:block; font-family:'Newsreader',serif; font-size:2rem; font-weight:600; line-height:1; margin-bottom:6px; }
+  .partner-btn .pa { color:var(--teal); } .partner-btn .pb { color:var(--amber); }
+  .partner-desc { display:block; font-size:.74rem; color:var(--muted); line-height:1.55; }
+
+  .btn { width:100%; padding:14px; border:none; border-radius:8px; font-family:'Sora',sans-serif; font-size:.88rem; font-weight:600; cursor:pointer; }
+  .btn-primary { background:var(--ink); color:#fff; }
+  .btn-primary:hover { background:#0e1828; }
+  .btn-primary:disabled { opacity:.35; cursor:not-allowed; }
+  .btn-ghost { background:transparent; border:1.5px solid var(--rule); color:var(--muted); margin-top:10px; }
+  .btn-ghost:hover { border-color:var(--muted); color:var(--ink); }
+
+  /* Reading */
+  .para { display:grid; grid-template-columns:54px 1fr; gap:8px; padding:16px 0; border-top:1px solid var(--rule); }
+  #articleContainer > :first-child { border-top:none; padding-top:4px; }
+  .para-side { text-align:center; }
+  .para-num { font-family:'Newsreader',serif; font-size:1.8rem; font-weight:600; line-height:1; }
+  .para.own-A .para-num { color:var(--teal); }
+  .para.own-B .para-num { color:var(--amber); }
+  .para-role { font-size:.62rem; color:var(--muted); margin-top:5px; line-height:1.35; }
+  .para-text { font-family:'Newsreader',serif; font-size:1.05rem; line-height:2.1; }
+  .source { font-size:.68rem; color:var(--muted); line-height:1.6; margin:6px 0 20px; }
+
+  select.gap-sel {
+    display:inline-block; background:var(--hl); border:1px solid var(--hl-edge); border-radius:4px;
+    color:var(--ink); font-family:'Sora',sans-serif; font-size:.78rem; font-weight:700;
+    padding:3px 24px 3px 8px; margin:0 2px; cursor:pointer;
+    -webkit-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2316233b'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 7px center;
+  }
+  select.gap-sel:disabled { cursor:default; opacity:1; color:var(--ink); }
+  select.gap-sel option { background:#fff; color:#16233b; }
+
+  .blank { display:inline-block; height:1.15em; vertical-align:-0.2em; background:var(--hl); border:1px solid var(--hl-edge); border-radius:4px; margin:0 3px; }
+  .nav-end { margin-top:18px; }
+
+  /* Headings */
+  .headlist { border:1px solid var(--rule); border-radius:4px; padding:10px 14px; margin-bottom:14px; }
+  .headlist-title { font-family:'Newsreader',serif; font-size:1rem; font-weight:600; margin-bottom:4px; }
+  .headlist-item { font-size:.84rem; line-height:1.9; }
+  .hpara { padding:16px 0; border-top:1px solid var(--rule); }
+  #skimContainer > :first-child { border-top:none; padding-top:4px; }
+  .hhead { display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+  .hhead { align-items:center; }
+  .hicon { display:inline-flex; width:38px; height:38px; align-items:center; justify-content:center; background:#e9f6f8; border:1.5px solid var(--teal); border-radius:8px; flex-shrink:0; }
+  .hicon svg { width:26px; height:26px; fill:none; stroke:var(--teal); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .hnum { font-family:'Newsreader',serif; font-size:1.6rem; font-weight:600; line-height:1; }
+  .hpara .para-text { line-height:1.85; margin-bottom:12px; }
+  select.head-sel {
+    width:100%; background:var(--hl); border:1px solid var(--hl-edge); border-radius:4px;
+    color:var(--ink); font-family:'Sora',sans-serif; font-size:.82rem; font-weight:700;
+    padding:10px 32px 10px 12px; cursor:pointer;
+    -webkit-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2316233b'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center;
+  }
+  select.head-sel option { background:#fff; color:#16233b; }
+  .head-end { margin-top:18px; }
+
+  /* Quiz */
+  .toggle-btn { width:100%; padding:12px 14px; border:1.5px solid var(--rule); background:#fff; color:var(--ink); border-radius:8px; font-family:'Sora',sans-serif; font-size:.82rem; font-weight:600; cursor:pointer; text-align:left; margin-bottom:12px; }
+  .full-article { display:none; border:1px solid var(--rule); border-radius:6px; padding:2px 14px 6px; margin-bottom:18px; background:#fbfcfe; }
+  .full-article.open { display:block; }
+  .fa-title { font-family:'Newsreader',serif; font-size:1.05rem; font-weight:600; padding:10px 0 4px; }
+  .fa-para { font-family:'Newsreader',serif; font-size:1rem; line-height:1.85; padding:10px 0; border-top:1px solid var(--rule); }
+  .fa-para mark { background:var(--hl); padding:0 2px; color:var(--ink); }
+
+  .q { padding:16px 0; border-top:1px solid var(--rule); }
+  #quizContainer > :first-child { border-top:none; padding-top:4px; }
+  .q-text { font-family:'Newsreader',serif; font-size:1.06rem; font-weight:600; line-height:1.5; margin-bottom:10px; }
+  .q-option { display:flex; gap:10px; align-items:flex-start; padding:11px 12px; border:1.5px solid var(--rule); border-radius:6px; margin-bottom:7px; cursor:pointer; background:#fff; }
+  .q-option:hover { border-color:var(--muted); }
+  .q-option.selected { background:var(--hl); border-color:var(--hl-edge); }
+  .opt-letter { min-width:22px; height:22px; border-radius:50%; border:1.5px solid var(--rule); font-size:.68rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; background:#fff; }
+  .q-option.selected .opt-letter { border-color:var(--ink); background:var(--ink); color:#fff; }
+  .opt-text { font-size:.85rem; line-height:1.5; padding-top:2px; }
+  .quiz-end { margin-top:18px; }
+
+  /* Score */
+  .score-big { font-family:'Newsreader',serif; font-size:3.4rem; font-weight:600; line-height:1; }
+  .score-sub { font-size:.82rem; color:var(--muted); margin:6px 0 18px; }
+  .score-row { display:flex; justify-content:space-between; padding:10px 0; border-top:1px solid var(--rule); font-size:.9rem; }
+  .score-row:last-of-type { border-bottom:1px solid var(--rule); }
+  .review-h { font-family:'Newsreader',serif; font-size:1.12rem; font-weight:600; margin:22px 0 4px; }
+  .review-row { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--rule); }
+  .review-mark { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.66rem; font-weight:700; flex-shrink:0; margin-top:1px; }
+  .review-mark.ok { background:var(--ok-soft); color:var(--ok); }
+  .review-mark.no { background:var(--bad-soft); color:var(--bad); }
+  .review-label { font-size:.7rem; color:var(--muted); }
+  .review-answer { font-size:.85rem; font-weight:600; }
+  .review-correct { font-size:.75rem; color:var(--muted); margin-top:2px; }
+  .review-correct b { color:var(--ok); font-weight:700; }
+  .fig { margin:2px 0 14px; border:1px solid var(--rule); border-radius:6px; padding:10px 10px 8px; background:#fbfcfe; }
+  .fig svg { display:block; width:100%; height:auto; max-width:460px; margin:0 auto; }
+  .fig figcaption { font-family:'Newsreader',serif; font-style:italic; font-size:.86rem; color:var(--muted); margin-top:6px; line-height:1.45; }
+  .hpara .fig { margin-bottom:12px; }
+  /* Tap-a-word */
+  button.tw { font:inherit; color:inherit; background:none; border:none; padding:0; margin:0; cursor:pointer;
+    text-decoration:underline dotted var(--teal); text-decoration-thickness:2px; text-underline-offset:3px; }
+  button.tw:hover { background:#e9f6f8; }
+  .gloss { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(14px + env(safe-area-inset-bottom,0px)); width:min(92vw,460px);
+    background:#fff; border:2px solid var(--teal); border-radius:10px; box-shadow:0 8px 28px rgba(22,35,59,.25); padding:14px 40px 14px 16px; z-index:50; }
+  .gloss-x { position:absolute; top:6px; right:8px; background:none; border:none; font-size:1rem; color:var(--muted); cursor:pointer; padding:6px; }
+  .gloss-word { font-family:'Newsreader',serif; font-size:1.2rem; font-weight:600; }
+  .gloss-jp { font-size:.88rem; color:var(--teal); font-weight:600; margin:2px 0 6px; }
+  .gloss-def { font-size:.86rem; line-height:1.55; }
+  /* My phone */
+  .st-sel { background:#fff; border:1.5px solid var(--rule); border-radius:6px; padding:9px 10px; font-family:'Sora',sans-serif; font-size:.9rem; color:var(--ink); }
+  .field .st-sel { width:100%; }
+  .st-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:.85rem; }
+  .st-row .st-sel { width:auto; min-width:72px; }
+  .howto { font-size:.8rem; line-height:1.7; background:#f4f7fb; border:1px solid var(--rule); border-radius:6px; padding:10px 12px; margin-bottom:12px; }
+  .st-check { display:flex; gap:8px; align-items:center; font-size:.8rem; color:var(--muted); }
+  .st-box { margin-top:14px; border:1.5px solid var(--amber); background:#fdf1e3; border-radius:8px; padding:14px; font-size:.88rem; line-height:1.6; }
+  .st-box p { margin-bottom:8px; }
+  .st-bar { position:relative; height:26px; background:#fff; border:1.5px solid var(--teal); border-radius:5px; overflow:hidden; margin-top:6px; }
+  .st-fill { height:100%; background:var(--amber); }
+  .st-half { position:absolute; left:50%; top:-2px; bottom:-2px; border-left:2px dashed var(--ink); }
+  .st-scale { display:flex; justify-content:space-between; font-size:.7rem; color:var(--muted); margin:3px 0 10px; }
+  .muted-note { font-size:.78rem; color:var(--muted); line-height:1.55; }
+  /* Plan */
+  .plan-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .plan-opt { display:flex; gap:8px; align-items:center; text-align:left; background:#fff; border:2px solid var(--rule); border-radius:8px; padding:10px; font-family:'Sora',sans-serif; font-size:.78rem; line-height:1.4; color:var(--ink); cursor:pointer; }
+  .plan-opt.on { border-color:var(--teal); background:#e9f6f8; font-weight:600; }
+  .plan-ic { font-size:1.3rem; flex-shrink:0; }
+  .plan-row { padding:12px 0; border-top:1px solid var(--rule); }
+  .plan-n { font-size:.74rem; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  .plan-line { font-family:'Newsreader',serif; font-size:1.05rem; line-height:2.2; }
+  .plan-card { margin-top:14px; border:2px solid var(--ink); border-radius:8px; padding:12px 14px; background:#fffbe6; }
+  .plan-card-title { font-family:'Newsreader',serif; font-size:1.05rem; font-weight:700; margin-bottom:4px; }
+  .plan-card p { font-family:'Newsreader',serif; font-size:1.02rem; line-height:1.6; }
+  @media (max-width:420px) { .plan-grid { grid-template-columns:1fr; } }
+  #sheetStatus { font-size:.74rem; color:var(--muted); padding:14px 0 0; }
+</style>
+</head>
+<body>
+<div class="gloss" id="gloss" hidden role="dialog" aria-live="polite">
+  <button type="button" class="gloss-x" onclick="closeGloss()" aria-label="Close">✕</button>
+  <div class="gloss-word" id="glossWord"></div>
+  <div class="gloss-jp" id="glossJp"></div>
+  <div class="gloss-def" id="glossDef"></div>
+</div>
+<div class="sheet">
+
+  <header class="masthead">
+    <h1>Why Are Test Scores Falling?</h1>
+    <p>Read with a partner, find the main ideas, then answer the quiz.</p>
+  </header>
+
+  <div class="steps" id="stepBar">
+    <div class="step active" id="s1"><div class="step-dot">1</div><span>Setup</span></div><div class="step-line"></div>
+    <div class="step" id="s2"><div class="step-dot">2</div><span>My phone</span></div><div class="step-line"></div>
+    <div class="step" id="s3"><div class="step-dot">3</div><span>Skim</span></div><div class="step-line"></div>
+    <div class="step" id="s4"><div class="step-dot">4</div><span>Reading</span></div><div class="step-line"></div>
+    <div class="step" id="s5"><div class="step-dot">5</div><span>Quiz</span></div><div class="step-line"></div>
+    <div class="step" id="s6"><div class="step-dot">6</div><span>My plan</span></div><div class="step-line"></div>
+    <div class="step" id="s7"><div class="step-dot">7</div><span>Score</span></div>
+  </div>
+
+  <!-- Screen 1: Setup -->
+  <div class="screen active" id="screen1">
+    <h2 class="h2">Your details</h2>
+    <div class="field"><label for="studentNumber">Student number</label><input type="text" id="studentNumber" placeholder="e.g. 24B001"></div>
+    <div class="field"><label for="studentName">Name (romaji)</label><input type="text" id="studentName" placeholder="e.g. Tanaka Yuki"></div>
+    <h2 class="h2">Which student are you?</h2>
+    <div class="partner-grid">
+      <button type="button" class="partner-btn" id="btnA" onclick="selectPartner('A')">
+        <span class="partner-letter pa">A</span>
+        <span class="partner-desc">You read paragraphs 1 and 3 aloud. You fill the gaps in paragraphs 2 and 4.</span>
+      </button>
+      <button type="button" class="partner-btn" id="btnB" onclick="selectPartner('B')">
+        <span class="partner-letter pb">B</span>
+        <span class="partner-desc">You read paragraphs 2 and 4 aloud. You fill the gaps in paragraphs 1 and 3.</span>
+      </button>
+    </div>
+    <button class="btn btn-primary" id="btnNext1" onclick="goTo(2)" disabled style="margin-top:22px;">Start</button>
+  </div>
+
+  <!-- Screen 2: My phone (warm-up) -->
+  <div class="screen" id="screen2">
+    <div class="instr">Before you read, look at your own phone. How much do you use it? First, guess. Then check.</div>
+    <h2 class="h2">1. Guess</h2>
+    <div class="field"><label for="stGuess">How many hours a day do you think you use your phone?</label>
+      <select class="st-sel" id="stGuess"></select></div>
+    <h2 class="h2">2. Check</h2>
+    <div class="howto">
+      <div><b>iPhone:</b> Settings → Screen Time → See All App &amp; Website Activity → <i>Daily Average</i></div>
+      <div><b>Android:</b> Settings → Digital Wellbeing &amp; parental controls</div>
+    </div>
+    <div class="field"><label>My real phone time (daily average)</label>
+      <div class="st-row"><select class="st-sel" id="stHours"></select><span>hours</span><select class="st-sel" id="stMins"></select><span>minutes</span></div></div>
+    <label class="st-check"><input type="checkbox" id="stUnknown"> I can’t find it. Use my guess.</label>
+    <button class="btn btn-ghost" id="stShowBtn" onclick="showScreenTime()" style="margin-top:14px;">Show my result</button>
+    <div id="stResult"></div>
+    <div class="nav-end">
+      <button class="btn btn-primary" id="stNext" onclick="goTo(3)" disabled>Start skimming</button>
+      <button class="btn btn-ghost" onclick="goTo(1)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Skim (match headings) -->
+  <div class="screen" id="screen3">
+    <div class="instr">Skim the article. <strong>Skim</strong> means read quickly to find the main idea. Some words are missing. You will fill them in on the next page. Read the first sentence of each paragraph and the last sentence of paragraph 1. Look at the charts and pictures. Tap the <u>underlined words</u> to see what they mean. Then choose a heading for each paragraph. Use each heading only once. Two headings do not match.</div>
+    <div class="headlist" id="headList"></div>
+    <div id="skimContainer"></div>
+    <div class="nav-end">
+      <button class="btn btn-primary" onclick="finishSkim()">Go to the reading page</button>
+      <button class="btn btn-ghost" onclick="goTo(2)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Reading (cloze) -->
+  <div class="screen" id="screen4">
+    <div class="instr" id="s3instr"></div>
+    <div id="articleContainer"></div>
+    <p class="source">Written for class using: Jared Cooney Horvath’s 2026 written testimony to the U.S. Senate, as reported by Fortune (21 February 2026); Toyo Keizai Online on Japan’s national test results; OECD PISA 2022 results; and a 2025 Dutch government study of 317 high schools, as reported by AFP. Rewritten in simpler English for class.</p>
+    <button class="btn btn-primary" onclick="finishReading()">Go to the quiz</button>
+    <button class="btn btn-ghost" onclick="goTo(3)">Back</button>
+  </div>
+
+  <!-- Screen 4: Quiz -->
+  <div class="screen" id="screen5">
+    <div class="instr">Answer all 10 questions on your own. You can open the article to check. It shows the words you chose.</div>
+    <button class="toggle-btn" id="toggleArticleBtn" onclick="toggleArticle()">Show the article</button>
+    <div class="full-article" id="fullArticle"></div>
+    <div id="quizContainer"></div>
+    <div class="quiz-end">
+      <button class="btn btn-primary" onclick="finishQuiz()">Next: make my screen plan</button>
+      <button class="btn btn-ghost" onclick="goTo(4)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 6: My screen plan -->
+  <div class="screen" id="screen6">
+    <div class="instr">Make your own screen plan. <strong>Part 1:</strong> Choose <strong>two</strong> ideas. <strong>Part 2:</strong> Make an if-then sentence for each idea. Then talk about your plan with your partner.</div>
+    <h2 class="h2">Part 1. Choose two ideas</h2>
+    <div class="plan-grid" id="planGrid"></div>
+    <h2 class="h2">Part 2. Make your plan</h2>
+    <div id="planBuild"><p class="muted-note">Choose two ideas first.</p></div>
+    <div class="plan-card" id="planCard" hidden>
+      <div class="plan-card-title">My screen plan</div>
+      <div id="planSummary"></div>
+    </div>
+    <div class="nav-end">
+      <button class="btn btn-primary" onclick="submitAll()">Submit and see my score</button>
+      <button class="btn btn-ghost" onclick="goTo(5)">Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 7: Score (no Back button: the score is already saved) -->
+  <div class="screen" id="screen7">
+    <div class="score-big" id="totalNum">0</div>
+    <div class="score-sub" id="totalDenom">out of 22</div>
+    <div class="score-row"><span>Reading gaps</span><strong id="clozeNum">0/8</strong></div>
+    <div class="score-row"><span>Headings</span><strong id="headNum">0/4</strong></div>
+    <div class="score-row"><span>Quiz</span><strong id="quizNum">0/10</strong></div>
+    <h2 class="review-h">Reading gaps</h2>
+    <div id="reviewCloze"></div>
+    <h2 class="review-h">Headings</h2>
+    <div id="reviewHead"></div>
+    <h2 class="review-h">Quiz</h2>
+    <div id="reviewQuiz"></div>
+    <h2 class="review-h">My screen plan</h2>
+    <div class="plan-card" id="planFinal"></div>
+    <div id="sheetStatus"></div>
+  </div>
+
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzOUiCXF4tKnVmro8R5kHBDmvpHEdLF-_U-eqrQyab_Dc40SGN-OtH5PScrvxwF7kAL/exec";
+
+// Each gap has one correct answer and two wrong options.
+const GAPS = {
+  1: { correct:"worse", options:["worse", "worth", "words"] },
+  2: { correct:"generation", options:["generation", "graduation", "generator"] },
+  3: { correct:"tests", options:["tests", "texts", "tents"] },
+  4: { correct:"survey", options:["survey", "service", "surface"] },
+  5: { correct:"phones", options:["phones", "funds", "fans"] },
+  6: { correct:"books", options:["books", "looks", "cooks"] },
+  7: { correct:"difficult", options:["difficult", "different", "digital"] },
+  8: { correct:"40%", options:["40%", "14%", "4%"] },
+  9: { correct:"media", options:["media", "meeting", "medal"] },
+  10: { correct:"stories", options:["stories", "stores", "stairs"] },
+  11: { correct:"anxiety", options:["anxiety", "energy", "honesty"] },
+  12: { correct:"80", options:["80", "18", "8"] },
+  13: { correct:"banned", options:["banned", "bent", "band"] },
+  14: { correct:"317", options:["317", "370", "173"] },
+  15: { correct:"tools", options:["tools", "toys", "tolls"] },
+  16: { correct:"paper", options:["paper", "pepper", "player"] }
+};
+
+// Numbers in segs are gap ids. Student A owns paragraphs 1 and 3. Student B owns 2 and 4.
+// Skim sentences have NO gap: the hook + thesis (last sentence) of paragraph 1, and the first sentence of paragraphs 2-4.
+const PARAS = [
+  {"n": 1, "owner": "A", "fig": 1, "segs": ["Many experts are worried because young people’s test scores are falling for the first time in many years. Students today are doing ", 1, " on academic tests than their parents did. Dr. Jared Cooney Horvath says Gen Z is the first ", 2, " in modern history to get lower scores on standardized ", 3, " than the generation before them. This is happening in Japan too. A recent ", 4, " showed that English scores for junior high students dropped by 22.9 points compared to a few years ago. Scores in Japanese and math also went down. Experts say screens and new digital habits are part of the reason, but there are ways to fix this problem."]},
+  {"n": 2, "owner": "B", "fig": 2, "segs": ["Using digital devices too much is making it harder for students to learn deeply. Many young people spend too much time on their ", 5, " instead of studying. Dr. Horvath says that teenagers spend more than half of the time they are awake looking at a screen. Because of this, students are reading fewer ", 6, ", which makes it hard for them to understand ", 7, " information. In the United States, the number of older students who read every day has fallen by more than ", 8, " over the last twenty years."]},
+  {"n": 3, "owner": "A", "fig": 3, "segs": ["New digital habits are changing how young people think and focus. Scrolling through social ", 9, " for a long time makes it difficult for students to focus on long ", 10, " or schoolwork. “Doomscrolling” means spending a long time looking at bad or upsetting news on a phone. It can cause high ", 11, " and stop students from thinking carefully. Also, using too much technology in the classroom may actually hurt learning. In one study of 3,000 university students, the students were off-task on their laptops almost two-thirds of the time. Research across ", 12, " countries shows that when schools use a lot of digital technology, student performance often goes down."]},
+  {"n": 4, "owner": "B", "fig": 4, "segs": ["There are some ways to solve this problem. First, many countries now stop students from using phones at school. In the Netherlands, schools ", 13, " phones in class in January 2024. In a study of ", 14, " high schools, three out of four schools said students could focus better. About two out of three said students got along better, and one out of three saw better grades. Second, Dr. Horvath says schools should check which digital ", 15, " really help students learn. Finally, students can help themselves. They can read ", 16, " books and put their phones in another room when they study."]}
+];
+
+const HEADINGS = {"a": "Test Scores Are Going Down", "b": "Too Much Screen Time, Too Few Books", "c": "New Habits Change How Students Think", "d": "Ways to Fix the Problem", "e": "Gen Z Gets the Best Scores in History", "f": "Phones Help Students Study Better"};
+const HEAD_ORDER = ["c", "e", "a", "f", "d", "b"];
+const HEAD_ANSWER = {"1": "a", "2": "b", "3": "c", "4": "d"};
+
+const QUIZ = [
+  {"type": "gist", "q": "What is the main topic of the whole article?", "opts": ["How to get a high score on an English test", "Why test scores are falling, and what we can do about it", "Why young people should never use phones"], "correct": 1},
+  {"type": "main idea", "q": "What is the main idea of Paragraph 3?", "opts": ["New digital habits change how young people think and focus", "Social media helps students write long stories", "Schools should buy more computers"], "correct": 0},
+  {"type": "main idea", "q": "What is the main idea of Paragraph 4?", "opts": ["Phone bans did not work in the Netherlands", "Only teachers can solve this problem", "Schools, experts, and students can all help solve the problem"], "correct": 2},
+  {"type": "detail", "q": "How many points did English scores for junior high students in Japan drop?", "opts": ["8 points", "12.7 points", "22.9 points"], "correct": 2},
+  {"type": "detail", "q": "According to Dr. Horvath, how much of their waking time do teenagers spend looking at screens?", "opts": ["More than half", "About one hour a day", "Only time at school"], "correct": 0},
+  {"type": "true or false", "q": "True or False: Research across 80 countries shows that more technology in schools always makes scores go up.", "opts": ["True", "False"], "correct": 1},
+  {"type": "true or false", "q": "True or False: In the Dutch study, three out of four schools said students could focus better.", "opts": ["True", "False"], "correct": 0},
+  {"type": "vocabulary", "q": "What does “doomscrolling” mean?", "opts": ["Finding good news on the internet", "Looking at bad or upsetting news on a phone for a long time", "Deleting apps from a phone"], "correct": 1},
+  {"type": "chart", "q": "Look at Chart 1. Which subject’s score went down the least?", "opts": ["English", "Japanese", "Math"], "correct": 2},
+  {"type": "inference", "q": "Why does the article tell students to put their phones in another room when they study?", "opts": ["So the phone can charge faster", "So they can focus and not look at their phones", "Because phones are banned at home"], "correct": 1}
+];
+
+// State
+let currentScreen = 1;
+let partner = null;
+let sel = {};
+let headSel = {};
+let quizSel = {};
+let quizBuilt = false;
+let st = {};        // screen time: guess, h, m, unknown, shown
+let planSel = [];   // chosen idea ids (max 2)
+let planOpt = {};   // per idea: {t: trigger index, f: form}
+let tapped = [];    // tap-a-word keys, in order of first tap
+
+const LS_KEY = 'genz_test_scores_screens_state_v1';
+
+function saveState() {
+  const state = { currentScreen, partner, sel, headSel, quizSel, st, planSel, planOpt, tapped,
+    studentName: document.getElementById('studentName').value,
+    studentNumber: document.getElementById('studentNumber').value };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch(e) { return null; }
+}
+function clearState() { try { localStorage.removeItem(LS_KEY); } catch(e) {} }
+
+function restoreState(state) {
+  partner = state.partner;
+  sel = state.sel || {};
+  headSel = state.headSel || {};
+  quizSel = state.quizSel || {};
+  st = state.st || {};
+  planSel = state.planSel || [];
+  planOpt = state.planOpt || {};
+  tapped = state.tapped || [];
+  if (state.studentName) document.getElementById('studentName').value = state.studentName;
+  if (state.studentNumber) document.getElementById('studentNumber').value = state.studentNumber;
+  if (partner) paintPartner();
+  checkReady();
+  goTo(state.currentScreen || 1);
+}
+
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+// Navigation
+function updateSteps(n) {
+  for (let i = 1; i <= 7; i++) {
+    const el = document.getElementById('s' + i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    el.querySelector('.step-dot').textContent = i < n ? '\u2713' : i;
+  }
+}
+function goTo(n) {
+  currentScreen = n;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen' + n).classList.add('active');
+  updateSteps(n);
+  window.scrollTo(0, 0);
+  if (n === 2) buildScreenTime();
+  if (n === 3) buildSkim();
+  if (n === 4) buildReading();
+  if (n === 5) { buildQuiz(); buildArticlePanel(); }
+  if (n === 6) buildPlan();
+  saveState();
+}
+
+// Setup
+function paintPartner() {
+  document.getElementById('btnA').className = 'partner-btn' + (partner === 'A' ? ' sel-A' : '');
+  document.getElementById('btnB').className = 'partner-btn' + (partner === 'B' ? ' sel-B' : '');
+}
+function resetBuiltPages() {
+  document.getElementById('skimContainer').innerHTML = '';
+  document.getElementById('headList').innerHTML = '';
+  document.getElementById('articleContainer').innerHTML = '';
+}
+function selectPartner(p) {
+  if (partner && partner !== p) { sel = {}; resetBuiltPages(); }
+  partner = p;
+  paintPartner(); checkReady(); saveState();
+}
+function checkReady() {
+  document.getElementById('btnNext1').disabled = !(
+    partner &&
+    document.getElementById('studentName').value.trim() &&
+    document.getElementById('studentNumber').value.trim()
+  );
+}
+document.getElementById('studentName').addEventListener('input', () => { checkReady(); saveState(); });
+document.getElementById('studentNumber').addEventListener('input', () => { checkReady(); saveState(); });
+
+// A blank spot (not fillable): used on the Skim page and in the quiz article
+function blankSpan(n) {
+  const b = document.createElement('span');
+  b.className = 'blank';
+  b.setAttribute('aria-label', 'missing word');
+  b.style.width = Math.max(56, GAPS[n].correct.length * 9 + 28) + 'px';
+  return b;
+}
+
+
+const ICONS = {"1": "<svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><line x1=\"5\" y1=\"27\" x2=\"28\" y2=\"27\"/><line x1=\"5\" y1=\"27\" x2=\"5\" y2=\"5\"/><path d=\"M8 9 L14 15 L19 12 L26 22\"/><path d=\"M21 22 L26 22 L26 17\"/></svg>", "2": "<svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><rect x=\"4\" y=\"5\" width=\"11\" height=\"20\" rx=\"2.5\"/><line x1=\"8\" y1=\"21\" x2=\"11\" y2=\"21\"/><path d=\"M18 9 Q22.5 7 27 9 L27 25 Q22.5 23 18 25 Z\"/><line x1=\"16\" y1=\"28\" x2=\"29\" y2=\"28\"/></svg>", "3": "<svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><circle cx=\"16\" cy=\"16\" r=\"12\"/><path d=\"M16 16 m0 -2 a2 2 0 1 1 -2 2 a4 4 0 1 1 4 4 a6 6 0 1 1 -6 -6 a8 8 0 1 1 8 8\"/></svg>", "4": "<svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><path d=\"M11 20 Q7 16.5 7 12.5 a9 9 0 0 1 18 0 Q25 16.5 21 20 Z\"/><line x1=\"12\" y1=\"24\" x2=\"20\" y2=\"24\"/><line x1=\"13.5\" y1=\"28\" x2=\"18.5\" y2=\"28\"/><line x1=\"16\" y1=\"20\" x2=\"16\" y2=\"13\"/></svg>"};
+const FIGS = {"1": {"svg": "<svg role=\"img\" aria-label=\"Bar chart. English scores fell 22.9 points, Japanese 12.7 points, and math 8 points.\" viewBox=\"0 0 320 150\" style=\"font-family:Sora,sans-serif\"><text x=\"8\" y=\"17\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">How many points did scores fall?</text><text x=\"8\" y=\"31\" font-size=\"9.5\" fill=\"#59687f\">Junior high, national test, 2021 → 2024</text><text x=\"8\" y=\"60\" font-size=\"11.5\" font-weight=\"600\" fill=\"#16233b\">English</text><rect x=\"74\" y=\"46\" width=\"200\" height=\"22\" rx=\"3\" fill=\"#d9822b\"/><text x=\"279\" y=\"61.5\" font-size=\"11.5\" font-weight=\"700\" fill=\"#16233b\">−22.9</text><text x=\"8\" y=\"94\" font-size=\"11.5\" font-weight=\"600\" fill=\"#16233b\">Japanese</text><rect x=\"74\" y=\"80\" width=\"111\" height=\"22\" rx=\"3\" fill=\"#1f8a9e\"/><text x=\"190\" y=\"95.5\" font-size=\"11.5\" font-weight=\"700\" fill=\"#16233b\">−12.7</text><text x=\"8\" y=\"128\" font-size=\"11.5\" font-weight=\"600\" fill=\"#16233b\">Math</text><rect x=\"74\" y=\"114\" width=\"70\" height=\"22\" rx=\"3\" fill=\"#1f8a9e\"/><text x=\"149\" y=\"129.5\" font-size=\"11.5\" font-weight=\"700\" fill=\"#16233b\">−8.0</text></svg>", "cap": "Chart 1. Average scores on Japan’s national test for junior high students went down in all three subjects (2021 to 2024)."}, "2": {"svg": "<svg role=\"img\" aria-label=\"A bar shows a teenager’s waking day. The screen part is longer than the half-way line.\" viewBox=\"0 0 320 138\" style=\"font-family:Sora,sans-serif\"><text x=\"8\" y=\"17\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">A teenager’s waking day</text><text x=\"8\" y=\"31\" font-size=\"9.5\" fill=\"#59687f\">About 16 hours awake</text><rect x=\"10\" y=\"50\" width=\"300\" height=\"38\" rx=\"5\" fill=\"#e9f6f8\" stroke=\"#1f8a9e\" stroke-width=\"1.5\"/><rect x=\"10\" y=\"50\" width=\"172\" height=\"38\" rx=\"5\" fill=\"#d9822b\"/><g transform=\"translate(22,57)\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.8\" stroke-linejoin=\"round\"><rect x=\"0\" y=\"0\" width=\"14\" height=\"24\" rx=\"3\"/><line x1=\"5\" y1=\"20\" x2=\"9\" y2=\"20\"/></g><text x=\"46\" y=\"74\" font-size=\"12\" font-weight=\"700\" fill=\"#fff\">Screens</text><g transform=\"translate(206,59)\" fill=\"none\" stroke=\"#1f8a9e\" stroke-width=\"1.6\" stroke-linejoin=\"round\"><path d=\"M0 2 Q7 -1 13 2 L13 20 Q7 17 0 20 Z\"/><path d=\"M13 2 Q19 -1 26 2 L26 20 Q19 17 13 20\"/></g><text x=\"238\" y=\"68\" font-size=\"9.5\" font-weight=\"600\" fill=\"#1f8a9e\">Everything</text><text x=\"238\" y=\"80\" font-size=\"9.5\" font-weight=\"600\" fill=\"#1f8a9e\">else</text><line x1=\"160\" y1=\"42\" x2=\"160\" y2=\"96\" stroke=\"#16233b\" stroke-width=\"1.5\" stroke-dasharray=\"4 3\"/><text x=\"160\" y=\"112\" font-size=\"11\" font-weight=\"700\" fill=\"#16233b\" text-anchor=\"middle\">half</text><path d=\"M160 118 L182 118\" stroke=\"#d9822b\" stroke-width=\"2\"/><path d=\"M178 114 L183 118 L178 122\" fill=\"none\" stroke=\"#d9822b\" stroke-width=\"2\"/><text x=\"188\" y=\"122\" font-size=\"10\" fill=\"#59687f\">more than half</text></svg>", "cap": "Chart 2. Teenagers look at screens for more than half of the time they are awake."}, "3": {"svg": "<svg role=\"img\" aria-label=\"A worried student scrolls down a phone full of bad news.\" viewBox=\"0 0 320 178\" style=\"font-family:Sora,sans-serif\"><rect x=\"118\" y=\"6\" width=\"100\" height=\"166\" rx=\"14\" fill=\"#fff\" stroke=\"#16233b\" stroke-width=\"2.2\"/><line x1=\"156\" y1=\"160\" x2=\"180\" y2=\"160\" stroke=\"#16233b\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><g transform=\"translate(128,20)\"><rect width=\"80\" height=\"26\" rx=\"4\" fill=\"#fae8e8\"/><circle cx=\"12\" cy=\"13\" r=\"7\" fill=\"#d04545\"/><text x=\"12\" y=\"17\" font-size=\"11\" font-weight=\"700\" fill=\"#fff\" text-anchor=\"middle\">!</text><rect x=\"24\" y=\"7\" width=\"48\" height=\"4\" rx=\"2\" fill=\"#59687f\"/><rect x=\"24\" y=\"15\" width=\"34\" height=\"4\" rx=\"2\" fill=\"#cdd7e3\"/></g><g transform=\"translate(128,53)\"><rect width=\"80\" height=\"26\" rx=\"4\" fill=\"#fae8e8\"/><circle cx=\"12\" cy=\"13\" r=\"7\" fill=\"#d04545\"/><text x=\"12\" y=\"17\" font-size=\"11\" font-weight=\"700\" fill=\"#fff\" text-anchor=\"middle\">!</text><rect x=\"24\" y=\"7\" width=\"48\" height=\"4\" rx=\"2\" fill=\"#59687f\"/><rect x=\"24\" y=\"15\" width=\"34\" height=\"4\" rx=\"2\" fill=\"#cdd7e3\"/></g><g transform=\"translate(128,86)\"><rect width=\"80\" height=\"26\" rx=\"4\" fill=\"#fae8e8\"/><circle cx=\"12\" cy=\"13\" r=\"7\" fill=\"#d04545\"/><text x=\"12\" y=\"17\" font-size=\"11\" font-weight=\"700\" fill=\"#fff\" text-anchor=\"middle\">!</text><rect x=\"24\" y=\"7\" width=\"48\" height=\"4\" rx=\"2\" fill=\"#59687f\"/><rect x=\"24\" y=\"15\" width=\"34\" height=\"4\" rx=\"2\" fill=\"#cdd7e3\"/></g><g transform=\"translate(128,119)\"><rect width=\"80\" height=\"26\" rx=\"4\" fill=\"#fae8e8\"/><circle cx=\"12\" cy=\"13\" r=\"7\" fill=\"#d04545\"/><text x=\"12\" y=\"17\" font-size=\"11\" font-weight=\"700\" fill=\"#fff\" text-anchor=\"middle\">!</text><rect x=\"24\" y=\"7\" width=\"48\" height=\"4\" rx=\"2\" fill=\"#59687f\"/><rect x=\"24\" y=\"15\" width=\"34\" height=\"4\" rx=\"2\" fill=\"#cdd7e3\"/></g><path d=\"M234 30 L234 130\" stroke=\"#d9822b\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><path d=\"M227 120 L234 132 L241 120\" fill=\"none\" stroke=\"#d9822b\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><path d=\"M248 46 L248 112\" stroke=\"#d9822b\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><path d=\"M241 102 L248 114 L255 102\" fill=\"none\" stroke=\"#d9822b\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><text x=\"262\" y=\"78\" font-size=\"10\" font-weight=\"600\" fill=\"#d9822b\">scroll</text><text x=\"262\" y=\"91\" font-size=\"10\" font-weight=\"600\" fill=\"#d9822b\">scroll</text><circle cx=\"62\" cy=\"80\" r=\"34\" fill=\"#fdf1e3\" stroke=\"#16233b\" stroke-width=\"2\"/><circle cx=\"50\" cy=\"74\" r=\"3.2\" fill=\"#16233b\"/><circle cx=\"74\" cy=\"74\" r=\"3.2\" fill=\"#16233b\"/><path d=\"M44 66 L56 69\" stroke=\"#16233b\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M80 66 L68 69\" stroke=\"#16233b\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M50 98 Q62 89 74 98\" fill=\"none\" stroke=\"#16233b\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M92 56 Q96 64 92 68 Q88 64 92 56 Z\" fill=\"#1f8a9e\"/><text x=\"62\" y=\"134\" font-size=\"10\" fill=\"#59687f\" text-anchor=\"middle\">worried</text></svg>", "cap": "Picture 3. “Doomscrolling”: looking at bad news on a phone for a long time."}, "4": {"svg": "<svg role=\"img\" aria-label=\"School icons. Three out of four schools said students focus better. About two out of three said students get along better. One out of three saw better grades.\" viewBox=\"0 0 320 152\" style=\"font-family:Sora,sans-serif\"><text x=\"8\" y=\"17\" font-size=\"12\" font-weight=\"700\" fill=\"#16233b\">After the phone rule, schools said…</text><g transform=\"translate(8,32)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><g transform=\"translate(36,32)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><g transform=\"translate(64,32)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><g transform=\"translate(92,32)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><text x=\"126\" y=\"44\" font-size=\"11\" font-weight=\"700\" fill=\"#16233b\">Students focus better</text><text x=\"126\" y=\"57\" font-size=\"10\" fill=\"#59687f\">3 out of 4 schools</text><g transform=\"translate(8,74)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><g transform=\"translate(36,74)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><g transform=\"translate(64,74)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><text x=\"126\" y=\"86\" font-size=\"11\" font-weight=\"700\" fill=\"#16233b\">Students get along better</text><text x=\"126\" y=\"99\" font-size=\"10\" fill=\"#59687f\">about 2 out of 3 schools</text><g transform=\"translate(8,116)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#d9822b\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><g transform=\"translate(36,116)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><g transform=\"translate(64,116)\"><path d=\"M0 9 L12 0 L24 9 Z\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><rect x=\"2\" y=\"9\" width=\"20\" height=\"15\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.6\"/><rect x=\"9.5\" y=\"15\" width=\"5\" height=\"9\" fill=\"#fff\" stroke=\"#d9822b\" stroke-width=\"1.2\"/></g><text x=\"126\" y=\"128\" font-size=\"11\" font-weight=\"700\" fill=\"#16233b\">Better grades</text><text x=\"126\" y=\"141\" font-size=\"10\" fill=\"#59687f\">1 out of 3 schools</text></svg>", "cap": "Chart 4. What Dutch high schools said after phones were stopped in class."}};
+function figEl(n) {
+  const f = FIGS[n]; if (!f) return document.createTextNode('');
+  const fig = document.createElement('figure'); fig.className = 'fig';
+  fig.innerHTML = f.svg + '<figcaption>' + f.cap + '</figcaption>';
+  return fig;
+}
+function iconEl(n) { const s = document.createElement('span'); s.className = 'hicon'; s.innerHTML = ICONS[n] || ''; return s; }
+
+
+// ── Tap-a-word ───────────────────────────────────────────────
+const GLOSS = {"expert": ["expert", "専門家", "A person who knows a lot about something."], "academic": ["academic", "学業の", "About school and studying."], "genz": ["Gen Z", "Z世代", "People born from about 1997 to 2012. You are Gen Z!"], "generation": ["generation", "世代", "A group of people born around the same time."], "modern": ["modern history", "近代の歴史", "The last 100 to 200 years."], "standardized": ["standardized test", "統一テスト", "A test that all students take in the same way, with the same questions."], "survey": ["survey", "調査", "A study that collects information from many people."], "juniorhigh": ["junior high", "中学校", "School for students aged 12 to 15."], "device": ["digital device", "デジタル機器", "A phone, tablet, or computer."], "deeply": ["deeply", "深く", "In a careful and complete way, not only on the surface."], "insteadof": ["instead of", "〜の代わりに", "In place of something. “Phones instead of studying” = using phones, not studying."], "awake": ["awake", "起きている", "Not sleeping."], "habit": ["habit", "習慣", "Something you do often, usually without thinking."], "focus": ["focus", "集中する", "To give all your attention to one thing."], "doomscroll": ["doomscrolling", "ドゥームスクローリング", "Looking at bad or upsetting news on a phone for a long time."], "scroll": ["scroll", "スクロールする", "To move up or down on a screen with your finger."], "socialmedia": ["social media", "SNS", "Apps like Instagram, TikTok, X, and LINE."], "upsetting": ["upsetting", "嫌な気持ちにさせる", "Making you feel sad, angry, or worried."], "anxiety": ["anxiety", "不安", "A feeling of being worried or nervous."], "technology": ["technology", "テクノロジー、技術", "Machines and computer tools, like tablets, apps, and the internet."], "performance": ["performance", "成績", "How well someone does something, for example on a test."], "research": ["research", "研究", "Careful study to find new facts."], "offtask": ["off-task", "（授業と）関係ないことをしている", "Doing something that is not your work, for example watching videos in class."], "twothirds": ["two-thirds", "3分の2", "2 out of 3 (about 67%)."], "solve": ["solve", "解決する", "To find an answer to a problem."], "netherlands": ["the Netherlands", "オランダ", "A country in Europe."], "banned": ["ban (banned)", "禁止する", "To say that people must not do or use something."], "getalong": ["get along", "仲良くする", "To be friendly with other people."], "grades": ["grades", "成績", "The marks or scores you get at school, like A, B, or C."], "tools": ["digital tools", "デジタル教材", "Apps and computer programs used for learning."], "study": ["study", "研究", "(noun) Research about something. “In a study of 317 schools…”"]};
+const GLOSS_PATTERNS = [["doomscrolling", "doomscroll"], ["scrolling", "scroll"], ["Gen Z", "genz"], ["modern history", "modern"], ["standardized", "standardized"], ["experts?", "expert"], ["academic", "academic"], ["generation", "generation"], ["survey", "survey"], ["junior high", "juniorhigh"], ["digital devices", "device"], ["deeply", "deeply"], ["instead of", "insteadof"], ["awake", "awake"], ["habits", "habit"], ["focus", "focus"], ["social", "socialmedia"], ["upsetting", "upsetting"], ["anxiety", "anxiety"], ["technology", "technology"], ["performance", "performance"], ["research", "research"], ["off-task", "offtask"], ["two-thirds", "twothirds"], ["solve", "solve"], ["Netherlands", "netherlands"], ["banned", "banned"], ["got along", "getalong"], ["grades", "grades"], ["(?<=In a )study", "study"]];
+const GLOSS_RE = new RegExp('\\b(' + GLOSS_PATTERNS.map(p => p[0]).join('|') + ')\\b', 'gi');
+function glossKey(match) {
+  for (const [pat, key] of GLOSS_PATTERNS) {
+    if (new RegExp('^' + pat.replace(/^\(\?<=[^)]*\)/, '') + '$', 'i').test(match)) return key;
+  }
+  return null;
+}
+function appendGlossed(parent, str) {
+  let last = 0; GLOSS_RE.lastIndex = 0; let m;
+  while ((m = GLOSS_RE.exec(str)) !== null) {
+    const key = glossKey(m[0]);
+    if (!key) continue;
+    if (m.index > last) parent.appendChild(document.createTextNode(str.slice(last, m.index)));
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'tw'; b.textContent = m[0]; b.dataset.k = key;
+    b.addEventListener('click', ev => { ev.stopPropagation(); openGloss(key); });
+    parent.appendChild(b);
+    last = m.index + m[0].length;
+  }
+  if (last < str.length) parent.appendChild(document.createTextNode(str.slice(last)));
+}
+function openGloss(key) {
+  const g = GLOSS[key]; if (!g) return;
+  document.getElementById('glossWord').textContent = g[0];
+  document.getElementById('glossJp').textContent = g[1];
+  document.getElementById('glossDef').textContent = g[2];
+  document.getElementById('gloss').hidden = false;
+  if (!tapped.includes(key)) { tapped.push(key); saveState(); }
+}
+function closeGloss() { document.getElementById('gloss').hidden = true; }
+document.addEventListener('click', e => { if (!e.target.closest('#gloss')) closeGloss(); });
+
+// ── My phone (screen time warm-up) ───────────────────────────
+const WAKING_MIN = 16 * 60;
+function fillSel(id, opts) {
+  const el = document.getElementById(id);
+  if (el.options.length) return el;
+  opts.forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; el.appendChild(o); });
+  return el;
+}
+function buildScreenTime() {
+  const g = fillSel('stGuess', [['', 'Choose']].concat(Array.from({length: 13}, (_, i) => [String(i), i === 12 ? '12 or more hours' : i + (i === 1 ? ' hour' : ' hours')])));
+  const h = fillSel('stHours', [['', '–']].concat(Array.from({length: 17}, (_, i) => [String(i), String(i)])));
+  const m = fillSel('stMins', [['', '–']].concat([0,5,10,15,20,25,30,35,40,45,50,55].map(x => [String(x), String(x)])));
+  if (st.guess !== undefined) g.value = st.guess;
+  if (st.h !== undefined) h.value = st.h;
+  if (st.m !== undefined) m.value = st.m;
+  document.getElementById('stUnknown').checked = !!st.unknown;
+  [g, h, m].forEach(el => el.onchange = () => { st.guess = g.value; st.h = h.value; st.m = m.value; st.shown = false; renderST(); saveState(); });
+  document.getElementById('stUnknown').onchange = e => { st.unknown = e.target.checked; st.shown = false; renderST(); saveState(); };
+  renderST();
+}
+function stMinutes() {
+  if (st.unknown) return st.guess === '' || st.guess === undefined ? null : Number(st.guess) * 60;
+  if (st.h === '' || st.h === undefined || st.m === '' || st.m === undefined) return null;
+  return Number(st.h) * 60 + Number(st.m);
+}
+function showScreenTime() {
+  if (st.guess === '' || st.guess === undefined) { alert('Please choose your guess first.'); return; }
+  if (stMinutes() === null) { alert('Please choose your hours and minutes, or tick “I can’t find it.”'); return; }
+  st.shown = true; saveState(); renderST();
+}
+function renderST() {
+  const box = document.getElementById('stResult');
+  const next = document.getElementById('stNext');
+  if (!st.shown || stMinutes() === null) { box.innerHTML = ''; next.disabled = true; return; }
+  const mins = stMinutes();
+  const pct = Math.min(100, Math.round(mins / WAKING_MIN * 100));
+  const hh = Math.floor(mins / 60), mm = mins % 60;
+  const timeTxt = hh + (hh === 1 ? ' hour' : ' hours') + (mm ? ' ' + mm + ' minutes' : '');
+  const guessTxt = st.unknown ? '' :
+    `<p>You guessed <b>${st.guess === '12' ? '12 or more' : st.guess} ${st.guess === '1' ? 'hour' : 'hours'}</b>. ${Math.abs(Number(st.guess) * 60 - mins) <= 30 ? 'Your guess was very close!' : (Number(st.guess) * 60 < mins ? 'You use your phone <b>more</b> than you thought.' : 'You use your phone <b>less</b> than you thought.')}</p>`;
+  box.innerHTML = `
+    <div class="st-box">
+      <p>My phone time: <b>${timeTxt}</b> a day. That is about <b>${pct}%</b> of my waking day (about 16 hours).</p>
+      <div class="st-bar"><div class="st-fill" style="width:${pct}%"></div><div class="st-half"></div></div>
+      <div class="st-scale"><span>0</span><span>half</span><span>16 hours</span></div>
+      ${guessTxt}
+      <p class="muted-note">This is only your phone. Computers, tablets, and TV are screens too. In the article, you will read about how much time teenagers spend on screens.</p>
+    </div>`;
+  next.disabled = false;
+}
+
+// ── My screen plan ───────────────────────────────────────────
+const PLAN_IDEAS = [
+  { id:'room',   label:'Put my phone in another room when I study', icon:'🚪',
+    triggers:['When I start my homework','When I study for a test','When I read for class'], action:'put my phone in another room' },
+  { id:'bed',    label:'Stop using my phone before bed', icon:'🌙',
+    triggers:['When it is 11 p.m.','When it is 11:30 p.m.','When it is midnight'], action:'stop using my phone and go to bed' },
+  { id:'paper',  label:'Read a paper book for 15 minutes a day', icon:'📖',
+    triggers:['When I get on the train or bus','When I finish dinner','When I wake up'], action:'read a paper book for 15 minutes' },
+  { id:'notif',  label:'Turn off notifications', icon:'🔕',
+    triggers:['When I start studying','When I go to class','When I go to bed'], action:'turn off my notifications' },
+  { id:'limit',  label:'Set a time limit for one app', icon:'⏱️',
+    triggers:['When I open TikTok','When I open Instagram','When I open YouTube','When I open X','When I play games'], action:'stop after 30 minutes' },
+  { id:'news',   label:'Check the news only once a day', icon:'📰',
+    triggers:['When I have breakfast','When I have lunch','When I get home'], action:'check the news, only one time' },
+];
+const FORMS = ["I’m going to", "I will"];
+function buildPlan() {
+  const grid = document.getElementById('planGrid');
+  grid.innerHTML = '';
+  PLAN_IDEAS.forEach(idea => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'plan-opt' + (planSel.includes(idea.id) ? ' on' : '');
+    b.innerHTML = `<span class="plan-ic" aria-hidden="true">${idea.icon}</span><span>${idea.label}</span>`;
+    b.onclick = () => togglePlan(idea.id);
+    grid.appendChild(b);
+  });
+  buildPlanSentences();
+}
+function togglePlan(id) {
+  if (planSel.includes(id)) planSel = planSel.filter(x => x !== id);
+  else {
+    if (planSel.length >= 2) { alert('Choose only two ideas. Tap one again to remove it.'); return; }
+    planSel.push(id);
+  }
+  saveState(); buildPlan();
+}
+function planSentence(id) {
+  const idea = PLAN_IDEAS.find(x => x.id === id), o = planOpt[id] || {};
+  if (o.t === undefined || o.t === '' || !o.f) return '';
+  return `${idea.triggers[o.t]}, ${o.f} ${idea.action}.`;
+}
+function buildPlanSentences() {
+  const box = document.getElementById('planBuild');
+  box.innerHTML = '';
+  if (!planSel.length) { box.innerHTML = '<p class="muted-note">Choose two ideas first.</p>'; renderPlanSummary(); return; }
+  planSel.forEach((id, i) => {
+    const idea = PLAN_IDEAS.find(x => x.id === id);
+    planOpt[id] = planOpt[id] || {};
+    const row = document.createElement('div'); row.className = 'plan-row';
+    const n = document.createElement('div'); n.className = 'plan-n'; n.textContent = (i + 1) + '. ' + idea.label;
+    const line = document.createElement('div'); line.className = 'plan-line';
+    const t = document.createElement('select'); t.className = 'gap-sel'; t.setAttribute('aria-label', 'When');
+    t.innerHTML = '<option value="">When…?</option>' + idea.triggers.map((x, k) => `<option value="${k}">${x}</option>`).join('');
+    t.value = planOpt[id].t === undefined ? '' : String(planOpt[id].t);
+    const fm = document.createElement('select'); fm.className = 'gap-sel'; fm.setAttribute('aria-label', 'Future form');
+    fm.innerHTML = '<option value="">I…</option>' + FORMS.map(x => `<option value="${x}">${x}</option>`).join('');
+    fm.value = planOpt[id].f || '';
+    t.onchange = () => { planOpt[id].t = t.value === '' ? undefined : Number(t.value); saveState(); renderPlanSummary(); };
+    fm.onchange = () => { planOpt[id].f = fm.value; saveState(); renderPlanSummary(); };
+    line.appendChild(t); line.appendChild(document.createTextNode(', ')); line.appendChild(fm);
+    line.appendChild(document.createTextNode(' ' + idea.action + '.'));
+    row.appendChild(n); row.appendChild(line); box.appendChild(row);
+  });
+  renderPlanSummary();
+}
+function renderPlanSummary() {
+  const card = document.getElementById('planCard');
+  const lines = planSel.map(planSentence).filter(Boolean);
+  card.hidden = !lines.length;
+  document.getElementById('planSummary').innerHTML = lines.map(l => `<p>${l}</p>`).join('');
+}
+function planComplete() { return planSel.length === 2 && planSel.every(id => planSentence(id)); }
+function planText() { return planSel.map((id, i) => (i + 1) + ') ' + planSentence(id)).join(' '); }
+
+// Skim page (match headings)
+function buildSkim() {
+  const cont = document.getElementById('skimContainer');
+  if (cont.innerHTML) return;
+  document.getElementById('headList').innerHTML =
+    '<div class="headlist-title">Headings</div>' +
+    HEAD_ORDER.map(id => `<div class="headlist-item">${HEADINGS[id]}</div>`).join('');
+
+  PARAS.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'hpara';
+
+    const head = document.createElement('div');
+    head.className = 'hhead';
+    const num = document.createElement('div');
+    num.className = 'hnum'; num.textContent = 'Paragraph ' + p.n;
+    head.appendChild(iconEl(p.n)); head.appendChild(num);
+
+    const text = document.createElement('div');
+    text.className = 'para-text';
+    p.segs.forEach(seg => {
+      if (typeof seg === 'number') {
+        if (p.owner === partner) appendGlossed(text, GAPS[seg].correct);
+        else text.appendChild(blankSpan(seg));
+      } else {
+        appendGlossed(text, seg);
+      }
+    });
+
+    const s = document.createElement('select');
+    s.className = 'head-sel'; s.id = 'head_' + p.n;
+    s.setAttribute('aria-label', 'Heading for paragraph ' + p.n);
+    const blank = document.createElement('option');
+    blank.value = ''; blank.textContent = 'Choose a heading';
+    s.appendChild(blank);
+    HEAD_ORDER.forEach(id => {
+      const op = document.createElement('option');
+      op.value = id; op.textContent = HEADINGS[id];
+      s.appendChild(op);
+    });
+    if (headSel[p.n]) s.value = headSel[p.n];
+    s.addEventListener('change', () => { headSel[p.n] = s.value; saveState(); });
+
+    div.appendChild(head); div.appendChild(text); div.appendChild(figEl(p.fig)); div.appendChild(s);
+    cont.appendChild(div);
+  });
+}
+
+function finishSkim() {
+  const vals = PARAS.map(p => headSel[p.n]);
+  if (vals.some(v => !v)) { alert('Please choose a heading for every paragraph.'); return; }
+  if (new Set(vals).size !== vals.length) { alert('You used the same heading twice. Use each heading only once.'); return; }
+  goTo(4);
+}
+
+// Reading page (cloze)
+function makeSelect(n) {
+  const g = GAPS[n];
+  const s = document.createElement('select');
+  s.className = 'gap-sel';
+  s.id = 'gap_' + n;
+  s.setAttribute('aria-label', 'Missing word ' + n);
+  const longest = Math.max.apply(null, g.options.map(o => o.length));
+  s.style.width = Math.max(80, longest * 9 + 34) + 'px';
+  const blank = document.createElement('option');
+  blank.value = ''; blank.textContent = '\u2014';
+  s.appendChild(blank);
+  shuffle(g.options).forEach(o => {
+    const op = document.createElement('option');
+    op.value = o; op.textContent = o;
+    s.appendChild(op);
+  });
+  if (sel[n]) s.value = sel[n];
+  s.addEventListener('change', () => { sel[n] = s.value; saveState(); });
+  return s;
+}
+
+function renderPara(p) {
+  const mine = (p.owner === partner);
+  const div = document.createElement('div');
+  div.className = 'para own-' + p.owner;
+
+  const side = document.createElement('div');
+  side.className = 'para-side';
+  const num = document.createElement('div');
+  num.className = 'para-num'; num.textContent = p.n;
+  const role = document.createElement('div');
+  role.className = 'para-role';
+  role.textContent = mine ? 'Read aloud' : 'Listen and choose';
+  side.appendChild(num); side.appendChild(role);
+
+  const text = document.createElement('div');
+  text.className = 'para-text';
+  p.segs.forEach(seg => {
+    if (typeof seg === 'number') {
+      if (mine) appendGlossed(text, GAPS[seg].correct);
+      else text.appendChild(makeSelect(seg));
+    } else {
+      appendGlossed(text, seg);
+    }
+  });
+
+  div.appendChild(side); div.appendChild(text);
+  return div;
+}
+
+function buildReading() {
+  document.getElementById('s3instr').innerHTML = partner === 'A'
+    ? 'You are <strong>Student A</strong>. <strong>Round 1:</strong> Read paragraphs 1 and 3 aloud. Your partner chooses the missing words. <strong>Round 2:</strong> Listen to your partner read paragraphs 2 and 4, and choose the missing words. The charts and pictures can help you. Do not show your screen.'
+    : 'You are <strong>Student B</strong>. <strong>Round 1:</strong> Listen to your partner read paragraphs 1 and 3, and choose the missing words. <strong>Round 2:</strong> Read paragraphs 2 and 4 aloud. Your partner chooses the missing words. The charts and pictures can help you. Do not show your screen.';
+  const cont = document.getElementById('articleContainer');
+  if (cont.innerHTML) return;
+  PARAS.forEach(p => { cont.appendChild(renderPara(p)); cont.appendChild(figEl(p.fig)); });
+}
+
+function finishReading() {
+  const missing = PARAS.some(p => p.owner !== partner && p.segs.some(seg => typeof seg === 'number' && !sel[seg]));
+  if (missing) { alert('Please choose a word for every gap.'); return; }
+  goTo(5);
+}
+
+// Quiz
+function buildArticlePanel() {
+  // Shows the student's own version: their own paragraphs, plus the words they chose.
+  const cont = document.getElementById('fullArticle');
+  cont.innerHTML = '';
+  const t = document.createElement('div');
+  t.className = 'fa-title';
+  t.textContent = 'Why Are Test Scores Falling?';
+  cont.appendChild(t);
+  PARAS.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'fa-para';
+    p.segs.forEach(seg => {
+      if (typeof seg === 'number') {
+        if (p.owner === partner) {
+          appendGlossed(d, GAPS[seg].correct);
+        } else if (sel[seg]) {
+          const m = document.createElement('mark');
+          m.textContent = sel[seg];
+          d.appendChild(m);
+        } else {
+          d.appendChild(blankSpan(seg));
+        }
+      } else {
+        appendGlossed(d, seg);
+      }
+    });
+    cont.appendChild(d);
+    cont.appendChild(figEl(p.fig));
+  });
+}
+
+function buildQuiz() {
+  if (quizBuilt) return;
+  const L = ['a', 'b', 'c'];
+  document.getElementById('quizContainer').innerHTML = QUIZ.map((q, qi) => `
+    <div class="q">
+      <div class="q-text">${qi + 1}. ${q.q}</div>
+      ${q.opts.map((o, oi) => `
+        <div class="q-option${quizSel[qi] === oi ? ' selected' : ''}" id="qo${qi}_${oi}" role="button" tabindex="0"
+             onclick="selectQuiz(${qi},${oi})"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectQuiz(${qi},${oi});}">
+          <div class="opt-letter">${L[oi]}</div>
+          <div class="opt-text">${o}</div>
+        </div>`).join('')}
+    </div>`).join('');
+  quizBuilt = true;
+}
+function selectQuiz(qi, oi) {
+  QUIZ[qi].opts.forEach((_, o) => { document.getElementById(`qo${qi}_${o}`).className = 'q-option'; });
+  quizSel[qi] = oi;
+  document.getElementById(`qo${qi}_${oi}`).className = 'q-option selected';
+  saveState();
+}
+function toggleArticle() {
+  const box = document.getElementById('fullArticle');
+  const open = box.classList.toggle('open');
+  document.getElementById('toggleArticleBtn').textContent = open ? 'Hide the article' : 'Show the article';
+}
+
+// Score
+function reviewRow(r) {
+  return `
+    <div class="review-row">
+      <div class="review-mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '\u2713' : '\u2717'}</div>
+      <div>
+        <div class="review-label">${r.label}</div>
+        <div class="review-answer">Your answer: ${r.chosen || '\u2014'}</div>
+        ${r.ok ? '' : `<div class="review-correct">Correct answer: <b>${r.correct}</b></div>`}
+      </div>
+    </div>`;
+}
+
+function finishQuiz() {
+  if (QUIZ.some((_, i) => quizSel[i] === undefined)) { alert('Please answer all 10 questions.'); return; }
+  goTo(6);
+}
+
+function submitAll() {
+  if (QUIZ.some((_, i) => quizSel[i] === undefined)) { alert('Please answer all 10 questions.'); goTo(5); return; }
+  if (!planComplete()) { alert('Please choose two ideas and finish both sentences.'); return; }
+
+  const clozeReview = [];
+  let clozeScore = 0, clozeMax = 0;
+  PARAS.forEach(p => {
+    if (p.owner === partner) return;
+    let gi = 0;
+    p.segs.forEach(seg => {
+      if (typeof seg !== 'number') return;
+      clozeMax++; gi++;
+      const chosen = sel[seg];
+      const ok = chosen === GAPS[seg].correct;
+      if (ok) clozeScore++;
+      clozeReview.push({ label: `Paragraph ${p.n}, gap ${gi}`, chosen, ok, correct: GAPS[seg].correct });
+    });
+  });
+
+  const headReview = [];
+  let headScore = 0;
+  PARAS.forEach(p => {
+    const c = headSel[p.n];
+    const ok = c === HEAD_ANSWER[p.n];
+    if (ok) headScore++;
+    headReview.push({ label: `Paragraph ${p.n}`, chosen: HEADINGS[c], ok, correct: HEADINGS[HEAD_ANSWER[p.n]] });
+  });
+
+  const L = ['a', 'b', 'c'];
+  const quizReview = [];
+  let quizScore = 0;
+  QUIZ.forEach((q, i) => {
+    const c = quizSel[i];
+    const ok = c === q.correct;
+    if (ok) quizScore++;
+    quizReview.push({
+      label: `Question ${i + 1} (${q.type})`,
+      chosen: `${L[c]}. ${q.opts[c]}`, ok,
+      correct: `${L[q.correct]}. ${q.opts[q.correct]}`
+    });
+  });
+
+  const total = clozeScore + headScore + quizScore;
+  const totalMax = clozeMax + PARAS.length + QUIZ.length;
+  const pct = Math.round(total / totalMax * 100);
+
+  document.getElementById('totalNum').textContent = total;
+  document.getElementById('totalDenom').textContent = 'out of ' + totalMax;
+  document.getElementById('clozeNum').textContent = clozeScore + '/' + clozeMax;
+  document.getElementById('headNum').textContent = headScore + '/' + PARAS.length;
+  document.getElementById('quizNum').textContent = quizScore + '/' + QUIZ.length;
+  document.getElementById('reviewCloze').innerHTML = clozeReview.map(reviewRow).join('');
+  document.getElementById('reviewHead').innerHTML = headReview.map(reviewRow).join('');
+  document.getElementById('reviewQuiz').innerHTML = quizReview.map(reviewRow).join('');
+
+  document.getElementById('planFinal').innerHTML = planSel.map(id => `<p>${planSentence(id)}</p>`).join('');
+  goTo(7);
+  clearState();
+  logToSheets(clozeScore, clozeMax, headScore, PARAS.length, quizScore, QUIZ.length, total, totalMax, pct, clozeReview.concat(headReview, quizReview));
+}
+
+function logToSheets(clozeScore, clozeMax, headScore, headMax, quizScore, quizMax, total, totalMax, pct, review) {
+  const status = document.getElementById('sheetStatus');
+  if (!SHEET_URL || SHEET_URL === 'PASTE_URL_HERE') {
+    status.textContent = 'No gradebook link is set yet, so this score was not saved.';
+    return;
+  }
+  status.textContent = 'Saving to the gradebook...';
+  const name = document.getElementById('studentName').value.trim();
+  const num  = document.getElementById('studentNumber').value.trim();
+  const detail = review.map(r => `${r.label}: ${r.chosen || '-'} (${r.ok ? 'correct' : 'wrong'})`).join(' | ')
+    + ` || Screen time guess: ${st.unknown ? 'n/a' : st.guess + 'h'}; actual: ${stMinutes() === null ? '-' : Math.floor(stMinutes()/60) + 'h ' + (stMinutes()%60) + 'm'}`
+    + ` || Plan: ${planText()} || Words tapped: ${tapped.map(k => GLOSS[k][0]).join(', ') || 'none'}`;
+
+  const payload = JSON.stringify({
+    studentNumber: num, studentName: name, partner,
+    score: total + '/' + totalMax, percent: pct,
+    clozeScore: clozeScore + '/' + clozeMax,
+    headingScore: headScore + '/' + headMax,
+    quizScore: quizScore + '/' + quizMax,
+    screenGuess: st.unknown ? '' : st.guess,
+    screenTime: stMinutes() === null ? '' : (Math.floor(stMinutes()/60) + ':' + String(stMinutes()%60).padStart(2,'0')),
+    screenPct: stMinutes() === null ? '' : Math.round(stMinutes() / WAKING_MIN * 100),
+    plan: planText(),
+    tapped: tapped.map(k => GLOSS[k][0]).join(', '),
+    response: detail
+  });
+
+  const form = document.createElement('form');
+  form.method = 'POST'; form.action = SHEET_URL; form.target = 'hidden_iframe'; form.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'hidden'; input.name = 'data'; input.value = payload;
+  form.appendChild(input);
+  const iframe = document.createElement('iframe');
+  iframe.name = 'hidden_iframe'; iframe.style.display = 'none';
+  iframe.onload = () => { status.textContent = 'Saved to the gradebook.'; };
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(() => {
+    if (status.textContent.indexOf('Saving') === 0) status.textContent = 'Saved to the gradebook.';
+  }, 3000);
+}
+
+window.addEventListener('load', () => {
+  const state = loadState();
+  if (state && state.currentScreen > 1) restoreState(state);
+});
+</script>
+</body>
+</html>
