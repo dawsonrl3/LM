@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gen Z Speed Dating Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#fbf6f7; --card:#ffffff; --line:#eadfe3;
+    --ink:#2a2430; --muted:#7a707f;
+    --rose:#d14d72; --rose-soft:#fdecf1;
+    --me:#f3f0f6;
+    --s:15px; --m:17px; --l:22px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Nunito',system-ui,sans-serif; font-size:var(--m); line-height:1.5; color:var(--ink); background:var(--bg); min-height:100vh; padding:20px 14px 48px; }
+  button, select { font:inherit; color:inherit; }
+  button:focus-visible, select:focus-visible { outline:3px solid var(--rose); outline-offset:2px; }
+  .wrap { max-width:560px; margin:0 auto; }
+  h1 { font-size:var(--l); font-weight:800; }
+  h2 { font-size:var(--l); font-weight:800; margin-bottom:12px; }
+  .muted { color:var(--muted); font-size:var(--s); }
+  .gap { margin-top:16px; }
+  .screen { display:none; }
+  .screen.active { display:block; }
+  .hidden { display:none !important; }
+
+  .btn { display:block; width:100%; padding:14px; border:none; border-radius:14px; font-weight:800; cursor:pointer; margin-top:12px; }
+  .btn-main { background:var(--rose); color:#fff; }
+  .btn-main:disabled { opacity:.35; cursor:not-allowed; }
+  .btn-soft { background:transparent; border:2px solid var(--line); color:var(--muted); }
+
+  .people { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .person { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:10px 2px; cursor:pointer; text-align:center; }
+  .person .e { display:block; font-size:30px; line-height:1.2; }
+  .person .n { display:block; font-size:var(--s); font-weight:700; }
+  .person.sel { border-color:var(--rose); background:var(--rose-soft); }
+
+  .card { background:var(--card); border:2px solid var(--line); border-radius:18px; padding:18px; }
+  .card-head { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .card-head .e { font-size:40px; line-height:1; }
+  .card-row { padding:10px 0; border-top:1px solid var(--line); }
+  .card-row b { display:block; }
+  .pill { display:inline-block; background:var(--rose-soft); border-radius:999px; padding:2px 12px; margin:4px 6px 0 0; }
+
+  .me-bar { display:flex; align-items:center; gap:10px; width:100%; background:var(--card); border:2px solid var(--line); border-radius:14px; padding:8px 12px; cursor:pointer; text-align:left; }
+  .me-bar .e { font-size:24px; }
+  .me-bar .t { flex:1; font-weight:700; }
+
+  .chat { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+  .msg { max-width:85%; }
+  .msg .who { font-size:var(--s); color:var(--muted); margin:0 6px 2px; }
+  .bubble { padding:10px 14px; border-radius:18px; }
+  .msg.you { align-self:flex-end; text-align:right; }
+  .msg.you .bubble { background:var(--rose); color:#fff; border-bottom-right-radius:6px; text-align:left; }
+  .msg.them { align-self:flex-start; }
+  .msg.them .bubble { background:var(--card); border:2px solid var(--line); border-bottom-left-radius:6px; }
+  .msg.mine { align-self:flex-end; text-align:right; }
+  .msg.mine .bubble { background:var(--me); border-bottom-right-radius:6px; text-align:left; }
+  .rate { align-self:flex-start; display:flex; gap:8px; align-items:center; }
+  .rate button { font-size:24px; background:var(--card); border:2px solid var(--line); border-radius:12px; padding:4px 12px; cursor:pointer; }
+  .rate button.sel { border-color:var(--rose); background:var(--rose-soft); }
+  .rate span { font-size:var(--s); color:var(--muted); }
+
+  .choice { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .choice button { background:var(--card); border:2px solid var(--line); border-radius:14px; padding:12px 4px; font-weight:700; cursor:pointer; }
+  .choice button.sel { border-color:var(--rose); background:var(--rose-soft); }
+  .sentence { margin-top:14px; }
+  .sentence select { width:100%; margin-top:6px; padding:10px; border:2px solid var(--line); border-radius:12px; background:var(--card); }
+  .tally { font-size:26px; letter-spacing:2px; }
+
+  .row { display:flex; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid var(--line); }
+  .box { background:var(--card); border:2px solid var(--line); border-radius:18px; padding:16px; margin-top:16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="screen active" id="s1">
+    <h1>Speed Dating 💘</h1>
+    <p class="gap">Choose your character:</p>
+    <div class="people gap" id="rolePick"></div>
+    <button class="btn btn-main" id="toRole" type="button" disabled>Next</button>
+  </div>
+
+  <div class="screen" id="s2">
+    <h2>This is you today</h2>
+    <p class="muted">Don’t show your phone to other students. Act like this person!</p>
+    <div class="card gap" id="roleCard"></div>
+    <button class="btn btn-main" id="toDate" type="button">Start dating 💘</button>
+    <button class="btn btn-soft" id="backRole" type="button">Change character</button>
+  </div>
+
+  <div class="screen" id="s3">
+    <button class="me-bar" id="meBar" type="button"></button>
+    <div class="card hidden gap" id="meFull"></div>
+    <p class="gap">Who is your partner?</p>
+    <div class="people gap" id="partnerPick"></div>
+    <div id="abBox" class="hidden">
+      <p class="gap">Rock, paper, scissors! The winner is A.</p>
+      <div class="choice gap" id="abPick" style="grid-template-columns:1fr 1fr"></div>
+    </div>
+    <div id="talk" class="hidden">
+      <div class="chat" id="chat"></div>
+      <button class="btn btn-main" id="nextQ" type="button">Next</button>
+      <button class="btn btn-main hidden" id="endDate" type="button">End the date</button>
+    </div>
+  </div>
+
+  <div class="screen" id="s4">
+    <h2 id="rateTitle"></h2>
+    <div class="tally" id="tally"></div>
+    <p class="gap">Do you want a second date?</p>
+    <div class="choice gap" id="second"></div>
+    <div class="sentence" id="sentence"></div>
+    <button class="btn btn-main" id="saveNext" type="button" disabled>Next date 💘</button>
+    <button class="btn btn-soft" id="saveEnd" type="button" disabled>See my results</button>
+  </div>
+
+  <div class="screen" id="s5">
+    <h2>My dates</h2>
+    <div id="results"></div>
+    <div class="box" id="tell"></div>
+    <button class="btn btn-soft" id="restart" type="button">Play again</button>
+  </div>
+
+</div>
+
+<script>
+const LS_KEY = 'genz_speed_dating_state_v3';
+const MAXD = 3;
+const ROLES = [
+ {name:"Aoi", emoji:"🎮", tags:["playing video games","watching anime","drawing"], text:"slow", oshi:"Hoshimachi Suisei, a VTuber", habits:["night","slowtext"], icks:["plan","early"], date:"a game center, then a ramen shop"},
+ {name:"Hikaru", emoji:"🏔️", tags:["hiking","going to onsen","cooking"], text:"call", oshi:"Shohei Ohtani, the baseball player", habits:["early","plan"], icks:["night","phone"], date:"a morning hike and an onsen"},
+ {name:"Rin", emoji:"🌸", tags:["dancing to K-pop","singing karaoke","taking photos"], text:"allday", oshi:"SEVENTEEN, the K-pop group", habits:["talk","phone","oshi"], icks:["slowtext","quiet"], date:"a SEVENTEEN concert"},
+ {name:"Yuki", emoji:"☕", tags:["reading manga","watching anime","baking"], text:"67", oshi:"Frieren, the anime character", habits:["quiet","plan","early"], icks:["talk","late"], date:"a quiet café and a bookstore"},
+ {name:"Sora", emoji:"🎤", tags:["singing karaoke","hiking","playing soccer"], text:"allday", oshi:null, habits:["talk","late"], icks:["plan","oshi"], date:"karaoke all night"}
+];
+const ME = {late:'I am often late', phone:'I check my phone a lot', talk:'I talk a lot', quiet:'I am very quiet', plan:'I plan everything', early:'I get up very early', night:'I stay up very late', oshi:'I spend a lot of money on my oshi', slowtext:'I reply to messages slowly'};
+const PEOPLE = {late:'are often late', phone:'check their phone a lot', talk:'talk a lot', quiet:'are very quiet', plan:'plan everything', early:'get up very early', night:'stay up very late', oshi:'spend a lot of money on an oshi', slowtext:'reply to messages slowly'};
+const THEY = {late:'is often late', phone:'checks the phone a lot', talk:'talks a lot', quiet:'is very quiet', plan:'plans everything', early:'gets up very early', night:'stays up very late', oshi:'spends a lot of money on an oshi', slowtext:'replies to messages slowly'};
+const TEXT = {'67':'for one hour a day (6-7 dating).', allday:'all day!', slow:'slowly, maybe the next day.', call:'only a little. I prefer phone calls.'};
+const ALL_TAGS = [...new Set(ROLES.flatMap(r=>r.tags))].sort();
+
+function join(a){ return a.length<2 ? a[0] : a.slice(0,-1).join(', ')+' and '+a[a.length-1]; }
+
+// Each exchange: [you ask, partner's sentence starter, your answer, rated?]
+function talkFor(r){
+  return [
+    ['Hi! What’s your name?', 'Hi! I’m ___. Nice to meet you!', 'Hi! I’m '+r.name+'. Nice to meet you!', false],
+    ['What are your hobbies?', 'I like ___ and ___.', 'I like '+join(r.tags)+'.', true],
+    ['How often do you like to text?', 'I like to text ___.', 'I like to text '+TEXT[r.text], true],
+    ['Do you have an oshi?', 'Yes! I love ___. / No, I don’t.', r.oshi ? 'Yes! I love '+r.oshi+'.' : 'No, I don’t.', true],
+    ['What are you like?', 'I ___, and I ___.', r.habits.map(h=>ME[h]).join(', and ')+'.', true],
+    ['What’s on your ick list?', 'I don’t like people who ___.', 'I don’t like people who '+r.icks.map(k=>PEOPLE[k]).join(' or ')+'.', true],
+    ['What’s your perfect date?', 'My perfect date is ___.', 'My perfect date is '+r.date+'.', true]
+  ];
+}
+
+let st = {role:null, dates:[], cur:null, step:0, ratings:[], screen:1};
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(st)); }catch(e){} }
+function load(){ try{ const r=localStorage.getItem(LS_KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
+const $ = id => document.getElementById(id);
+function go(n){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $('s'+n).classList.add('active'); st.screen=n; save(); window.scrollTo(0,0); }
+
+function peopleHTML(sel){ return ROLES.map((r,i)=>'<button class="person'+(sel===i?' sel':'')+'" type="button" data-i="'+i+'"><span class="e">'+r.emoji+'</span><span class="n">'+r.name+'</span></button>').join(''); }
+
+function renderPick(){
+  $('rolePick').innerHTML=peopleHTML(st.role);
+  $('rolePick').querySelectorAll('.person').forEach(b=>b.onclick=()=>{ st.role=+b.dataset.i; save(); renderPick(); });
+  $('toRole').disabled = st.role===null;
+}
+$('toRole').onclick=()=>{ renderCard(); go(2); };
+$('backRole').onclick=()=>{ renderPick(); go(1); };
+
+function cardHTML(r){
+  return '<div class="card-head"><span class="e">'+r.emoji+'</span><h2 style="margin:0">'+r.name+'</h2></div>'+
+    '<div class="card-row"><b>My hobbies</b>'+r.tags.map(t=>'<span class="pill">'+t+'</span>').join('')+'</div>'+
+    '<div class="card-row"><b>Texting</b>I like to text '+TEXT[r.text]+'</div>'+
+    '<div class="card-row"><b>My oshi</b>'+(r.oshi ? 'I love '+r.oshi+'! 💖' : 'I don’t have an oshi.')+'</div>'+
+    '<div class="card-row"><b>What I’m like</b>'+r.habits.map(h=>ME[h]+'.').join(' ')+'</div>'+
+    '<div class="card-row"><b>My ick list 🙅</b>I don’t like people who '+r.icks.map(k=>PEOPLE[k]).join(' or ')+'.</div>'+
+    '<div class="card-row"><b>My perfect date</b>'+r.date+'</div>';
+}
+function renderCard(){ $('roleCard').innerHTML=cardHTML(ROLES[st.role]); }
+
+$('toDate').onclick=()=>startDate();
+function startDate(){ st.cur=null; st.ab=null; st.step=0; st.ratings=[]; save(); renderDate(); go(3); }
+function renderDate(){
+  const me=ROLES[st.role];
+  $('meBar').innerHTML='<span class="e">'+me.emoji+'</span><span class="t">You are '+me.name+'</span><span class="muted">See my card</span>';
+  $('meFull').innerHTML=cardHTML(me);
+  $('partnerPick').innerHTML=peopleHTML(st.cur);
+  $('partnerPick').querySelectorAll('.person').forEach(b=>b.onclick=()=>{ st.cur=+b.dataset.i; save(); renderDate(); });
+  $('abBox').classList.toggle('hidden', st.cur===null);
+  $('abPick').innerHTML=['I’m A','I’m B'].map((t,i)=>'<button type="button"'+(st.ab===i?' class="sel"':'')+' data-i="'+i+'">'+t+'</button>').join('');
+  $('abPick').querySelectorAll('button').forEach(b=>b.onclick=()=>{ st.ab=+b.dataset.i; save(); renderDate(); });
+  const ready = st.cur!==null && st.ab!==null && st.ab!==undefined;
+  $('talk').classList.toggle('hidden', !ready);
+  if (ready) renderChat();
+}
+$('meBar').onclick=()=>$('meFull').classList.toggle('hidden');
+
+function renderChat(){
+  const T=talkFor(ROLES[st.role]);
+  let h='';
+  for (let i=0;i<=st.step;i++){
+    const [q,starter,mine,rated]=T[i];
+    const iAsk = (i%2===0) === (st.ab===0);   // A asks 1st, 3rd, 5th…; B asks 2nd, 4th, 6th…
+    const rateRow = rated ? '<div class="rate" data-i="'+i+'">'+['❤️','🤔','💔'].map(v=>'<button type="button"'+(st.ratings[i]===v?' class="sel"':'')+' aria-label="'+v+'">'+v+'</button>').join('')+(i===st.step?'<span>Do you like their answer?</span>':'')+'</div>' : '';
+    const you = (t,lab=true)=>'<div class="msg you">'+(lab?'<div class="who">You</div>':'')+'<div class="bubble">'+t+'</div></div>';
+    const youAns = t=>'<div class="msg mine"><div class="who">You</div><div class="bubble">'+t+'</div></div>';
+    const them = (t,lab=true)=>'<div class="msg them">'+(lab?'<div class="who">Your partner</div>':'')+'<div class="bubble">'+t+'</div></div>';
+    const id = '<span id="ex'+i+'"></span>';
+    if (i===0) h += id + (iAsk ? you(q)+them(starter)+them('How about you?',false)+youAns(starter)
+                               : them(q)+youAns(starter)+you('How about you?')+them(starter));
+    else if (iAsk) h += id + you(q) + them(starter) + rateRow + them('How about you?') + youAns(starter);
+    else           h += id + them(q) + youAns(starter) + you('How about you?') + them(starter) + rateRow;
+  }
+  $('chat').innerHTML=h;
+  $('chat').querySelectorAll('.rate').forEach(row=>row.querySelectorAll('button').forEach(b=>b.onclick=()=>{ st.ratings[+row.dataset.i]=b.textContent; save(); renderChat(); }));
+  const last = st.step===T.length-1;
+  const needRate = T[st.step][3] && !st.ratings[st.step];
+  $('nextQ').classList.toggle('hidden', last);
+  $('endDate').classList.toggle('hidden', !last);
+  $('nextQ').disabled = needRate; $('endDate').disabled = needRate;
+}
+$('nextQ').onclick=()=>{ st.step++; save(); renderChat(); const e=$('ex'+st.step); if(e) e.scrollIntoView({behavior:'smooth', block:'start'}); };
+$('endDate').onclick=()=>{ rate={second:null, reason:''}; renderRate(); go(4); };
+
+let rate={second:null, reason:''};
+function tally(rs){ const c=v=>rs.filter(x=>x===v).length; return '❤️'.repeat(c('❤️'))+'🤔'.repeat(c('🤔'))+'💔'.repeat(c('💔')); }
+function renderRate(){
+  const p=ROLES[st.cur];
+  $('rateTitle').textContent='Your date with '+p.name+' '+p.emoji;
+  $('tally').textContent=tally(st.ratings.filter(Boolean));
+  $('second').innerHTML=['Yes!','Maybe','No'].map(s=>'<button type="button"'+(rate.second===s?' class="sel"':'')+'>'+s+'</button>').join('');
+  $('second').querySelectorAll('button').forEach(b=>b.onclick=()=>{ rate.second=b.textContent; rate.reason=''; renderRate(); });
+  let html='';
+  if (rate.second){
+    const opts = rate.second==='No'
+      ? Object.keys(THEY).map(k=>p.name+' '+THEY[k]).concat(['we don’t like the same things','we text in very different ways'])
+      : ALL_TAGS.map(t=>'we both like '+t).concat(['we text the same way','we both love our oshi',p.name+' is fun to talk to',p.name+' is kind']);
+    const start = rate.second==='Yes!' ? 'Yes, because…' : rate.second==='Maybe' ? 'Maybe. I’m not sure, but…' : 'No, because…';
+    html = start+'<select id="reasonSel"><option value="">choose…</option>'+opts.map(o=>'<option'+(o===rate.reason?' selected':'')+'>'+o+'</option>').join('')+'</select>';
+  }
+  $('sentence').innerHTML=html;
+  const r=$('reasonSel'); if(r) r.onchange=()=>{ rate.reason=r.value; checkRate(); };
+  checkRate();
+}
+function checkRate(){
+  const ok=!!(rate.second && rate.reason), lastDate = st.dates.length+1>=MAXD;
+  $('saveNext').disabled=!ok; $('saveEnd').disabled=!ok;
+  $('saveNext').classList.toggle('hidden', lastDate);
+  $('saveEnd').className = lastDate ? 'btn btn-main' : 'btn btn-soft';
+}
+function saveDate(){
+  const rs=st.ratings.filter(Boolean);
+  st.dates.push({partner:st.cur, ratings:rs, hearts:rs.filter(x=>x==='❤️').length, icks:rs.filter(x=>x==='💔').length, second:rate.second, reason:rate.reason});
+  save();
+}
+$('saveNext').onclick=()=>{ saveDate(); startDate(); };
+$('saveEnd').onclick=()=>{ saveDate(); renderResults(); go(5); };
+
+function renderResults(){
+  $('results').innerHTML=st.dates.map(d=>{
+    const p=ROLES[d.partner];
+    const facts = p.name+' likes '+join(p.tags)+'. '+(p.oshi ? p.name+' loves '+p.oshi.split(',')[0]+'.' : p.name+' doesn’t have an oshi.');
+    return '<div class="box"><div style="display:flex;justify-content:space-between;gap:10px"><b>'+p.emoji+' '+p.name+'</b><span>'+tally(d.ratings)+'</span></div>'+
+      '<p class="muted" style="margin-top:6px">'+facts+'</p>'+
+      '<p style="margin-top:6px">Second date? <b>'+(d.second==='Maybe'?'Maybe.':d.second)+'</b> '+(d.second==='Maybe'?'I’m not sure, but ':'Because ')+d.reason+'.</p></div>';
+  }).join('');
+  if (!st.dates.length){ $('tell').textContent='No dates yet!'; return; }
+  const score=d=>d.hearts-d.icks+(d.second==='Yes!'?2:d.second==='Maybe'?1:0);
+  const best=st.dates.slice().sort((x,y)=>score(y)-score(x))[0], B=ROLES[best.partner];
+  const no=st.dates.find(d=>d.second==='No'&&d!==best);
+  let t='<b>Tell the group:</b><br>';
+  t+= best.second==='No'
+    ? 'My best date was <b>'+B.name+'</b>, but I didn’t want a second date because '+best.reason+'.'
+    : 'My best date was <b>'+B.name+'</b> because '+best.reason+'.';
+  if (no) t+='<br>I didn’t want a second date with <b>'+ROLES[no.partner].name+'</b> because '+no.reason+'.';
+  else {
+    const maybe=st.dates.find(d=>d.second==='Maybe'&&d!==best);
+    t+= maybe ? '<br>I’m not sure about <b>'+ROLES[maybe.partner].name+'</b>, but '+maybe.reason+'.' : '<br>I wanted a second date with everyone! 💘';
+  }
+  $('tell').innerHTML=t;
+}
+$('restart').onclick=()=>{ if(!window.confirm('Play again? Your dates will be deleted.')) return; st={role:null,dates:[],cur:null,step:0,ratings:[],screen:1}; try{localStorage.removeItem(LS_KEY);}catch(e){} renderPick(); go(1); };
+
+(function(){
+  const s=load(); if (s) st=Object.assign(st,s);
+  renderPick();
+  if (st.role===null || st.screen===1) return;
+  renderCard();
+  if (st.screen===5){ renderResults(); go(5); }
+  else if (st.screen===4){ rate={second:null, reason:''}; renderRate(); go(4); }
+  else if (st.screen===3){ renderDate(); go(3); }
+  else go(2);
+})();
+</script>
+</body>
+</html>
